@@ -1,30 +1,34 @@
-// app/api/page/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+export async function GET() {
+  return NextResponse.json({ ok: true, route: "/api/auth" });
+}
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+  const body = await req.json();
+  const { email, password, isRegister, name, lastName } = body;
 
-    const page = await prisma.page.upsert({
-      where: { path: body.path }, //path único por usuario
-      update: {
-        title: body.title,
-        content: body.content,
-      },
-      create: {
-        title: body.title,
-        path: body.path,
-        content: body.content,
-        user: {
-          connect: { id: body.userId },
-        },
-      },
+  if (isRegister) {
+    const exists = await prisma.user.findUnique({ where: { email } });
+    if (exists) return new Response("Usuario ya existe", { status: 400 });
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: { email, password: hashed, name, lastName },
     });
-
-    return NextResponse.json(page);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Error creating/updating page" }, { status: 500 });
+    return NextResponse.json({ message: "Usuario creado", userId: user.id });
   }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return new Response("Datos Incorrectos", { status: 401 });
+  }
+
+  const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET!, {
+    expiresIn: "1d",
+  });
+
+  return NextResponse.json({ token, user: { id: user.id, email: user.email, name: user.name } });
 }
