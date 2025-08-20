@@ -17,10 +17,6 @@ export async function middleware(req: NextRequest) {
       return NextResponse.rewrite(new URL(pathWithEditPrefix, req.url));
     }
 
-    // Disable "/puck/[...puckPath]"
-    if (req.nextUrl.pathname.startsWith("/puck")) {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
   }
 
   return res;
