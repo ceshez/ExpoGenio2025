@@ -1,5 +1,5 @@
 {
-  "name": "ExpoGenio2025",
+  "name": "expogenio2025",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,17 +9,34 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@measured/puck": "^0.19.3",
+    "@measured/puck": "0.20.0",
+    "@prisma/client": "^6.13.0",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tailwindcss/postcss": "^4.1.11",
+    "bcryptjs": "^3.0.2",
+    "class-variance-authority": "^0.7.1",
     "classnames": "^2.3.2",
+    "clsx": "^2.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.539.0",
     "next": "^15.2.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "next-auth": "^4.24.11",
+    "postcss": "^8.5.6",
+    "prisma": "^6.13.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^17.0.12",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "eslint-config-custom": "*",
+    "tw-animate-css": "^1.3.7",
     "typescript": "^5.5.4"
   }
 }

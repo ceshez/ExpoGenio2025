@@ -1,0 +1,4 @@
+bg-inherit
+bg-red-300
+bg-yellow-100
+bg-green-100

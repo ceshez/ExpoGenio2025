@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from 'react';
 
 // Importar componentes comunes
@@ -27,7 +26,7 @@ const App = () => {
     // Simular carga
     const interval = setInterval(() => {
       setLoadingProgress(prev => {
-        const newProgress = prev + Math.random() * 20;
+        const newProgress = prev + Math.random() * 10;
         if (newProgress >= 100) {
           clearInterval(interval);
           setTimeout(() => setIsLoading(false), 500);
