@@ -1,5 +1,5 @@
 // lib/auth.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../lib/generated/prisma";
 import { compare } from "bcryptjs";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
@@ -41,3 +41,24 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login", // tu formulario custom
   },
 };
+export default async function getUserSession(token: string) {
+  if (!token) return null;
+
+  try {
+    const session = await prisma.session.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (!session) return null;
+
+    return {
+      id: session.user.id.toString(),
+      email: session.user.email,
+      name: session.user.name,
+    };
+  } catch (error) {
+    console.error("Error fetching user session:", error);
+    return null;
+  }
+}
