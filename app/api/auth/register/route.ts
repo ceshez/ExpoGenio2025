@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
+  console.log("DATABASE_URL at runtime =>", process.env.DATABASE_URL);
+
   try {
     const body = await req.json();
     const { email, password, name, lastName } = body;
