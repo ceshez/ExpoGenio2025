@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma"; // ajusta según tu ruta real
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +11,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Todos los campos son requeridos" }, { status: 400 });
     }
 
-    // Verificar si el email ya existe
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -20,10 +19,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "El correo ya está registrado" }, { status: 400 });
     }
 
-    // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear usuario
     const user = await prisma.user.create({
       data: {
         email,

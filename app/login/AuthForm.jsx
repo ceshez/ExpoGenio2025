@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, CheckCircle, AlertCircle, Sparkles } from "lucide-react"
@@ -137,30 +138,20 @@ const handleLogin = async (e) => {
   setIsLoading(true)
 
   try {
-    const res = await fetch("/api/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: loginData.email,
-        password: loginData.password,
-        isRegister: false,
-      }),
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: loginData.email,
+      password: loginData.password,
     })
 
-    if (!res.ok) {
-      const msg = await res.text()
-      showModal("error", msg || "Error al iniciar sesión")
+    if (result?.error) {
+      showModal("error", result.error || "Error al iniciar sesión")
       return
-    }
-
-    const data = await res.json()
-    if (data.token) {
-      localStorage.setItem("token", data.token)
     }
 
     showModal("success", "Inicio de sesión exitoso. Redirigiendo...")
     setTimeout(() => {
-      window.location.href = "/puck" // o a la ruta que quieras
+      window.location.href = "/puck"
     }, 1000)
   } catch (err) {
     showModal("error", "Error de red")
@@ -183,7 +174,7 @@ const handleRegister = async (e) => {
 
   setIsLoading(true)
   try {
-    const res = await fetch("/api/auth", {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -191,17 +182,17 @@ const handleRegister = async (e) => {
         lastName: registerData.lastName,
         email: registerData.email,
         password: registerData.password,
-        isRegister: true,
       }),
     })
 
+    const data = await res.json()
+
     if (!res.ok) {
-      const msg = await res.text()
-      showModal("error", msg || "Error en el registro")
+      showModal("error", data.error || "Error en el registro")
       return
     }
 
-    showModal("success", "¡Registro exitoso! Ahora inicia sesión.")
+    showModal("success", data.message || "¡Registro exitoso! Ahora inicia sesión.")
     setTimeout(() => {
       setIsLoginMode(true)
       closeModal()
