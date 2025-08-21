@@ -26,8 +26,9 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center gap-3 justify-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+            <button onClick={() => (window.location.href = "/edit")} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center gap-3 justify-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
               <Rocket className="w-5 h-5" />
+              
               Comenzar ahora
             </button>
             <button

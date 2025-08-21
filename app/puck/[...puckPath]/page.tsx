@@ -11,6 +11,8 @@
  * NB this route is public, and you will need to add authentication
  */
 
+//este codigo es para ver las rutas publicas sin seguridad
+/*
 import "@measured/puck/puck.css";
 import { Client } from "./client";
 import { Metadata } from "next";
@@ -42,9 +44,11 @@ export default async function Page({
 }
 
 export const dynamic = "force-dynamic";
+*/
+
 
 //este codigo servira para despues cuando las rutas esten autenticadas
-/*import "@measured/puck/puck.css";
+import "@measured/puck/puck.css";
 import { Client } from "./client";
 import { Metadata } from "next";
 import { getPage } from "../../../lib/get-page";
@@ -72,4 +76,4 @@ export default async function Page({ params }: { params: Promise<{ puckPath: str
 }
 
 export const dynamic = "force-dynamic";
-*/
+

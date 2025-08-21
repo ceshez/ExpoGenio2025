@@ -151,7 +151,7 @@ const handleLogin = async (e) => {
 
     showModal("success", "Inicio de sesión exitoso. Redirigiendo...")
     setTimeout(() => {
-      window.location.href = "/puck"
+      window.location.href = "/edit"
     }, 1000)
   } catch (err) {
     showModal("error", "Error de red")

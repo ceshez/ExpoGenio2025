@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import LogoGenio from "../LogoGenio"
 import { Menu, X, User, Globe, Settings, CreditCard, HelpCircle, LogOut } from "lucide-react"
+import { signOut } from "next-auth/react";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -171,11 +172,14 @@ const Header = () => {
             </nav>
 
             <div className="pt-6 border-t border-gray-200">
-              <button className="flex items-center gap-3 w-full p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 hover:translate-x-1 group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium">Cerrar sesión</span>
-              </button>
-            </div>
+      <button
+        onClick={() => signOut({ callbackUrl: "/login" })} // 👈 Cierra sesión y redirige al login
+        className="flex items-center gap-3 w-full p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 hover:translate-x-1 group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+      >
+        <LogOut className="w-5 h-5" />
+        <span className="font-medium">Cerrar sesión</span>
+      </button>
+    </div>
           </div>
         </>
       )}

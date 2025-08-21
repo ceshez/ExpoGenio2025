@@ -102,7 +102,7 @@ const TemplatesSection = () => {
 
         <div className="mt-16 text-center">
           <a
-            href="#"
+            href="/plantillas"
             className="inline-flex items-center gap-2 text-purple-500 font-semibold hover:text-pink-500 transition-colors duration-200 group bg-white px-6 py-3 rounded-full shadow-md hover:shadow-lg"
           >
             Ver todas las plantillas
