@@ -38,7 +38,7 @@ const Header = () => {
             className="flex items-center gap-3 text-2xl font-bold text-slate-800 hover:scale-105 transition-all duration-300 group"
           >
           <div className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
-          <LogoGenio></LogoGenio>
+          <LogoGenio variant="simplified"/>
           </div>
             <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">GENIO</span>
           </a>
@@ -64,7 +64,7 @@ const Header = () => {
             </button>
 
             <button
-              onClick={() => (window.location.href = "/edit")}
+              onClick={() => (window.location.href = "/dashboard")}
               className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2.5 rounded-full font-medium hover:scale-105 hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
             >
               Probar Gratis
@@ -106,7 +106,7 @@ const Header = () => {
                 </a>
               ))}
               <button
-                onClick={() => (window.location.href = "/edit")}
+                onClick={() => (window.location.href = "/dashboard")}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium mt-6 hover:scale-105 hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
               >
                 Probar Gratis
@@ -173,7 +173,7 @@ const Header = () => {
 
             <div className="pt-6 border-t border-gray-200">
       <button
-        onClick={() => signOut({ callbackUrl: "/login" })} // 👈 Cierra sesión y redirige al login
+        onClick={() => signOut({ callbackUrl: "/login" })} // Cierra sesión y redirige al login
         className="flex items-center gap-3 w-full p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 hover:translate-x-1 group focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
       >
         <LogOut className="w-5 h-5" />

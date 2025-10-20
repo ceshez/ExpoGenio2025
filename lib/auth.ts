@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Busca el usuario en tu tabla User
+        // Busca el usuario en la tabla User
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });

@@ -12,7 +12,7 @@
 
 import { Client } from "./client";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { getPage } from "../../lib/get-page";
 
 export async function generateMetadata({
@@ -23,8 +23,9 @@ export async function generateMetadata({
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
+  const rec = await getPage(path);
   return {
-    title: getPage(path)?.root.props?.title,
+    title: rec?.title ?? rec?.content?.root?.props?.title ?? "Genio",
   };
 }
 
@@ -35,13 +36,11 @@ export default async function Page({
 }) {
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
-  const data = getPage(path);
 
-  if (!data) {
-    return notFound();
-  }
+  const rec = await getPage(path);
+  if (!rec?.content) return notFound();
 
-  return <Client data={data} />;
+  return <Client data={rec.content} />;
 }
 
 // Force Next.js to produce static pages: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamic

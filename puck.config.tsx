@@ -2,7 +2,7 @@ import { type Config } from "@measured/puck";
 
 type Props = {
   Encabezado: { titulo: string };
-  Grid: { };
+  Grid: { items: any[] };
   Carta: {
      titulo: string; 
      descripcion: string 

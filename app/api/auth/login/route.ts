@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     });
 
     // Cookie segura en prod; en dev sameSite lax y secure false normalmente
-    res.cookies.set("genio_token", token, {
+    res.cookies.set("token", token, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
