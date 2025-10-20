@@ -1,11 +1,22 @@
-import { Data } from "@measured/puck";
-import fs from "fs";
+// lib/get-page.ts
+import { prisma } from "@/lib/prisma";
+import type { Data } from "@measured/puck"; // solo para tipado del contenido
 
-// Replace with call to your database
-export const getPage = (path: string) => {
-  const allData: Record<string, Data> | null = fs.existsSync("database.json")
-    ? JSON.parse(fs.readFileSync("database.json", "utf-8"))
-    : null;
+// Devuelve {content, title} o null
+export async function getPage(path: string, userId?: number) {
+  if (userId) {
+    // clave compuesta: (userId, path)
+    const page = await prisma.page.findUnique({
+      where: { userId_path: { userId, path } },
+      select: { content: true, title: true },
+    });
+    return page as { content: Data; title: string | null } | null;
+  }
 
-  return allData ? allData[path] : null;
-};
+  // Fallback si no tienes userId (no recomendado si hay multiusuario)
+  const page = await prisma.page.findFirst({
+    where: { path },
+    select: { content: true, title: true },
+  });
+  return page as { content: Data; title: string | null } | null;
+}

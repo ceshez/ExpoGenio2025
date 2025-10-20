@@ -48,32 +48,43 @@ export const dynamic = "force-dynamic";
 
 
 //este codigo servira para despues cuando las rutas esten autenticadas
+// app/puck/[...puckPath]/page.tsx
 import "@measured/puck/puck.css";
 import { Client } from "./client";
 import { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
 import { getPage } from "../../../lib/get-page";
-import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export async function generateMetadata({ params }: { params: Promise<{ puckPath: string[] }> }): Promise<Metadata> {
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
-  return { title: "Genio: " + path };
+  return { title: "Puck: " + path };
 }
 
 export default async function Page({ params }: { params: Promise<{ puckPath: string[] }> }) {
+  // exige login
   const session = await getServerSession(authOptions);
+  if (!session?.user?.email) redirect("/login");
 
-  if (!session) {
-    redirect("/login"); // si no está logeado, se manda al login
-  }
+  // id del usuario
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!user) redirect("/login");
 
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
-  const data = getPage(path);
-  return <Client path={path} data={data || {}} />;
+
+  // ahora sí: trae la página de ESTE usuario
+  const data = await getPage(path, user.id);
+  // Si es la primera vez y no hay data, puedes pasar {} para iniciar el editor vacío:
+  return <Client path={path} data={data?.content || {}} />; // data?.content es el JSON de Puck
 }
 
 export const dynamic = "force-dynamic";
+
 

@@ -1,46 +1,82 @@
+// app/puck/api/route.ts
+export const runtime = "nodejs";
+
 import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // tu config de NextAuth
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
+import { getToken } from "next-auth/jwt";
 
-export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+const hsSecret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-  if (!session?.user?.email) {
+type PuckPayload = { path: string; data: any; title?: string };
+
+export async function POST(req: NextRequest) {
+  // --- 1) intenta cookie 'token' (JWT custom)
+  const cookieStore = await cookies();
+  const custom = cookieStore.get("token")?.value;
+
+  let userId: number | null = null;
+  let userEmail: string | null = null;
+
+  if (custom) {
+    try {
+      const { payload } = await jwtVerify(custom, hsSecret, { algorithms: ["HS256"] });
+      userId = Number(payload.id);
+    } catch {
+      // si falla, seguimos y probamos NextAuth
+    }
+  }
+
+  // --- 2) si no hay JWT custom válido, intenta NextAuth
+  if (!userId) {
+    const na = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (na?.email) {
+      userEmail = na.email as string;
+      const u = await prisma.user.findUnique({ where: { email: userEmail }, select: { id: true } });
+      userId = u?.id ?? null;
+    }
+  }
+
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const payload = await request.json();
-
-  // busca al usuario logueado
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  // --- 3) payload del editor
+  let payload: PuckPayload;
+  try {
+    payload = (await req.json()) as PuckPayload;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  if (!payload?.path || !payload?.data) {
+    return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
 
-  // guarda la página en la DB
-  const page = await prisma.page.upsert({
-  where: { path: payload.path },
-  update: {
-    title: payload.title,
-    content: payload.content,
-  },
-  create: {
-    title: payload.title,
-    path: payload.path,
-    content: payload.content,
-    user: {
-      connect: { id: payload.userId }, 
-    },
-  },
-});
+  // --- 4) guardar por (userId, path)
+  const existing = await prisma.page.findFirst({
+    where: { userId, path: payload.path },
+    select: { id: true },
+  });
 
+  const saved = existing
+    ? await prisma.page.update({
+        where: { id: existing.id },
+        data: {
+          title: payload.title ?? undefined,
+          content: payload.data,
+        },
+      })
+    : await prisma.page.create({
+        data: {
+          title: payload.title ?? (payload.path.replace(/^\//, "") || "Mi sitio"),
+          path: payload.path,
+          content: payload.data,
+          userId,
+        },
+      });
 
   revalidatePath(payload.path);
-
-  return NextResponse.json({ status: "ok", page });
+  return NextResponse.json({ status: "ok", page: saved });
 }

@@ -170,7 +170,7 @@ export default function Template() {
               <Menu className="text-gray-700" size={24} />
             </button>
             <div onClick={() => (window.location.href = "/")} className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
-               <LogoGenio></LogoGenio>
+              <LogoGenio variant="simplified"/>
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               GENIO

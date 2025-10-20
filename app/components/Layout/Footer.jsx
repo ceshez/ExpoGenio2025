@@ -40,7 +40,7 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <a href="#" className="flex items-center gap-3 text-2xl font-bold mb-4 group">
              <div className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
-              <LogoGenio></LogoGenio>
+              <LogoGenio variant="simplified"/>
             </div>
               <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GENIO</span>
             </a>
