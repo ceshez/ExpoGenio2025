@@ -2,10 +2,8 @@
 import { compare } from "bcryptjs";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
-import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
-// Config NextAuth usando JWT (no BD para sesiones)
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -17,7 +15,6 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Busca el usuario en la tabla User
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
@@ -26,7 +23,7 @@ export const authOptions: NextAuthOptions = {
         const ok = await compare(credentials.password, user.password);
         if (!ok) return null;
 
-        // Devuelve el objeto que NextAuth usará para firmar el JWT
+        // ¡OJO!: devolvemos id numérico/string
         return {
           id: user.id.toString(),
           email: user.email,
@@ -36,32 +33,23 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: {
-    strategy: "jwt", 
+    strategy: "jwt",
   },
   pages: {
     signIn: "/login",
   },
+  callbacks: {
+    // Mete el id del usuario en el JWT
+    async jwt({ token, user }) {
+      if (user?.id) token.uid = user.id; // guardamos id como uid
+      return token;
+    },
+    // Expone el id en la session (session.user.id)
+    async session({ session, token }) {
+      if (token?.uid && session.user) {
+        (session.user as any).id = token.uid;
+      }
+      return session;
+    },
+  },
 };
-
-//Helper para obtener el usuario a partir de un token JWT emitido por tu API (/api/auth)
-export async function getUserSession(token: string) {
-  if (!token) return null;
-
-  try {
-    // Debe coincidir con cómo firmas tu token en /api/auth
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      id: number | string;
-      email?: string;
-    };
-
-    const user = await prisma.user.findUnique({
-      where: { id: Number(decoded.id) },
-      select: { id: true, email: true, name: true, lastName: true },
-    });
-
-    return user ? { ...user, id: user.id.toString() } : null;
-  } catch (error) {
-    console.error("Error verifying JWT or fetching user:", error);
-    return null;
-  }
-}

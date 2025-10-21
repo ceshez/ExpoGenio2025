@@ -220,7 +220,7 @@ const handleRegister = async (e) => {
         <div className="relative w-full h-[600px] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden transition-all duration-500 hover:shadow-3xl hover:scale-[1.01]">
           <div className="absolute top-6 left-6 z-50 flex items-center space-x-3 bg-white/95 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border border-white/30">
             <div onClick={() => (window.location.href = "/")} className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
-              <LogoGenio></LogoGenio>
+              <LogoGenio variant="simplified" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               GENIO

@@ -28,16 +28,11 @@ model User {
 model Page {
   id        Int      @id @default(autoincrement())
   title     String
-  path      String
+  path      String   @unique        
   content   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
-
-  @@unique([userId, path]) 
-  /*esto asegura que cada usuario tenga rutas unicas para sus paginas es decir
-  que varios usuarios puedan tener la misma ruta pero un mismo usuario no pueda
-  tener dos paginas con la misma ruta*/
-  
 }
+
