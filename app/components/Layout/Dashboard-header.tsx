@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu, Sparkles } from "lucide-react";
+import GenioLogo from "../LogoGenio";
 
 interface DashboardHeaderProps {
   sidebarOpen: boolean;
@@ -25,8 +26,8 @@ export default function DashboardHeader({
           onClick={() => (window.location.href = "/")}
           className="transition-transform duration-300 hover:rotate-12 hover:scale-110 cursor-pointer"
         >
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <Sparkles className="text-primary-foreground" size={24} />
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+            <GenioLogo variant="simplified"/>
           </div>
         </div>
         <h1 className="text-2xl font-bold text-primary">GENIO</h1>

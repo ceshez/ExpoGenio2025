@@ -13,70 +13,44 @@ const hsSecret = new TextEncoder().encode(process.env.JWT_SECRET!);
 type PuckPayload = { path: string; data: any; title?: string };
 
 export async function POST(req: NextRequest) {
-  // --- 1) intenta cookie 'token' (JWT custom)
+  // auth: cookie 'token' (custom) o NextAuth
   const cookieStore = await cookies();
   const custom = cookieStore.get("token")?.value;
 
-  let userId: number | null = null;
-  let userEmail: string | null = null;
-
+  let isAuth = false;
   if (custom) {
-    try {
-      const { payload } = await jwtVerify(custom, hsSecret, { algorithms: ["HS256"] });
-      userId = Number(payload.id);
-    } catch {
-      // si falla, seguimos y probamos NextAuth
-    }
+    try { await jwtVerify(custom, hsSecret, { algorithms: ["HS256"] }); isAuth = true; } catch {}
   }
-
-  // --- 2) si no hay JWT custom válido, intenta NextAuth
-  if (!userId) {
+  if (!isAuth) {
     const na = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    if (na?.email) {
-      userEmail = na.email as string;
-      const u = await prisma.user.findUnique({ where: { email: userEmail }, select: { id: true } });
-      userId = u?.id ?? null;
-    }
+    isAuth = !!na?.email;
   }
+  if (!isAuth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // --- 3) payload del editor
   let payload: PuckPayload;
-  try {
-    payload = (await req.json()) as PuckPayload;
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { payload = await req.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
   if (!payload?.path || !payload?.data) {
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
 
-  // --- 4) guardar por (userId, path)
-  const existing = await prisma.page.findFirst({
-    where: { userId, path: payload.path },
-    select: { id: true },
-  });
+  // upsert por path (único global)
+  const existing = await prisma.page.findUnique({ where: { path: payload.path }, select: { id: true } });
 
   const saved = existing
     ? await prisma.page.update({
         where: { id: existing.id },
-        data: {
-          title: payload.title ?? undefined,
-          content: payload.data,
-        },
+        data: { title: payload.title ?? undefined, content: payload.data },
       })
     : await prisma.page.create({
         data: {
-          title: payload.title ?? (payload.path.replace(/^\//, "") || "Mi sitio"),
+          title: payload.title ?? payload.path.replace(/^\//, ""),
           path: payload.path,
           content: payload.data,
-          userId,
+          userId: 1, // Replace with actual userId from session or editor
         },
       });
 
   revalidatePath(payload.path);
   return NextResponse.json({ status: "ok", page: saved });
 }
+

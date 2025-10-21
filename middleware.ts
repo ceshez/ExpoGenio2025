@@ -1,26 +1,11 @@
 // middleware.ts
 import { NextResponse, NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { jwtVerify } from "jose";
-
-const COOKIE_NAME = "token"; // tu cookie custom (login)
-const hsSecret = new TextEncoder().encode(process.env.JWT_SECRET!); // HS256
-
-async function hasCustomToken(req: NextRequest) {
-  const token = req.cookies.get(COOKIE_NAME)?.value;
-  if (!token) return false;
-  try {
-    await jwtVerify(token, hsSecret, { algorithms: ["HS256"] });
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  // No interceptar APIs/estáticos
+  // No interceptar API/estáticos
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
@@ -29,12 +14,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Acepta sesión de NextAuth o cookie 'token'
-  const naToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const customOK = await hasCustomToken(req);
-  const isAuth = !!naToken || customOK;
+  // Usa SOLO NextAuth
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const isAuth = !!token;
 
-  // /cualquier-cosa/edit => /puck/cualquier-cosa (si está auth)
+  // /algo/edit ⇒ /puck/algo (si está auth)
   if (pathname.endsWith("/edit")) {
     if (!isAuth) {
       const u = new URL("/login", req.url);
@@ -61,4 +45,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
-

@@ -162,7 +162,7 @@ const GenioLogo = ({
 
   const variants = {
     full: <FullSVG />,
-    simplified: <SimplifiedSVG />,
+    simplified: <SimplifiedSVG isMono={undefined} title={undefined} />,
     lettermark: <LettermarkSVG />,
   };
 
