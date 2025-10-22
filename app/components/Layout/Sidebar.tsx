@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, Home, Layout, FolderPlus, User, Settings, LogOut, X, MoreHorizontal, Trash2 } from "lucide-react"
+import { Menu, Home, Layout, FolderPlus, User, Settings, LogOut, X, MoreHorizontal, Trash2, CircleFadingPlus } from "lucide-react"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
 
@@ -22,7 +22,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   useEffect(() => {
-    console.log("[v0] Sidebar sidebarOpen state:", sidebarOpen)
+    console.log("Sidebar sidebarOpen state:", sidebarOpen)
   }, [sidebarOpen])
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -47,11 +47,11 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
   return (
     <>
       {/* Icon Sidebar */}
-      <aside className="flex flex-col w-16 bg-sidebar shadow-sm border-r border-sidebar-border z-30">
+      <aside className="flex flex-col w-16 bg-sidebar shadow-sm border-r border-sidebar-border z-30 max-h-screen">
         <div className="p-3">
           <button
             onClick={handleBurgerClick}
-            className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200"
+            className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer"
             aria-label="Toggle sidebar"
           >
             <Menu className="text-sidebar-foreground" size={20} />
@@ -59,15 +59,19 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
         </div>
 
         <div className="flex flex-col gap-2 px-3 flex-1">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200">
+          <Link href="/dashboard">
+          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
             <Home className="text-sidebar-foreground" size={20} />
           </button>
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200">
+          </Link>
+          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
             <Layout className="text-sidebar-foreground" size={20} />
           </button>
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200">
-            <FolderPlus className="text-sidebar-foreground" size={20} />
+          <Link href="/dashboard/new">
+          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+            <CircleFadingPlus className="text-sidebar-foreground" size={20} />
           </button>
+          </Link>
         </div>
 
         <div className="p-3 border-t border-sidebar-border">
@@ -75,13 +79,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
             <button
               onClick={(e) => {
                 e.stopPropagation()
-                console.log("[v0] User menu clicked, current state:", userMenuOpen)
+                console.log("User menu clicked, current state:", userMenuOpen)
                 setUserMenuOpen(!userMenuOpen)
               }}
               className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 w-full"
               aria-label="User menu"
             >
-              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center mx-auto">
+              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center mx-auto hover:scale-105 transition-transform duration-200 cursor-pointer">
                 <User size={12} className="text-primary-foreground" />
               </div>
             </button>
@@ -127,13 +131,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
           ${!sidebarOpen && "pointer-events-none"}
         `}
       >
-        <div className="w-72">
-          <div className="p-4 border-b border-sidebar-border">
+        <div className="w-72 flex flex-col h-full">
+          <div className="p-4 border-b border-sidebar-border flex-shrink-0">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-sidebar-foreground">Sitios recientes</h2>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-1 rounded-lg hover:bg-sidebar-accent transition-colors"
+                className="p-1 rounded-lg hover:bg-sidebar-accent transition-colors hover:text-sidebar-foreground cursor-pointer"
               >
                 <X size={16} className="text-sidebar-foreground" />
               </button>
@@ -142,11 +146,11 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
 
           <div className="flex-1 overflow-y-auto">
             <div className="p-4 space-y-2">
-              {recentDesigns.slice(0, 5).map((page) => (
+              {recentDesigns.map((page) => (
                 <Link
                   key={page.id}
                   href={`${page.path}/edit`}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors cursor-pointer group"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors group"
                 >
                   <div className="w-12 h-8 rounded-md bg-muted flex-shrink-0 shadow-sm flex items-center justify-center">
                     <Layout size={14} className="text-muted-foreground" />
@@ -162,18 +166,12 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                   </div>
                   <button
                     onClick={(e) => e.preventDefault()}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-sidebar-accent transition-all"
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-sidebar-accent transition-all duration-200 cursor-pointer"
                   >
                     <MoreHorizontal size={14} className="text-muted-foreground" />
                   </button>
                 </Link>
               ))}
-
-              {recentDesigns.length > 5 && (
-                <button className="w-full text-left p-3 rounded-lg hover:bg-sidebar-accent transition-colors text-sm text-sidebar-primary hover:text-sidebar-primary/80 font-medium">
-                  Ver todos los sitios ({recentDesigns.length})
-                </button>
-              )}
 
               {recentDesigns.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">No hay sitios recientes</p>
@@ -181,8 +179,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
             </div>
           </div>
 
-          <div className="p-4 border-t border-sidebar-border">
-            <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors text-sidebar-foreground">
+          <div className="p-4 border-t border-sidebar-border flex-shrink-0">
+            <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors text-sidebar-foreground cursor-pointer">
               <Trash2 size={18} />
               <span className="text-sm font-medium">Eliminar</span>
             </button>
