@@ -10,10 +10,11 @@
  * will invalidate the cache as the page is written in /api/puck/route.ts
  */
 
-import { Client } from "./client";
+// app/[...puckPath]/page.tsx
+import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPage } from "../../lib/get-page";
+import { Client as Viewer } from "./client"; // o tu componente de render público
 
 export async function generateMetadata({
   params,
@@ -22,10 +23,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
-
-  const rec = await getPage(path);
+  const rec = await prisma.page.findUnique({
+    where: { path },
+    select: { title: true, content: true },
+  });
   return {
-    title: rec?.title ?? rec?.content?.root?.props?.title ?? "Genio",
+    title: rec?.title ?? (rec?.content as any)?.root?.props?.title ?? "Genio",
   };
 }
 
@@ -37,12 +40,14 @@ export default async function Page({
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
-  const rec = await getPage(path);
-  if (!rec?.content) return notFound();
+  const rec = await prisma.page.findUnique({
+    where: { path },
+    select: { content: true },
+  });
 
-  return <Client data={rec.content} />;
+  if (!rec?.content) return notFound();
+  return <Viewer data={rec.content as any} />;
 }
 
-// Force Next.js to produce static pages: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamic
-// Delete this if you need dynamic rendering, such as access to headers or cookies
 export const dynamic = "force-dynamic";
+
