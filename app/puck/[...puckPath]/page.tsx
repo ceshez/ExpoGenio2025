@@ -51,41 +51,47 @@ export const dynamic = "force-dynamic";
 // app/puck/[...puckPath]/page.tsx
 // app/puck/[...puckPath]/page.tsx
 // app/puck/[...puckPath]/page.tsx
+// app/puck/[...puckPath]/page.tsx
 import "@measured/puck/puck.css";
 import { Client } from "./client";
-import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-export async function generateMetadata({
-  params,
-}: { params: Promise<{ puckPath: string[] }> }): Promise<Metadata> {
-  const { puckPath = [] } = await params;
-  const path = `/${puckPath.join("/")}`;
-  return { title: "Puck: " + path };
-}
-
 export default async function Page({
   params,
-}: { params: Promise<{ puckPath: string[] }> }) {
+}: {
+  params: Promise<{ puckPath: string[] }>;
+}) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email) redirect("/login"); // el editor sí es privado
+  if (!session?.user?.email) redirect("/login");
+
+  const me = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+  if (!me) redirect("/login");
 
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
   const page = await prisma.page.findUnique({
-    where: { path },
-    select: { content: true, title: true },
+    where: { path }, // path único global
+    select: { userId: true, content: true },
   });
 
-  // Si no existe, abre vacío (o redirige si prefieres)
+  // existe pero no es mía -> 403
+  if (page && page.userId !== me.id) {
+    redirect("/forbidden");
+  }
+
+  // si es mía, cargo su contenido; si no existe, abro el editor vacío
   return <Client path={path} data={(page?.content as any) ?? {}} />;
 }
 
 export const dynamic = "force-dynamic";
+
 
 
 
