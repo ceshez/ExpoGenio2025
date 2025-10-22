@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from '../common/Card';
+import Card from '../Common/Card';
 
 const TestimonialCard = ({ name, business, avatar, rating, content, delay = 0 }) => {
   return (
