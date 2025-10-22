@@ -30,7 +30,7 @@ export default async function NewSitePage() {
     await prisma.page.create({
       data: {
         title,
-        path, // <- aleatorio, NO del título
+        path, 
         userId: user.id,
         content: { root: { type: "container", props: { title }, children: [] } },
       },
@@ -46,7 +46,7 @@ export default async function NewSitePage() {
           action={create}
           className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
         >
-          {/* Header Section */}
+          {/* Header*/}
           <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 backdrop-blur-sm rounded-2xl mb-4">
               <LogoGenio variant="simplified"/>
@@ -55,9 +55,9 @@ export default async function NewSitePage() {
             <p className="text-white/90 text-sm">Dale vida a tu próxima idea en segundos</p>
           </div>
 
-          {/* Form Content */}
+          {/*Formulario*/}
           <div className="p-8 space-y-6">
-            {/* Cover Image Upload (Non-functional example) */}
+            {/* imagen de ejempolo/ no funciona */}
             <div className="space-y-3">
               <label className="block text-sm font-semibold text-gray-800">
                 Imagen de portada
@@ -86,7 +86,7 @@ export default async function NewSitePage() {
               </div>
             </div>
 
-            {/* Site Title Input */}
+            {/* inputs */}
             <div className="space-y-3">
               <label htmlFor="title" className="block text-sm font-semibold text-gray-800">
                 Nombre del sitio
@@ -101,11 +101,10 @@ export default async function NewSitePage() {
               <p className="text-xs text-gray-600">Puedes cambiarlo más tarde desde la configuración</p>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                className="flex-1 px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-400 hover:from-purple-700 hover:to-pink-700 text-white font-semibold hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-400 hover:from-purple-700 hover:to-pink-700 text-white font-semibold hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <LogoGenio variant="simplified"/>
                 Crear y Editar
@@ -114,7 +113,7 @@ export default async function NewSitePage() {
           </div>
         </form>
 
-        {/* Footer Note */}
+        {/* nota footer */}
         <p className="text-center text-xs text-gray-600 mt-6">
           Tu sitio se creará con una URL única y podrás personalizarlo completamente
         </p>

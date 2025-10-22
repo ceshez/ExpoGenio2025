@@ -10,7 +10,7 @@ export default function Forbidden() {
       <div className="max-w-5xl w-full">
         <div className="bg-card rounded-3xl shadow-xl border border-border p-12 md:p-16">
           <div className="flex flex-col md:flex-row items-center gap-12">
-            {/* Left side - Text and Button */}
+            {/*txto y boton*/}
             <div className="flex-1 space-y-6 text-left">
               <h1 className="text-5xl md:text-6xl font-bold text-foreground text-balance leading-tight">
                 Acceso denegado
@@ -36,7 +36,7 @@ export default function Forbidden() {
               </p>
             </div>
 
-            {/* Right side - Robot Image */}
+            {/* derecha imagen de Gio */}
             <div className="flex-shrink-0">
               <div className="relative w-64 h-64 md:w-80 md:h-80">
                 <img src={Denied.src} alt="" />
