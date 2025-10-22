@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     id: String(p.id),
     title: p.title ?? p.path.replace("/", ""),
     path: p.path,
-    updatedAtText: `Editado ${fmt.format(p.updatedAt)}`, // <-- pasamos el string ya listo
+    updatedAtText: `${fmt.format(p.updatedAt)}`, // <-- pasamos el string ya listo
     previewTitle: (p.content as any)?.root?.props?.title ?? "Vista previa",
   }));
 
