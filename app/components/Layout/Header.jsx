@@ -19,13 +19,14 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const navLinks = [
-    { href: "#beneficios", text: "Beneficios" },
-    { href: "#plantillas", text: "Plantillas" },
-    { href: "#testimonios", text: "Testimonios" },
-    { href: "#planes", text: "Precios" },
-    { href: "#contacto", text: "Contacto" },
-  ]
+const navLinks = [
+  { href: "#beneficios", text: "Beneficios" },
+  { href: "#plantillas", text: "Plantillas" },
+  { href: "#testimonios", text: "Testimonios" },
+  { href: "#planes", text: "Precios" },
+  { href: "#contacto", text: "Contacto" },
+  { href: "/about", text: "Sobre Nosotros" }, // AboutUs
+]
 
   return (
     <>
