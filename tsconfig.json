@@ -7,6 +7,6 @@
       "@/*": ["./*"]
   },
 },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/plantillas/Plantillas.jsx", "app/components/LogoGenio.tsx", "app/components/Layout/Dashboard-header.tsx", "app/AboutUs/AboutUsSection.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/plantillas/Plantillas.jsx", "app/components/LogoGenio.tsx", "app/components/Layout/Dashboard-header.tsx", "app/about/AboutUsSection.tsx"],
   "exclude": ["node_modules"]
 }

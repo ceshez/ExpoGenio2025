@@ -1,15 +1,11 @@
-// src/components/AboutUs/AboutUsPage.tsx
+'use client';
 import React from "react";
-
-// Layout
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
-import ScrollToTop from '../components/layout/ScrollToTop';
-
-// Sección principal de About Us
+import ScrollToTop from "../components/layout/ScrollToTop";
 import AboutUsSection from "./AboutUsSection";
 
-const AboutUsPage = () => {
+export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900 relative overflow-x-hidden">
       <Header />
@@ -18,6 +14,4 @@ const AboutUsPage = () => {
       <ScrollToTop />
     </div>
   );
-};
-
-export default AboutUsPage;
+}

@@ -20,7 +20,7 @@ import ContactSection from './components/Sections/ContactSection';
 import CTASection from './components/Sections/CTASection';
 
 // Importar AboutUs
-import AboutUsPage from './AboutUs/AboutUsPage';
+import AboutUsPage from './about/AboutUsSection';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +45,11 @@ const App = () => {
 
   return (
     <Router>
+      <ScrollToTop />
+      <LoadingScreen isLoading={isLoading} progress={loadingProgress} />
+
       <Routes>
+        {/* Página principal */}
         <Route
           path="/"
           element={
@@ -64,8 +68,6 @@ const App = () => {
                 </div>
               </div>
 
-              <LoadingScreen isLoading={isLoading} progress={loadingProgress} />
-              
               <div className="relative z-10">
                 <Header />
                 <HeroSection />
@@ -77,12 +79,22 @@ const App = () => {
                 <ContactSection />
                 <CTASection />
                 <Footer />
-                <ScrollToTop />
               </div>
             </div>
           }
         />
-        <Route path="/about" element={<AboutUsPage />} />
+
+        {/* Página Sobre Nosotros */}
+        <Route
+          path="/about"
+          element={
+            <div className="bg-white text-gray-900">
+              <Header />
+              <AboutUsPage />
+              <Footer />
+            </div>
+          }
+        />
       </Routes>
     </Router>
   );
