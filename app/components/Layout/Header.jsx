@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import LogoGenio from "../LogoGenio"
 import { Menu, X, User, Globe, Settings, CreditCard, HelpCircle, LogOut } from "lucide-react"
 import { signOut } from "next-auth/react";
+import Link from "next/link"
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -19,14 +20,14 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-const navLinks = [
-  { href: "#beneficios", text: "Beneficios" },
-  { href: "#plantillas", text: "Plantillas" },
-  { href: "#testimonios", text: "Testimonios" },
-  { href: "#planes", text: "Precios" },
-  { href: "#contacto", text: "Contacto" },
-  { href: "/about", text: "Sobre Nosotros" }, // AboutUs
-]
+  const navLinks = [
+    { href: "#beneficios", text: "Beneficios" },
+    { href: "#plantillas", text: "Plantillas" },
+    { href: "/tutorial", text: "Tutoriales" },
+    { href: "#planes", text: "Precios" },
+    { href: "#contacto", text: "Contacto" },
+     { href: "/about", text: "Sobre Nosotros" }
+  ]
 
   return (
     <>
@@ -34,7 +35,8 @@ const navLinks = [
         className={`fixed top-0 left-0 w-full bg-white/95 backdrop-blur-lg z-50 transition-all duration-500 border-b ${isScrolled ? "shadow-2xl border-gray-200/50" : "shadow-lg border-transparent"}`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
-          <a
+          <Link href="/">
+          <div
             href="#"
             className="flex items-center gap-3 text-2xl font-bold text-slate-800 hover:scale-105 transition-all duration-300 group"
           >
@@ -42,7 +44,8 @@ const navLinks = [
           <LogoGenio variant="simplified"/>
           </div>
             <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">GENIO</span>
-          </a>
+          </div>
+          </Link>
 
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
