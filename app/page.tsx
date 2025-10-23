@@ -2,12 +2,11 @@
 import React, { useState, useEffect } from 'react';
 
 // Importar componentes comunes
-import LoadingScreen from './components/common/LoadingScreen';
+import LoadingScreen from "./components/Common/LoadingScreen";
+import Header        from "./components/Layout/Header";
+import Footer        from "./components/Layout/Footer";
+import ScrollToTop   from "./components/Layout/ScrollToTop";
 
-// Importar layout
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import ScrollToTop from './components/layout/ScrollToTop';
 
 // Importar secciones
 import HeroSection from './components/Sections/HeroSection';
