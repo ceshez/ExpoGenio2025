@@ -167,10 +167,28 @@ const handleRegister = async (e) => {
     showModal("error", "Las contraseñas no coinciden")
     return
   }
+
+
   if (!registerData.acceptTerms) {
     showModal("error", "Debes aceptar los términos y condiciones para continuar")
     return
   }
+
+
+  const password = registerData.password
+  const errors = []
+
+  if (password.length < 8) errors.push("La contraseña debe tener al menos 8 caracteres.")
+  if (!/[a-z]/.test(password)) errors.push("La contraseña debe incluir al menos una letra minúscula.")
+  if (!/[A-Z]/.test(password)) errors.push("La contraseña debe incluir al menos una letra mayúscula.")
+  if (!/\d/.test(password)) errors.push("La contraseña debe incluir al menos un número.")
+  if (!/[^\w\s]/.test(password)) errors.push("La contraseña debe incluir al menos un carácter especial (ej: !@#$%).")
+
+  if (errors.length > 0) {
+    showModal("error", errors.join("\n"))
+    return
+  }
+
 
   setIsLoading(true)
   try {
