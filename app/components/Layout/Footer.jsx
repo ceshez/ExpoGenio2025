@@ -19,7 +19,7 @@ const Footer = () => {
     },
     {
       title: "Empresa",
-      links: ["Nosotros", "Socios", "Contacto"],
+      links: ["Mision", "Socios", "Contacto"],
     },
   ]
 

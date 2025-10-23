@@ -26,6 +26,7 @@ const Header = () => {
     { href: "/tutorial", text: "Tutoriales" },
     { href: "#planes", text: "Precios" },
     { href: "#contacto", text: "Contacto" },
+     { href: "/about", text: "Sobre Nosotros" }
   ]
 
   return (
