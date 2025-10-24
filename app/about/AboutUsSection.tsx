@@ -1,5 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
+import { useState } from "react"
+import InteractiveName from "./interactive-name"
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -17,74 +19,77 @@ const staggerContainer = {
 }
 
 export default function AboutUsSection() {
+  const [activeTimeline, setActiveTimeline] = useState(0)
+
   return (
-    <section className="relative z-10 py-20 md:py-32 bg-gradient-to-br from-purple-100 via-pink-50 to-purple-50 overflow-hidden">
+    <section className="relative z-10 py-20 md:py-32 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100 overflow-hidden">
       <motion.div
         animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
         transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute top-1/4 left-10 w-96 h-96 bg-gradient-to-br from-purple-500 to-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+        className="absolute top-1/4 left-10 w-96 h-96 bg-gradient-to-br from-purple-400 to-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
       />
       <motion.div
         animate={{ y: [0, -15, 0], x: [0, -15, 0] }}
         transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute top-1/3 right-20 w-[28rem] h-[28rem] bg-gradient-to-br from-pink-500 to-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25"
+        className="absolute top-1/3 right-20 w-[28rem] h-[28rem] bg-gradient-to-br from-pink-400 to-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-15"
       />
       <motion.div
         animate={{ y: [0, -10, 0], x: [0, 5, 0] }}
         transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute bottom-1/4 left-20 w-80 h-80 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+        className="absolute bottom-1/4 left-20 w-80 h-80 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
       />
-      <motion.div
-        animate={{ y: [0, 15, 0], x: [0, -10, 0] }}
-        transition={{ duration: 7, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute top-1/2 right-1/4 w-72 h-72 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
-      />
-      <motion.div
-        animate={{ y: [0, -12, 0], x: [0, 8, 0] }}
-        transition={{ duration: 9, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        className="absolute bottom-1/3 right-10 w-64 h-64 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-25"
-      />
-      {/* </CHANGE> */}
-
-      {/* Elementos decorativos geométricos */}
-      <div className="absolute top-20 right-1/4 w-2 h-2 bg-purple-500 rounded-full opacity-60" />
-      <div className="absolute top-40 right-1/3 w-3 h-3 bg-pink-500 rounded-full opacity-50" />
-      <div className="absolute bottom-40 left-1/4 w-2 h-2 bg-purple-600 rounded-full opacity-70" />
-      <div className="absolute top-60 left-1/3 w-2 h-2 bg-rose-500 rounded-full opacity-50" />
 
       <div className="relative z-20 container mx-auto px-6 md:px-12 lg:px-20 max-w-7xl">
-        <motion.div initial="hidden" animate="show" variants={fadeInUp} className="text-center mb-16 md:mb-24">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent mb-6 leading-tight">
-            Sobre Nosotros
+        <motion.div initial="hidden" animate="show" variants={fadeInUp} className="text-center mb-20 md:mb-28">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="inline-block mb-6"
+          >
+            <span className="text-6xl md:text-8xl font-black bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+              GENIO
+            </span>
+          </motion.div>
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
+            Empoderando a las PYMEs de Costa Rica
           </h1>
           <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            En <span className="font-bold text-purple-600">GENIO</span>, creemos que la tecnología debe empoderar,
-            inspirar y simplificar la creatividad digital para todos.
+            Creemos que cada pequeña y mediana empresa merece tener presencia digital profesional. La tecnología debe
+            ser accesible, poderosa y diseñada para impulsar tu negocio.
           </p>
         </motion.div>
-        {/* </CHANGE> */}
 
-        {/* Misión y Visión - Layout mejorado lado a lado */}
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          variants={fadeInUp}
+          viewport={{ once: true }}
+          className="mb-20 md:mb-28 flex justify-center"
+        >
+          <InteractiveName />
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-8 mb-20 md:mb-28">
           <motion.div
             initial="hidden"
             whileInView="show"
             variants={fadeInUp}
             viewport={{ once: true }}
-            className="group relative bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 md:p-10 border border-purple-200/50 hover:shadow-2xl transition-all duration-300 overflow-hidden"
+            className="group relative bg-white/60 backdrop-blur-lg rounded-3xl shadow-xl p-10 border border-purple-200/50 hover:shadow-2xl transition-all duration-500 overflow-hidden text-center"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/30 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-300/20 to-transparent rounded-bl-full" />
             <div className="relative">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all mx-auto">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-purple-700 mb-4">Nuestra Misión</h2>
-              <p className="text-gray-700 leading-relaxed text-base md:text-lg">
-                Ofrecer una plataforma intuitiva y poderosa que permita a cualquier persona —sin importar su experiencia
-                técnica— construir sitios web modernos, funcionales y visualmente impactantes que transformen sus ideas
-                en realidad.
+              <h2 className="text-3xl md:text-4xl font-bold text-purple-700 mb-5">Nuestra Misión</h2>
+              <p className="text-gray-700 leading-relaxed text-lg">
+                Democratizar la creación web para las PYMEs costarricenses, ofreciendo herramientas profesionales,
+                intuitivas y accesibles que permitan a cualquier emprendedor construir su presencia digital sin barreras
+                técnicas ni económicas.
               </p>
             </div>
           </motion.div>
@@ -94,12 +99,12 @@ export default function AboutUsSection() {
             whileInView="show"
             variants={fadeInUp}
             viewport={{ once: true }}
-            className="group relative bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 md:p-10 border border-pink-200/50 hover:shadow-2xl transition-all duration-300 overflow-hidden"
+            className="group relative bg-white/60 backdrop-blur-lg rounded-3xl shadow-xl p-10 border border-pink-200/50 hover:shadow-2xl transition-all duration-500 overflow-hidden text-center"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-400/30 to-transparent rounded-bl-full" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-pink-300/20 to-transparent rounded-bl-full" />
             <div className="relative">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all mx-auto">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -114,10 +119,10 @@ export default function AboutUsSection() {
                   />
                 </svg>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-pink-600 mb-4">Nuestra Visión</h2>
-              <p className="text-gray-700 leading-relaxed text-base md:text-lg">
-                Convertirnos en el referente global de herramientas web accesibles, impulsando una nueva generación de
-                creadores digitales con libertad para diseñar, innovar y emprender sin límites tecnológicos.
+              <h2 className="text-3xl md:text-4xl font-bold text-pink-600 mb-5">Nuestra Visión</h2>
+              <p className="text-gray-700 leading-relaxed text-lg">
+                Ser la plataforma líder en Costa Rica para la transformación digital de PYMEs, impulsando el crecimiento
+                económico local y posicionando a nuestras empresas en el mercado global con tecnología de clase mundial.
               </p>
             </div>
           </motion.div>
@@ -128,201 +133,387 @@ export default function AboutUsSection() {
           whileInView="show"
           variants={fadeInUp}
           viewport={{ once: true }}
-          className="bg-gradient-to-br from-purple-100 via-white to-pink-100 rounded-3xl p-8 md:p-12 shadow-2xl border border-purple-200/50 mb-16"
+          className="relative rounded-3xl overflow-hidden shadow-2xl mb-20 md:mb-28"
         >
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-3">
-              Nuestros Valores
-            </h2>
-            <p className="text-gray-700 max-w-2xl mx-auto">
-              Los principios que guían cada decisión y cada línea de código que escribimos
-            </p>
-          </div>
-          <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              {
-                title: "Innovación",
-                desc: "Exploramos constantemente nuevas formas de crear y mejorar experiencias digitales que inspiren y sorprendan al usuario.",
-                icon: (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                ),
-                color: "from-purple-500 to-purple-600",
-              },
-              {
-                title: "Simplicidad",
-                desc: "Diseñamos herramientas potentes pero intuitivas, eliminando la complejidad innecesaria para que todos puedan crear.",
-                icon: (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
-                    />
-                  </svg>
-                ),
-                color: "from-pink-500 to-pink-600",
-              },
-              {
-                title: "Compromiso",
-                desc: "Nos dedicamos a brindar soporte excepcional, calidad superior y crecimiento continuo a nuestra comunidad global.",
-                icon: (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                ),
-                color: "from-indigo-500 to-purple-600",
-              },
-            ].map((val, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group bg-white/90 rounded-2xl shadow-lg p-8 transition-all hover:shadow-2xl border border-purple-100 relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-200/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div
-                  className={`w-16 h-16 bg-gradient-to-br ${val.color} rounded-xl flex items-center justify-center mb-5 shadow-md text-white group-hover:scale-110 transition-transform`}
-                >
-                  {val.icon}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-3">{val.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{val.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
-
-        <motion.div initial="hidden" whileInView="show" variants={fadeInUp} viewport={{ once: true }} className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-3">
-              ¿Por qué GENIO?
-            </h2>
-            <p className="text-gray-700 max-w-2xl mx-auto">
-              Características que nos hacen únicos en el mundo de la creación web
-            </p>
+          <div className="absolute inset-0">
+            <img
+              src="https://es.visitcostarica.com/sites/default/files/styles/scale_1440/public/2024-10/Aerial%20Drone%20view%20of%20Manuel%20Antonio%20National%20Park%20in%20Costa%20Rica.%20.jpg?itok=-fmtK_-h"
+              alt="Costa Rica"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-900/85 via-gray-800/80 to-gray-900/85" />
           </div>
 
-          <motion.div variants={staggerContainer} className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: "Sin Código",
-                desc: "Crea sitios profesionales sin escribir una sola línea de código",
-                gradient: "from-purple-500 to-purple-600",
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                    />
-                  </svg>
-                ),
-              },
-              {
-                title: "Diseño Moderno",
-                desc: "Plantillas y componentes con las últimas tendencias visuales",
-                gradient: "from-pink-500 to-rose-500",
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                    />
-                  </svg>
-                ),
-              },
-              {
-                title: "Responsive",
-                desc: "Todos tus diseños se adaptan perfectamente a cualquier dispositivo",
-                gradient: "from-indigo-500 to-purple-600",
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                    />
-                  </svg>
-                ),
-              },
-              {
-                title: "Rápido",
-                desc: "Optimización automática para tiempos de carga ultrarrápidos",
-                gradient: "from-violet-500 to-purple-600",
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                ),
-              },
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                whileHover={{ y: -10, scale: 1.05 }}
-                className="group relative bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border border-purple-100 overflow-hidden"
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity`}
-                />
-                <div
-                  className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center mb-4 text-white shadow-md group-hover:scale-110 transition-transform`}
-                >
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-32 h-32 border-4 border-white rounded-full" />
+            <div className="absolute bottom-10 right-10 w-40 h-40 border-4 border-white rounded-full" />
+            <div className="absolute top-1/2 left-1/3 w-24 h-24 border-4 border-white rounded-full" />
+          </div>
+
+          <div className="relative z-10 p-12 md:p-20 text-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-6xl font-bold text-white mb-8">De Costa Rica, para Costa Rica</h2>
+              <p className="text-white/95 text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed mb-8">
+                Nacimos en el corazón de Costa Rica con un propósito claro: fortalecer el tejido empresarial local. Cada
+                PYME que crece con GENIO es un paso hacia una economía digital más fuerte y competitiva.
+              </p>
+              <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+                {[...Array(3)].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.2 }}
+                    viewport={{ once: true }}
+                    className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all text-center"
+                  >
+                    <div className="text-5xl mb-3">{["💼", "🌱", "🚀"][i]}</div>
+                    <h3 className="text-white font-bold text-xl mb-2">
+                      {["Enfocados en PYMEs", "Crecimiento Local", "Alcance Global"][i]}
+                    </h3>
+                    <p className="text-white/80 text-sm">
+                      {
+                        [
+                          "Soluciones diseñadas para pequeñas y medianas empresas",
+                          "Impulsando la economía costarricense",
+                          "Tecnología local con estándares internacionales",
+                        ][i]
+                      }
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </motion.div>
-        {/* </CHANGE> */}
 
         <motion.div
           initial="hidden"
           whileInView="show"
           variants={fadeInUp}
           viewport={{ once: true }}
-          className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 rounded-3xl p-10 md:p-16 text-center shadow-2xl overflow-hidden"
+          className="mb-20 md:mb-28"
         >
-          {/* Elementos decorativos */}
-          <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-56 h-56 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
-          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full" />
-          <motion.div
-            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            className="absolute top-1/3 right-1/3 w-24 h-24 bg-white/10 rounded-full"
-          />
-
-          <div className="relative z-10">
-            <h3 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              Construyendo el futuro de la creación web
-            </h3>
-            <p className="text-white/90 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-              GENIO está en desarrollo activo para convertirse en la plataforma donde cada idea cobra vida con diseño
-              excepcional, funcionalidad robusta y una experiencia de usuario sin precedentes.
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-4">
+              Nuestro Camino
+            </h2>
+            <p className="text-gray-700 text-lg max-w-2xl mx-auto">
+              La evolución de una idea hacia una plataforma que transformará las PYMEs de Costa Rica
             </p>
           </div>
+
+          <div className="relative max-w-5xl mx-auto">
+            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-300 via-pink-300 to-purple-300 transform -translate-x-1/2 hidden md:block" />
+
+            <motion.div variants={staggerContainer} className="space-y-12">
+              {[...Array(4)].map((_, i) => {
+                const isLeft = ["left", "right", "left", "right"][i] === "left"
+                return (
+                  <motion.div
+                    key={i}
+                    variants={fadeInUp}
+                    onViewportEnter={() => setActiveTimeline(i)}
+                    viewport={{ once: false, amount: 0.5 }}
+                    className="relative flex items-center md:gap-8 flex-col md:flex-row"
+                  >
+                    {/* Left side */}
+                    <div className={`w-full md:w-5/12 ${isLeft ? "md:text-right" : "md:order-2"}`}>
+                      {isLeft ? (
+                        // Date, icon, quartil on left
+                        <div className="flex items-center gap-4 justify-center md:justify-end mb-4 md:mb-0">
+                          <div>
+                            <div
+                              className={`text-sm font-bold bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} bg-clip-text text-transparent mb-1`}
+                            >
+                              {["Q1", "Q2-Q3", "Q4", "Futuro"][i]}
+                            </div>
+                            <div className="text-3xl font-black text-gray-800">
+                              {["2025", "2025", "2025", "2026+"][i]}
+                            </div>
+                          </div>
+                          <div
+                            className={`w-16 h-16 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
+                          >
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              {i === 0 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                />
+                              )}
+                              {i === 1 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                                />
+                              )}
+                              {i === 2 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                />
+                              )}
+                              {i === 3 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                                />
+                              )}
+                            </svg>
+                          </div>
+                        </div>
+                      ) : (
+                        // Content on left
+                        <motion.div
+                          whileHover={{ scale: 1.05, y: -5 }}
+                          className={`bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 ${activeTimeline === i ? "border-purple-400" : "border-purple-200/50"}`}
+                        >
+                          <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                            {
+                              [
+                                "Primeras Ideas",
+                                "Diseños Principales",
+                                "Creación de la Plataforma",
+                                "Ayuda a las PYMEs del País",
+                              ][i]
+                            }
+                          </h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            {
+                              [
+                                "Identificación de las necesidades de las PYMEs costarricenses. Investigación de mercado y validación del concepto con emprendedores locales.",
+                                "Desarrollo de la arquitectura de la plataforma. Creación de prototipos y pruebas de usabilidad con usuarios reales del sector PYME.",
+                                "Desarrollo completo de GENIO. Implementación de funcionalidades core: generación de sitios, componentes interactivos y sistema de objetos modulares.",
+                                "Lanzamiento oficial y expansión. Programas de capacitación, alianzas estratégicas y crecimiento sostenido apoyando a cientos de empresas costarricenses.",
+                              ][i]
+                            }
+                          </p>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Center dot */}
+                    <motion.div
+                      animate={{
+                        scale: activeTimeline === i ? [1, 1.3, 1] : 1,
+                        boxShadow:
+                          activeTimeline === i
+                            ? [
+                                "0 0 0 0 rgba(168, 85, 247, 0.4)",
+                                "0 0 0 20px rgba(168, 85, 247, 0)",
+                                "0 0 0 0 rgba(168, 85, 247, 0)",
+                              ]
+                            : "0 0 0 0 rgba(168, 85, 247, 0)",
+                      }}
+                      transition={{ duration: 2, repeat: activeTimeline === i ? Number.POSITIVE_INFINITY : 0 }}
+                      className={`hidden md:block w-6 h-6 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-full border-4 border-white shadow-lg z-10 md:order-1`}
+                    />
+
+                    {/* Right side */}
+                    <div className={`w-full md:w-5/12 ${!isLeft ? "md:text-left" : "md:order-2"}`}>
+                      {!isLeft ? (
+                        // Date, icon, quartil on right
+                        <div className="flex items-center gap-4 justify-center md:justify-start mb-4 md:mb-0">
+                          <div
+                            className={`w-16 h-16 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
+                          >
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              {i === 0 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                />
+                              )}
+                              {i === 1 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+                                />
+                              )}
+                              {i === 2 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                                />
+                              )}
+                              {i === 3 && (
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                                />
+                              )}
+                            </svg>
+                          </div>
+                          <div>
+                            <div
+                              className={`text-sm font-bold bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} bg-clip-text text-transparent mb-1`}
+                            >
+                              {["Q1", "Q2-Q3", "Q4", "Futuro"][i]}
+                            </div>
+                            <div className="text-3xl font-black text-gray-800">
+                              {["2025", "2025", "2025", "2026+"][i]}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        // Content on right
+                        <motion.div
+                          whileHover={{ scale: 1.05, y: -5 }}
+                          className={`bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 ${activeTimeline === i ? "border-purple-400" : "border-purple-200/50"}`}
+                        >
+                          <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                            {
+                              [
+                                "Primeras Ideas",
+                                "Diseños Principales",
+                                "Creación de la Plataforma",
+                                "Ayuda a las PYMEs del País",
+                              ][i]
+                            }
+                          </h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            {
+                              [
+                                "Identificación de las necesidades de las PYMEs costarricenses. Investigación de mercado y validación del concepto con emprendedores locales.",
+                                "Desarrollo de la arquitectura de la plataforma. Creación de prototipos y pruebas de usabilidad con usuarios reales del sector PYME.",
+                                "Desarrollo completo de GENIO. Implementación de funcionalidades core: generación de sitios, componentes interactivos y sistema de objetos modulares.",
+                                "Lanzamiento oficial y expansión. Programas de capacitación, alianzas estratégicas y crecimiento sostenido apoyando a cientos de empresas costarricenses.",
+                              ][i]
+                            }
+                          </p>
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          </div>
         </motion.div>
-        {/* </CHANGE> */}
+
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          variants={fadeInUp}
+          viewport={{ once: true }}
+          className="bg-white/50 backdrop-blur-lg rounded-3xl p-10 md:p-16 shadow-xl border border-purple-200/50 mb-20 md:mb-28"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-4">
+              Nuestros Valores
+            </h2>
+            <p className="text-gray-700 text-lg max-w-2xl mx-auto">
+              Los principios que guían cada decisión y cada línea de código
+            </p>
+          </div>
+          <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                whileHover={{ y: -10, scale: 1.03 }}
+                className="group bg-white/70 backdrop-blur-md rounded-3xl shadow-lg p-8 transition-all hover:shadow-2xl border border-purple-100 relative overflow-hidden text-center"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div
+                  className={`w-18 h-18 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-pink-600", "from-indigo-500 to-purple-600"][i]} rounded-2xl flex items-center justify-center mb-6 shadow-md text-white group-hover:scale-110 group-hover:rotate-6 transition-all p-4 mx-auto`}
+                >
+                  {["🧠", "🌍", "❤️"][i]}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                  {["Innovación", "Accesibilidad", "Compromiso Local"][i]}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {
+                    [
+                      "Exploramos constantemente nuevas formas de simplificar la creación web, manteniéndonos a la vanguardia tecnológica para ofrecer las mejores herramientas.",
+                      "Diseñamos para todos. Herramientas potentes pero intuitivas que eliminan barreras técnicas y económicas para las PYMEs costarricenses.",
+                      "Dedicados al crecimiento de Costa Rica. Cada funcionalidad está pensada para impulsar el éxito de nuestras empresas locales.",
+                    ][i]
+                  }
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          variants={fadeInUp}
+          viewport={{ once: true }}
+          className="mb-20 md:mb-28"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-4">
+              El Equipo Detrás de GENIO
+            </h2>
+            <p className="text-gray-700 text-lg max-w-2xl mx-auto">
+              Mentes creativas y apasionadas trabajando para democratizar la tecnología
+            </p>
+          </div>
+
+          <motion.div variants={staggerContainer} className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
+            {[
+              { first: "Britanny", last: "Segura", initial: "B" },
+              { first: "Carlos", last: "Sánchez", initial: "C" },
+              { first: "Yerick", last: "Mondragón", initial: "Y" },
+              { first: "Xiao", last: "Méndez", initial: "X" },
+              { first: "Darien", last: "Mena", initial: "D" },
+            ].map((member, i) => (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                whileHover={{ y: -12, scale: 1.05 }}
+                className="group relative bg-white/70 backdrop-blur-lg rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all border border-purple-100 text-center w-44"
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className={`w-24 h-24 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-purple-600", "from-fuchsia-500 to-pink-600"][i]} rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg`}
+                >
+                  {member.initial}
+                </motion.div>
+                <h3 className="text-lg font-bold text-gray-800">{member.first}</h3>
+                <h4 className="text-base font-semibold text-gray-600">{member.last}</h4>
+                <div className="mt-3 flex justify-center gap-1">
+                  {[...Array(3)].map((_, j) => (
+                    <motion.div
+                      key={j}
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ delay: i * 0.1 + j * 0.1 }}
+                      viewport={{ once: true }}
+                      className={`w-2 h-2 bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-purple-600", "from-fuchsia-500 to-pink-600"][i]} rounded-full`}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )
