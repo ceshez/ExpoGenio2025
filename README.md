@@ -1,3 +1,14 @@
+<p align="center">
+  <img src="./app/public/banner-genio.svg" alt="GENIO Banner" width="100%" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" />
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/TailwindCSS-0EA5E9?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white" />
+  <img src="https://img.shields.io/badge/ExpoTec-2025-purple?style=for-the-badge" />
+</p>
+
 # 🧠 GENIO -- Creador de Sitios Web Inteligente
 
 **GENIO** es una plataforma **no-code / low-code** desarrollada por
@@ -138,12 +149,13 @@ diseño web sin perder personalización.\
 
 ## 👤 Autor
 
-**Carlos Eduardo Sánchez Hernández**
-Colegio Técnico Profesional CEDES Don Bosco\
-🖥️ Especialidad: Desarrollo Web\
-🇨🇷 San José, Costa Rica\
-📧 carlossanchezher10@gmail.com\
-📅 Proyecto ExpoTec 2025
+<p align="left">
+  <img src="/app/public/logo-genio.svg" alt="GENIO Logo" width="70" align="left" style="margin-right:10px;" />
+  <strong>Carlos Eduardo Sánchez Hernández</strong><br/>
+  Colegio Técnico Profesional CEDES Don Bosco<br/>
+  🇨🇷 San José, Costa Rica<br/>
+  💻 Especialidad en Desarrollo Web
+</p>
 
 ------------------------------------------------------------------------
 
