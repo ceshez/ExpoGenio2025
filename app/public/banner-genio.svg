@@ -1,0 +1,64 @@
+<!-- GENIO – Banner SVG (ES, sin logo) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">GENIO – Constructor visual</title>
+  <desc id="desc">Banner del proyecto GENIO sin logo, con fondo degradado y texto en español.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#257DC0"/>
+      <stop offset="55%" stop-color="#2E388E"/>
+      <stop offset="100%" stop-color="#5C2382"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="30%"  stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="70%"  stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="1.1" fill="#FFFFFF" opacity="0.18"/>
+    </pattern>
+    <g id="icon">
+      <rect x="0" y="0" width="54" height="54" rx="10" fill="#ffffff" opacity="0.08" stroke="#257DC0" stroke-width="2"/>
+      <circle cx="8"  cy="8"  r="2" fill="#257DC0"/>
+      <circle cx="46" cy="8"  r="2" fill="#257DC0"/>
+      <circle cx="8"  cy="46" r="2" fill="#257DC0"/>
+      <circle cx="46" cy="46" r="2" fill="#257DC0"/>
+      <path d="M38 34 L53 49 L46 51 L43 58 L38 34Z" fill="#257DC0" opacity="0.95"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="300" rx="20" fill="url(#bg)"/>
+  <rect width="1200" height="300" rx="20" fill="url(#grid)"/>
+  <g transform="translate(-200,-80) rotate(12 600 150)">
+    <rect x="0" y="0" width="1600" height="160" fill="url(#shine)"/>
+  </g>
+
+  <!-- Título -->
+  <g transform="translate(80,70)" filter="url(#soft)">
+    <text x="0" y="60" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif" font-weight="800" font-size="82" letter-spacing="2" fill="#FFFFFF">GENIO</text>
+    <text x="2" y="105" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif" font-weight="600" font-size="22" fill="#CFEFFC" opacity="0.95">Constructor visual • Next.js • React • Tailwind • Puck</text>
+  </g>
+
+  <!-- Badges -->
+  <g transform="translate(80,200)">
+    <rect x="0" y="0" rx="8" width="178" height="36" fill="#ffffff" opacity="0.10" stroke="#257DC0" stroke-width="1.2"/>
+    <text x="14" y="24" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif" font-size="16" fill="#E9FAFF">Código abierto</text>
+
+    <rect x="192" y="0" rx="8" width="200" height="36" fill="#ffffff" opacity="0.10" stroke="#257DC0" stroke-width="1.2"/>
+    <text x="206" y="24" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif" font-size="16" fill="#E9FAFF">Componentes listos</text>
+
+    <rect x="404" y="0" rx="8" width="200" height="36" fill="#ffffff" opacity="0.10" stroke="#257DC0" stroke-width="1.2"/>
+    <text x="418" y="24" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif" font-size="16" fill="#E9FAFF">Asistencia con IA</text>
+  </g>
+
+  <g opacity="0.28" transform="translate(820,10)">
+    <circle cx="140" cy="70" r="36" fill="#257DC0"/>
+    <circle cx="220" cy="50" r="18" fill="#FFFFFF" opacity="0.35"/>
+    <rect x="70" y="130" width="220" height="120" rx="18" fill="#FFFFFF" opacity="0.08"/>
+    <use href="#icon" transform="translate(240,160) scale(0.8)"/>
+  </g>
+</svg>
