@@ -1,8 +1,8 @@
 'use client';
 import React from "react";
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
-import ScrollToTop from "../components/layout/ScrollToTop";
+import Header from "../components/Layout/Header";
+import Footer from "../components/Layout/Footer";
+import ScrollToTop from "../components/Layout/ScrollToTop";
 import AboutUsSection from "./AboutUsSection";
 
 export default function AboutPage() {
