@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Importar componentes comunes
 import LoadingScreen from './components/Common/LoadingScreen';
