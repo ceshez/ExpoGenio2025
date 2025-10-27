@@ -2,6 +2,7 @@
 import { motion } from "framer-motion"
 import { useState } from "react"
 import InteractiveName from "./interactive-name"
+import Image from "next/image"
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -40,24 +41,47 @@ export default function AboutUsSection() {
       />
 
       <div className="relative z-20 container mx-auto px-6 md:px-12 lg:px-20 max-w-7xl">
-        <motion.div initial="hidden" animate="show" variants={fadeInUp} className="text-center mb-20 md:mb-28">
+        <motion.div initial="hidden" animate="show" variants={fadeInUp} className="text-center mb-20 md:mb-28 relative">
+          {/* Decorative glass spheres */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="inline-block mb-6"
-          >
-            <span className="text-6xl md:text-8xl font-black bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-              GENIO
-            </span>
-          </motion.div>
-          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
-            Empoderando a las PYMEs de Costa Rica
-          </h1>
-          <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Creemos que cada pequeña y mediana empresa merece tener presencia digital profesional. La tecnología debe
-            ser accesible, poderosa y diseñada para impulsar tu negocio.
-          </p>
+            animate={{ y: [0, -15, 0], rotate: [0, 180, 360] }}
+            transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            className="absolute -top-10 -left-10 w-32 h-32 bg-gradient-to-br from-purple-400/30 to-pink-400/30 rounded-full backdrop-blur-xl border border-white/40 shadow-2xl"
+          />
+          <motion.div
+            animate={{ y: [0, 20, 0], rotate: [360, 180, 0] }}
+            transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            className="absolute -top-5 -right-5 w-24 h-24 bg-gradient-to-br from-pink-400/30 to-purple-400/30 rounded-full backdrop-blur-xl border border-white/40 shadow-2xl"
+          />
+          <motion.div
+            animate={{ y: [0, -10, 0], x: [0, 10, 0] }}
+            transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-indigo-400/30 to-purple-400/30 rounded-full backdrop-blur-xl border border-white/40 shadow-2xl"
+          />
+
+          <div className="relative bg-white/40 backdrop-blur-2xl rounded-3xl p-12 md:p-16 shadow-2xl border border-white/60">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-purple-500/5 rounded-3xl" />
+            <div className="relative">
+              <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-purple-700 via-pink-600 to-purple-700 bg-clip-text text-transparent mb-6 leading-tight">
+                Empoderando a las PYMEs de Costa Rica
+              </h1>
+              <div className="flex justify-center gap-3 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    className={`w-3 h-3 rounded-full bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600", "from-fuchsia-500 to-pink-600"][i]}`}
+                  />
+                ))}
+              </div>
+              <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                Creemos que cada pequeña y mediana empresa merece tener presencia digital profesional. La tecnología
+                debe ser accesible, poderosa y diseñada para impulsar tu negocio.
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         <motion.div
@@ -136,11 +160,8 @@ export default function AboutUsSection() {
           className="relative rounded-3xl overflow-hidden shadow-2xl mb-20 md:mb-28"
         >
           <div className="absolute inset-0">
-            <img
-              src="https://es.visitcostarica.com/sites/default/files/styles/scale_1440/public/2024-10/Aerial%20Drone%20view%20of%20Manuel%20Antonio%20National%20Park%20in%20Costa%20Rica.%20.jpg?itok=-fmtK_-h"
-              alt="Costa Rica"
-              className="w-full h-full object-cover"
-            />
+            <Image src="/volcanarenal.svg" alt="Costa Rica" fill className="object-cover" priority />
+
             <div className="absolute inset-0 bg-gradient-to-br from-gray-900/85 via-gray-800/80 to-gray-900/85" />
           </div>
 
@@ -209,38 +230,57 @@ export default function AboutUsSection() {
           </div>
 
           <div className="relative max-w-5xl mx-auto">
-            <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-300 via-pink-300 to-purple-300 transform -translate-x-1/2 hidden md:block" />
+            <div className="absolute left-1/2 top-0 bottom-0 transform -translate-x-1/2 hidden md:block">
+              <svg className="w-1 h-full" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgb(216, 180, 254)" />
+                    <stop offset="50%" stopColor="rgb(251, 207, 232)" />
+                    <stop offset="100%" stopColor="rgb(216, 180, 254)" />
+                  </linearGradient>
+                </defs>
+                <line
+                  x1="50%"
+                  y1="0"
+                  x2="50%"
+                  y2="100%"
+                  stroke="url(#lineGradient)"
+                  strokeWidth="4"
+                  strokeDasharray="80 40"
+                />
+              </svg>
+            </div>
 
-            <motion.div variants={staggerContainer} className="space-y-12">
+            <motion.div variants={staggerContainer} className="space-y-16">
               {[...Array(4)].map((_, i) => {
-                const isLeft = ["left", "right", "left", "right"][i] === "left"
+                const isLeft = i % 2 === 0
                 return (
                   <motion.div
                     key={i}
                     variants={fadeInUp}
                     onViewportEnter={() => setActiveTimeline(i)}
                     viewport={{ once: false, amount: 0.5 }}
-                    className="relative flex items-center md:gap-8 flex-col md:flex-row"
+                    className="relative flex items-start md:gap-12 flex-col md:flex-row"
                   >
                     {/* Left side */}
-                    <div className={`w-full md:w-5/12 ${isLeft ? "md:text-right" : "md:order-2"}`}>
+                    <div className={`w-full md:w-5/12 ${isLeft ? "md:text-right md:pr-4" : "md:order-2 md:pl-4"}`}>
                       {isLeft ? (
-                        // Date, icon, quartil on left
-                        <div className="flex items-center gap-4 justify-center md:justify-end mb-4 md:mb-0">
-                          <div>
+                        // Date on left
+                        <div className="flex items-center gap-3 justify-center md:justify-end mb-6 md:mb-0">
+                          <div className="text-right">
                             <div
-                              className={`text-sm font-bold bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} bg-clip-text text-transparent mb-1`}
+                              className={`text-xs font-bold bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} bg-clip-text text-transparent mb-1`}
                             >
                               {["Q1", "Q2-Q3", "Q4", "Futuro"][i]}
                             </div>
-                            <div className="text-3xl font-black text-gray-800">
+                            <div className="text-2xl font-black text-gray-800">
                               {["2025", "2025", "2025", "2026+"][i]}
                             </div>
                           </div>
                           <div
-                            className={`w-16 h-16 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
+                            className={`w-14 h-14 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
                           >
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               {i === 0 && (
                                 <path
                                   strokeLinecap="round"
@@ -279,10 +319,10 @@ export default function AboutUsSection() {
                       ) : (
                         // Content on left
                         <motion.div
-                          whileHover={{ scale: 1.05, y: -5 }}
+                          whileHover={{ scale: 1.03, y: -5 }}
                           className={`bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 ${activeTimeline === i ? "border-purple-400" : "border-purple-200/50"}`}
                         >
-                          <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                          <h3 className="text-2xl font-bold text-gray-800 mb-4">
                             {
                               [
                                 "Primeras Ideas",
@@ -306,32 +346,33 @@ export default function AboutUsSection() {
                       )}
                     </div>
 
-                    {/* Center dot */}
                     <motion.div
                       animate={{
-                        scale: activeTimeline === i ? [1, 1.3, 1] : 1,
+                        scale: activeTimeline === i ? [1, 1.2, 1] : 1,
                         boxShadow:
                           activeTimeline === i
                             ? [
                                 "0 0 0 0 rgba(168, 85, 247, 0.4)",
-                                "0 0 0 20px rgba(168, 85, 247, 0)",
+                                "0 0 0 15px rgba(168, 85, 247, 0)",
                                 "0 0 0 0 rgba(168, 85, 247, 0)",
                               ]
                             : "0 0 0 0 rgba(168, 85, 247, 0)",
                       }}
                       transition={{ duration: 2, repeat: activeTimeline === i ? Number.POSITIVE_INFINITY : 0 }}
-                      className={`hidden md:block w-6 h-6 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-full border-4 border-white shadow-lg z-10 md:order-1`}
-                    />
+                      className={`hidden md:flex w-8 h-8 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-full border-4 border-white shadow-xl z-10 md:order-1 flex-shrink-0 items-center justify-center`}
+                    >
+                      <div className="w-2 h-2 bg-white rounded-full" />
+                    </motion.div>
 
                     {/* Right side */}
-                    <div className={`w-full md:w-5/12 ${!isLeft ? "md:text-left" : "md:order-2"}`}>
+                    <div className={`w-full md:w-5/12 ${!isLeft ? "md:text-left md:pl-4" : "md:order-2 md:pr-4"}`}>
                       {!isLeft ? (
-                        // Date, icon, quartil on right
-                        <div className="flex items-center gap-4 justify-center md:justify-start mb-4 md:mb-0">
+                        // Date on right
+                        <div className="flex items-center gap-3 justify-center md:justify-start mb-6 md:mb-0">
                           <div
-                            className={`w-16 h-16 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
+                            className={`w-14 h-14 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0`}
                           >
-                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               {i === 0 && (
                                 <path
                                   strokeLinecap="round"
@@ -366,13 +407,13 @@ export default function AboutUsSection() {
                               )}
                             </svg>
                           </div>
-                          <div>
+                          <div className="text-left">
                             <div
-                              className={`text-sm font-bold bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} bg-clip-text text-transparent mb-1`}
+                              className={`text-xs font-bold bg-gradient-to-r ${["from-purple-500 to-purple-600", "from-pink-500 to-rose-500", "from-indigo-500 to-purple-600", "from-violet-500 to-pink-600"][i]} bg-clip-text text-transparent mb-1`}
                             >
                               {["Q1", "Q2-Q3", "Q4", "Futuro"][i]}
                             </div>
-                            <div className="text-3xl font-black text-gray-800">
+                            <div className="text-2xl font-black text-gray-800">
                               {["2025", "2025", "2025", "2026+"][i]}
                             </div>
                           </div>
@@ -380,10 +421,10 @@ export default function AboutUsSection() {
                       ) : (
                         // Content on right
                         <motion.div
-                          whileHover={{ scale: 1.05, y: -5 }}
+                          whileHover={{ scale: 1.03, y: -5 }}
                           className={`bg-white/70 backdrop-blur-lg rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 ${activeTimeline === i ? "border-purple-400" : "border-purple-200/50"}`}
                         >
-                          <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                          <h3 className="text-2xl font-bold text-gray-800 mb-4">
                             {
                               [
                                 "Primeras Ideas",
@@ -418,45 +459,81 @@ export default function AboutUsSection() {
           whileInView="show"
           variants={fadeInUp}
           viewport={{ once: true }}
-          className="bg-white/50 backdrop-blur-lg rounded-3xl p-10 md:p-16 shadow-xl border border-purple-200/50 mb-20 md:mb-28"
+          className="relative rounded-3xl overflow-hidden shadow-2xl mb-20 md:mb-28"
         >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-4">
-              Nuestros Valores
-            </h2>
-            <p className="text-gray-700 text-lg max-w-2xl mx-auto">
-              Los principios que guían cada decisión y cada línea de código
-            </p>
+          <div className="absolute inset-0">
+            <Image src="/volcanarenal.svg" alt="Nuestros Valores" fill className="object-cover" priority />
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/85 via-pink-800/80 to-purple-900/85" />
           </div>
-          <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                whileHover={{ y: -10, scale: 1.03 }}
-                className="group bg-white/70 backdrop-blur-md rounded-3xl shadow-lg p-8 transition-all hover:shadow-2xl border border-purple-100 relative overflow-hidden text-center"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100/50 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div
-                  className={`w-18 h-18 bg-gradient-to-br ${["from-purple-500 to-purple-600", "from-pink-500 to-pink-600", "from-indigo-500 to-purple-600"][i]} rounded-2xl flex items-center justify-center mb-6 shadow-md text-white group-hover:scale-110 group-hover:rotate-6 transition-all p-4 mx-auto`}
+
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-32 h-32 border-4 border-white rounded-full" />
+            <div className="absolute bottom-10 right-10 w-40 h-40 border-4 border-white rounded-full" />
+            <div className="absolute top-1/2 left-1/3 w-24 h-24 border-4 border-white rounded-full" />
+          </div>
+
+          <div className="relative z-10 p-10 md:p-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Nuestros Valores</h2>
+              <p className="text-white/90 text-lg max-w-2xl mx-auto">
+                Los principios que guían cada decisión y cada línea de código
+              </p>
+            </div>
+            <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeInUp}
+                  whileHover={{ y: -10, scale: 1.03 }}
+                  className="group bg-white/10 backdrop-blur-md rounded-3xl shadow-lg p-8 transition-all hover:shadow-2xl border border-white/20 hover:bg-white/20 relative overflow-hidden text-center"
                 >
-                  {["🧠", "🌍", "❤️"][i]}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                  {["Innovación", "Accesibilidad", "Compromiso Local"][i]}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {
-                    [
-                      "Exploramos constantemente nuevas formas de simplificar la creación web, manteniéndonos a la vanguardia tecnológica para ofrecer las mejores herramientas.",
-                      "Diseñamos para todos. Herramientas potentes pero intuitivas que eliminan barreras técnicas y económicas para las PYMEs costarricenses.",
-                      "Dedicados al crecimiento de Costa Rica. Cada funcionalidad está pensada para impulsar el éxito de nuestras empresas locales.",
-                    ][i]
-                  }
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div
+                    className={`w-16 h-16 bg-gradient-to-br ${["from-purple-400 to-purple-500", "from-pink-400 to-pink-500", "from-indigo-400 to-purple-500"][i]} rounded-2xl flex items-center justify-center mb-6 shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all mx-auto`}
+                  >
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {i === 0 && (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                        />
+                      )}
+                      {i === 1 && (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      )}
+                      {i === 2 && (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
+                      )}
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    {["Innovación", "Accesibilidad", "Compromiso Local"][i]}
+                  </h3>
+                  <p className="text-white/90 leading-relaxed">
+                    {
+                      [
+                        "Exploramos constantemente nuevas formas de simplificar la creación web, manteniéndonos a la vanguardia tecnológica para ofrecer las mejores herramientas.",
+                        "Diseñamos para todos. Herramientas potentes pero intuitivas que eliminan barreras técnicas y económicas para las PYMEs costarricenses.",
+                        "Dedicados al crecimiento de Costa Rica. Cada funcionalidad está pensada para impulsar el éxito de nuestras empresas locales.",
+                      ][i]
+                    }
+                  </p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
         </motion.div>
 
         <motion.div
