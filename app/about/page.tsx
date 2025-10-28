@@ -4,6 +4,7 @@ import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import ScrollToTop from "../components/Layout/ScrollToTop";
 import AboutUsSection from "./AboutUsSection";
+import InteractiveName from "./interactive-name"
 
 export default function AboutPage() {
   return (
