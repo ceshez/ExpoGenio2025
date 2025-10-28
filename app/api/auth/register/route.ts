@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   console.log("DATABASE_URL at runtime =>", process.env.DATABASE_URL);
