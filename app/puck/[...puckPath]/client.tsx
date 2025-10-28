@@ -6,6 +6,7 @@ import config from "../../../puck.config";
 import Sidebar from "../../components/Layout/Sidebar";
 import { useState } from "react";
 import  Link from "next/link";
+export const runtime = "nodejs";
 
 type RecentItem = {
   id: string;
