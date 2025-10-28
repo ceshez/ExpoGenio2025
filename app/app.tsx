@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './styles.css';
 
 // Importar componentes comunes
 import LoadingScreen from './components/Common/LoadingScreen';
