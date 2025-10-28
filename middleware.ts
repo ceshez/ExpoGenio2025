@@ -5,6 +5,7 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
+  // deja pasar api y assets
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
@@ -12,10 +13,12 @@ export async function middleware(req: NextRequest) {
   ) {
     return NextResponse.next();
   }
-  // Usa SOLO NextAuth
+
+  // Auth por JWT en edge (requiere NEXTAUTH_SECRET y strategy: 'jwt')
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const isAuth = !!token;
 
+  // /cualquier/ruta/edit  → /puck/cualquier/ruta
   if (pathname.endsWith("/edit")) {
     if (!isAuth) {
       const u = new URL("/login", req.url);
@@ -26,7 +29,8 @@ export async function middleware(req: NextRequest) {
     const target = new URL(`/puck${withoutEdit}${search}`, req.url);
     return NextResponse.rewrite(target);
   }
-  // Proteger ruta /puck/*
+
+  // proteger /puck/*
   if (pathname.startsWith("/puck")) {
     if (!isAuth) {
       const u = new URL("/login", req.url);

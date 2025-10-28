@@ -48,18 +48,22 @@ export const dynamic = "force-dynamic";
 
 
 //este codigo servira para despues cuando las rutas esten autenticadas
+// app/puck/[...puckPath]/page.tsx
 import "@measured/puck/puck.css";
 import { Client } from "./client";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ puckPath: string[] }>;
+  params: { puckPath?: string[] };
 }) {
   // exige login
   const session = await getServerSession(authOptions);
@@ -72,13 +76,13 @@ export default async function Page({
   });
   if (!me) redirect("/login");
 
-  const { puckPath = [] } = await params;
-  const path = `/${puckPath.join("/")}`;
+  const { puckPath = [] } = params; // <- YA NO await
+  const path = `/${puckPath.join("/") || ""}`; // "/" si está vacío
 
   // página que se intenta editar
   const page = await prisma.page.findUnique({
-    where: { path }, // path único global en tu schema actual
-    select: { userId: true, content: true },
+    where: { path }, // path único global
+    select: { userId: true, content: true, title: true },
   });
 
   // existe pero NO es mía → 403
@@ -94,7 +98,6 @@ export default async function Page({
     take: 12,
   });
 
-  // render del editor + sidebar
   return (
     <Client
       path={path}
@@ -108,11 +111,3 @@ export default async function Page({
     />
   );
 }
-
-export const dynamic = "force-dynamic";
-
-
-
-
-
-
