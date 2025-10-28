@@ -55,15 +55,12 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function Page({
   params,
 }: {
-  params: { puckPath?: string[] };
+  params: Promise<{ puckPath: string[] }>;
 }) {
   // exige login
   const session = await getServerSession(authOptions);
@@ -76,13 +73,13 @@ export default async function Page({
   });
   if (!me) redirect("/login");
 
-  const { puckPath = [] } = params; // <- YA NO await
-  const path = `/${puckPath.join("/") || ""}`; // "/" si está vacío
+  const { puckPath = [] } = await params;
+  const path = `/${puckPath.join("/")}`;
 
   // página que se intenta editar
   const page = await prisma.page.findUnique({
-    where: { path }, // path único global
-    select: { userId: true, content: true, title: true },
+    where: { path }, // path único global en tu schema actual
+    select: { userId: true, content: true },
   });
 
   // existe pero NO es mía → 403
@@ -98,6 +95,7 @@ export default async function Page({
     take: 12,
   });
 
+  // render del editor + sidebar
   return (
     <Client
       path={path}
@@ -111,3 +109,5 @@ export default async function Page({
     />
   );
 }
+
+export const dynamic = "force-dynamic";
