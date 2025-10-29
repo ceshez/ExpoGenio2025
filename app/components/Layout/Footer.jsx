@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import LogoGenio from "../LogoGenio"
-import { Facebook, Instagram, Twitter, Linkedin, Mail, Send, Sparkles } from "lucide-react"
+import { Facebook, Instagram, Twitter, Linkedin, Mail, Send, Sparkles, Link } from "lucide-react"
 
 const Footer = () => {
   const [email, setEmail] = useState("")
@@ -12,14 +12,17 @@ const Footer = () => {
     {
       title: "Producto",
       links: ["Características", "Plantillas", "Precios", "Demo", "Actualizaciones"],
+      ref:["caracteristicas", "templates", "pricing", "demo", "updates"],
     },
     {
       title: "Recursos",
       links: ["Blog", "Tutoriales", "Documentación", "Comunidad"],
+      ref:["blog", "tutorial", "documentation", "community"],
     },
     {
       title: "Empresa",
       links: ["Mision", "Socios", "Contacto"],
+      ref:["mision", "partners", "contact"],
     },
   ]
 
@@ -38,7 +41,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Logo y descripción */}
           <div className="lg:col-span-2">
-            <a href="#" className="flex items-center gap-3 text-2xl font-bold mb-4 group">
+            <a href="/" className="flex items-center gap-3 text-2xl font-bold mb-4 group">
              <div className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
               <LogoGenio variant="simplified"/>
             </div>
@@ -105,16 +108,17 @@ const Footer = () => {
               <h4 className="font-semibold text-lg mb-4 text-purple-300">{section.title}</h4>
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
+                 <li key={linkIndex}>
                     <a
-                      href="#"
-                      className="text-gray-400 hover:text-purple-300 transition-colors hover:translate-x-1 inline-block"
+                      href={`/${section.ref[linkIndex]}`}
+                    className="text-gray-400 hover:text-purple-300 transition-colors hover:translate-x-1 inline-block"
                     >
-                      {link}
-                    </a>
+                        {link}
+                   </a>
                   </li>
-                ))}
-              </ul>
+  ))}
+</ul>
+
             </div>
           ))}
         </div>
