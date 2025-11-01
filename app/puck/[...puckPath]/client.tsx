@@ -27,7 +27,7 @@ export function Client({ path, data, recentDesigns = [] }: ClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen"> 
+    <div className="flex h-screen"> 
       <div className="flex flex-none">
         {recentDesigns.length > 0 && (
           <Sidebar

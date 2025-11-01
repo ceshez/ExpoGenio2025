@@ -26,7 +26,7 @@ export default function DashboardClient({ recentDesigns }: { recentDesigns: Rece
           id: r.id,
           title: r.title,
           path: r.path,
-          updatedAt: new Date().toISOString(),
+          updatedAt: r.updatedAtText,
         }))}
       />
 
@@ -97,4 +97,3 @@ export default function DashboardClient({ recentDesigns }: { recentDesigns: Rece
     </div>
   )
 }
-

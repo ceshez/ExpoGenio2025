@@ -1,7 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, Home, Layout, FolderPlus, User, Settings, LogOut, X, MoreHorizontal, Trash2, CircleFadingPlus } from "lucide-react"
+import {
+  Menu,
+  Home,
+  Layout,
+  User,
+  Settings,
+  LogOut,
+  X,
+  MoreHorizontal,
+  Trash2,
+  CircleFadingPlus,
+  Star,
+} from "lucide-react"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
 
@@ -20,6 +32,9 @@ interface SidebarProps {
 
 export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [activeContextMenu, setActiveContextMenu] = useState<string | null>(null)
+  const [showAllPages, setShowAllPages] = useState(false)
+  const PAGES_LIMIT = 7
 
   useEffect(() => {
     console.log("Sidebar sidebarOpen state:", sidebarOpen)
@@ -30,19 +45,24 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
     if (!target.closest("[data-user-menu]")) {
       setUserMenuOpen(false)
     }
+    if (!target.closest("[data-context-menu]")) {
+      setActiveContextMenu(null)
+    }
   }
 
   useEffect(() => {
-    if (userMenuOpen) {
+    if (userMenuOpen || activeContextMenu) {
       document.addEventListener("click", handleClickOutside)
       return () => document.removeEventListener("click", handleClickOutside)
     }
-  }, [userMenuOpen])
+  }, [userMenuOpen, activeContextMenu])
 
   const handleBurgerClick = () => {
-    console.log("[v0] Burger menu clicked, current state:", sidebarOpen)
     setSidebarOpen(!sidebarOpen)
   }
+
+  const visiblePages = showAllPages ? recentDesigns : recentDesigns.slice(0, PAGES_LIMIT)
+  const hasMorePages = recentDesigns.length > PAGES_LIMIT
 
   return (
     <>
@@ -60,16 +80,28 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
 
         <div className="flex flex-col gap-2 px-3 flex-1">
           <Link href="/dashboard">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Home className="text-sidebar-foreground" size={20} />
-          </button>
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <Home className="text-sidebar-foreground" size={20} />
+            </button>
           </Link>
+          <Link href="/dashboard/projects">
           <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
             <Layout className="text-sidebar-foreground" size={20} />
           </button>
+          </Link>
           <Link href="/dashboard/new">
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <CircleFadingPlus className="text-sidebar-foreground" size={20} />
+            </button>
+          </Link>
+          <Link href="/dashboard/favorites">
           <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <CircleFadingPlus className="text-sidebar-foreground" size={20} />
+            <Star className="text-sidebar-foreground" size={20} />
+          </button>
+          </Link>
+          <Link href="/dashboard/deleted">
+          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+            <Trash2 className="text-sidebar-foreground" size={20} />
           </button>
           </Link>
         </div>
@@ -144,46 +176,71 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto min-h-0">
             <div className="p-4 space-y-2">
-              {recentDesigns.map((page) => (
-                <Link
-                  key={page.id}
-                  href={`${page.path}/edit`}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors group"
-                >
-                  <div className="w-12 h-8 rounded-md bg-muted flex-shrink-0 shadow-sm flex items-center justify-center">
-                    <Layout size={14} className="text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-sidebar-foreground truncate">{page.title}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(page.updatedAt).toLocaleDateString("es-ES", {
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </p>
-                  </div>
-                  <button
-                    onClick={(e) => e.preventDefault()}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-sidebar-accent transition-all duration-200 cursor-pointer"
+              {visiblePages.map((page) => (
+                <div key={page.id} className="relative">
+                  <Link
+                    href={`${page.path}/edit`}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors group"
                   >
-                    <MoreHorizontal size={14} className="text-muted-foreground" />
-                  </button>
-                </Link>
+                    <div className="w-12 h-8 rounded-md bg-muted flex-shrink-0 shadow-sm flex items-center justify-center">
+                      <Layout size={14} className="text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-sidebar-foreground truncate">{page.title}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(page.updatedAt).toLocaleDateString("es-ES", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </p>
+                    </div>
+                    <div data-context-menu className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setActiveContextMenu(activeContextMenu === page.id ? null : page.id)
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-sidebar-accent transition-all duration-200 cursor-pointer"
+                      >
+                        <MoreHorizontal size={14} className="text-muted-foreground" />
+                      </button>
+
+                      {activeContextMenu === page.id && (
+                        <>
+                          <div className="fixed inset-0 z-40" onClick={() => setActiveContextMenu(null)} />
+                          <div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-40 z-50">
+                            <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left">
+                              <Star size={14} />
+                              Favoritos
+                            </button>
+                            <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left">
+                              <Trash2 size={14} />
+                              Eliminar
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </Link>
+                </div>
               ))}
 
               {recentDesigns.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">No hay sitios recientes</p>
               )}
-            </div>
-          </div>
 
-          <div className="p-4 border-t border-sidebar-border flex-shrink-0">
-            <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors text-sidebar-foreground cursor-pointer">
-              <Trash2 size={18} />
-              <span className="text-sm font-medium">Eliminar</span>
-            </button>
+              {hasMorePages && (
+                <button
+                  onClick={() => setShowAllPages(!showAllPages)}
+                  className="w-full mt-2 p-3 text-sm text-primary hover:bg-sidebar-accent rounded-lg transition-colors font-medium"
+                >
+                  {showAllPages ? "Ver menos" : `Ver más (${recentDesigns.length - PAGES_LIMIT})`}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </aside>
