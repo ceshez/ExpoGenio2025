@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./app/public/banner-genio.svg" alt="GENIO Banner" width="100%" />
+  <img src="public/banner-genio.svg" alt="GENIO Banner" width="100%" />
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" />
@@ -150,7 +150,7 @@ diseño web sin perder personalización.\
 ## 👤 Autor
 
 <p align="left">
-  <img src="/app/public/logo-genio.svg" alt="GENIO Logo" width="70" align="left" style="margin-right:10px;" />
+  <img src="public/logo-genio.svg" alt="GENIO Logo" width="70" align="left" style="margin-right:10px;" />
   <strong>Carlos Eduardo Sánchez Hernández</strong><br/>
   Colegio Técnico Profesional CEDES Don Bosco<br/>
   🇨🇷 San José, Costa Rica<br/>
