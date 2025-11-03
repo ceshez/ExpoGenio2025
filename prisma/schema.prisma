@@ -13,22 +13,46 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-//Datos que tendra el usuario y sus paginas
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String
-  name     String
-  lastName String
-  pages    Page[]
+
+enum Role {
+  USER
+  SUBADMIN
+  ADMIN
 }
 
-//Datos de las paginas que tendra el usuario
-//Cada pagina tendra un titulo, contenido, fecha de creacion y actualizacion, y una relacion con el usuario
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  password        String
+  name            String
+  lastName        String
+
+  // NUEVOS 
+  role            Role     @default(USER)
+  recoveryEmail   String?  @unique
+  photoUrl        String?
+  photoBase64     String?
+
+  // Verificación y 2FA
+  emailVerifiedAt DateTime?
+  twoFAEnabled    Boolean  @default(false)
+  twoFAMethod     String?  // "email" | "totp"
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // (conservar mientras se migra a Mongo)
+  pages           Page[]
+
+  favorites       Favorite[] // favoritos (referencia a Mongo por string IDs/paths)
+}
+
+// (Opcional) mantener durante migración mientras se migra a Mongo
+// Cuando se terminde de migrar a Mongo,se eliminara este modelo
 model Page {
   id        Int      @id @default(autoincrement())
   title     String
-  path      String   @unique        
+  path      String   @unique
   content   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -36,3 +60,15 @@ model Page {
   user      User     @relation(fields: [userId], references: [id])
 }
 
+// Tabla de favoritos (apunta a Mongo)
+// Guarda el "tipo" y "ref" (ObjectId string o path slug)
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  kind      String   // "page" | "blog" | "tutorial" | "news" | "update"
+  ref       String   // p.ej. ObjectId como string, o path
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, kind, ref], name: "favorites_user_kind_ref_idx")
+}
