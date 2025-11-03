@@ -1,6 +1,5 @@
 // app/puck/api/route.ts
 export const runtime = "nodejs";
-
 import { revalidatePath } from "next/cache";
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";

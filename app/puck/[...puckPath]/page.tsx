@@ -49,24 +49,24 @@ export const dynamic = "force-dynamic";
 
 //este codigo servira para despues cuando las rutas esten autenticadas
 // app/puck/[...puckPath]/page.tsx
-// app/puck/[...puckPath]/page.tsx
-// app/puck/[...puckPath]/page.tsx
-// app/puck/[...puckPath]/page.tsx
 import "@measured/puck/puck.css";
 import { Client } from "./client";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+export const runtime = "nodejs";
 
 export default async function Page({
   params,
 }: {
   params: Promise<{ puckPath: string[] }>;
 }) {
+  // exige login
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
+  // dueño actual
   const me = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true },
@@ -76,23 +76,38 @@ export default async function Page({
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
+  // página que se intenta editar
   const page = await prisma.page.findUnique({
-    where: { path }, // path único global
+    where: { path }, // path único global en tu schema actual
     select: { userId: true, content: true },
   });
 
-  // existe pero no es mía -> 403
+  // existe pero NO es mía → 403
   if (page && page.userId !== me.id) {
     redirect("/forbidden");
   }
 
-  // si es mía, cargo su contenido; si no existe, abro el editor vacío
-  return <Client path={path} data={(page?.content as any) ?? {}} />;
+  // sitios recientes del dueño (para el Sidebar del editor)
+  const recent = await prisma.page.findMany({
+    where: { userId: me.id },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, title: true, path: true, updatedAt: true },
+    take: 12,
+  });
+
+  // render del editor + sidebar
+  return (
+    <Client
+      path={path}
+      data={(page?.content as any) ?? {}}
+      recentDesigns={recent.map((r) => ({
+        id: String(r.id),
+        title: r.title || r.path,
+        path: r.path,
+        updatedAt: r.updatedAt,
+      }))}
+    />
+  );
 }
 
 export const dynamic = "force-dynamic";
-
-
-
-
-

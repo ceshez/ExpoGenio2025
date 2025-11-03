@@ -11,6 +11,7 @@
  */
 
 // app/[...puckPath]/page.tsx
+export const runtime = "nodejs";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";

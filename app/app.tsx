@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import './styles.css';
 
 // Importar componentes comunes
-import LoadingScreen from './components/common/LoadingScreen';
+import LoadingScreen from './components/Common/LoadingScreen';
 
 // Importar layout
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import ScrollToTop from './components/layout/ScrollToTop';
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
+import ScrollToTop from './components/Layout/ScrollToTop';
 
 // Importar secciones
 import HeroSection from './components/Sections/HeroSection';
@@ -19,7 +20,7 @@ import ContactSection from './components/Sections/ContactSection';
 import CTASection from './components/Sections/CTASection';
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true);
+ const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   useEffect(() => {

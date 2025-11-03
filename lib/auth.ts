@@ -23,7 +23,6 @@ export const authOptions: NextAuthOptions = {
         const ok = await compare(credentials.password, user.password);
         if (!ok) return null;
 
-        // ¡OJO!: devolvemos id numérico/string
         return {
           id: user.id.toString(),
           email: user.email,
@@ -41,7 +40,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // Mete el id del usuario en el JWT
     async jwt({ token, user }) {
-      if (user?.id) token.uid = user.id; // guardamos id como uid
+      if (user?.id) token.uid = user.id; 
       return token;
     },
     // Expone el id en la session (session.user.id)

@@ -1,6 +1,6 @@
 import VideoSection from "./InfoVideo"
-import Header from "../components/layout/Header"
-import Footer from "../components/layout/Footer"
+import Header from "../components/Layout/Header"
+import Footer from "../components/Layout/Footer"
 export default function Page() {
   return (
     <main>

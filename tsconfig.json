@@ -2,11 +2,21 @@
   "extends": "./tsconfig/nextjs.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
   },
 },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/plantillas/Plantillas.jsx", "app/components/LogoGenio.tsx", "app/components/Layout/Dashboard-header.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/plantillas/Plantillas.jsx", "app/components/LogoGenio.tsx", "app/components/Layout/Dashboard-header.tsx", "app/AboutUs/AboutUsSection.tsx", "app/components/Common/LoadingScreen.jsx"],
   "exclude": ["node_modules"]
 }
