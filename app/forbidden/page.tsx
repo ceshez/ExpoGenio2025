@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import Denied from "../GIO-mascota/GIO_Denied@100x.png"
+import Denied from "../GIO-mascota/GIO2.0-error.svg"
 
 export default function Forbidden() {
   return (

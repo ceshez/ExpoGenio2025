@@ -49,65 +49,77 @@ export const dynamic = "force-dynamic";
 
 //este codigo servira para despues cuando las rutas esten autenticadas
 // app/puck/[...puckPath]/page.tsx
+// app/puck/[...puckPath]/page.tsx
 import "@measured/puck/puck.css";
+import * as React from "react";
 import { Client } from "./client";
+
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-export const runtime = "nodejs";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ puckPath: string[] }>;
-}) {
-  // exige login
+import { PageModel } from "@/lib/mongodb/models/Page";
+import type { IPage } from "@/lib/mongodb/models/Page";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+type RouteParams = {
+  params: { puckPath?: string[] }; // <- NO es Promise
+};
+
+export default async function Page({ params }: RouteParams) {
+  // 1) Exige login
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  // dueño actual
+  // 2) Dueño actual 
   const me = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true },
   });
   if (!me) redirect("/login");
 
-  const { puckPath = [] } = await params;
+  // 3) Path desde la URL
+  const { puckPath = [] } = params || {};
   const path = `/${puckPath.join("/")}`;
 
-  // página que se intenta editar
-  const page = await prisma.page.findUnique({
-    where: { path }, // path único global en tu schema actual
-    select: { userId: true, content: true },
-  });
+  // 4) Cargar página desde Mongo
+  const Pages = await PageModel();
 
-  // existe pero NO es mía → 403
+  const page = (await Pages.findOne({ path }).lean<IPage | null>()) ?? null;
+
+  // 5) solo el dueño puede editar
   if (page && page.userId !== me.id) {
     redirect("/forbidden");
   }
 
-  // sitios recientes del dueño (para el Sidebar del editor)
-  const recent = await prisma.page.findMany({
-    where: { userId: me.id },
-    orderBy: { updatedAt: "desc" },
-    select: { id: true, title: true, path: true, updatedAt: true },
-    take: 12,
-  });
+  const dataForEditor = page?.content ?? {};
 
-  // render del editor + sidebar
+  // 6) Sitios recientes del dueño 
+  const recentDocs = await Pages.find(
+    { userId: me.id, isDeleted: { $ne: true } },
+    { _id: 0, title: 1, path: 1, updatedAt: 1 } // solo incluyo estos
+  )
+    .sort({ updatedAt: -1 })
+    .lean<IPage[]>();
+
+  // 7) Mapear lo que necesita tu <Client />
+  const recentDesigns = recentDocs.map((r) => ({
+    id: r.path, // usamos el path como id visible
+    title: r.title || r.path,
+    path: r.path,
+
+    updatedAt: r.updatedAt ?? new Date(),
+  }));
+
+  // 8) Render del editor
   return (
     <Client
       path={path}
-      data={(page?.content as any) ?? {}}
-      recentDesigns={recent.map((r) => ({
-        id: String(r.id),
-        title: r.title || r.path,
-        path: r.path,
-        updatedAt: r.updatedAt,
-      }))}
+      data={dataForEditor}
+      recentDesigns={recentDesigns}
     />
   );
 }
-
-export const dynamic = "force-dynamic";
