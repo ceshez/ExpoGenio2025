@@ -38,16 +38,13 @@ model User {
   twoFAEnabled    Boolean  @default(false)
   twoFAMethod     String?  // "email" | "totp"
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 
   // (conservar mientras se migra a Mongo)
   pages           Page[]
 
   favorites       Favorite[] // favoritos (referencia a Mongo por string IDs/paths)
 }
-
-// (Opcional) mantener durante migración mientras se migra a Mongo
+// (Opcional) mantener  mientras se migra a Mongo
 // Cuando se terminde de migrar a Mongo,se eliminara este modelo
 model Page {
   id        Int      @id @default(autoincrement())
