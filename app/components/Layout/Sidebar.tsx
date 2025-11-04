@@ -211,16 +211,59 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                       {activeContextMenu === page.id && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setActiveContextMenu(null)} />
-                          <div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-40 z-50">
-                            <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left">
-                              <Star size={14} />
-                              Favoritos
-                            </button>
-                            <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left">
-                              <Trash2 size={14} />
-                              Eliminar
-                            </button>
-                          </div>
+<div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-40 z-50">
+  {/* Toggle favoritos */}
+  <button
+    onClick={async (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      try {
+        await fetch("/api/pages/favorite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path: page.path,
+            // si no viene isFavorite desde el backend, asumimos false
+            favorite: !(page as any).isFavorite,
+          }),
+        })
+      } finally {
+        setActiveContextMenu(null)
+        window.location.reload()
+      }
+    }}
+    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left"
+  >
+    <Star
+      size={14}
+      className={(page as any).isFavorite ? "text-yellow-400 fill-yellow-400" : ""}
+    />
+    {(page as any).isFavorite ? "Quitar favorito" : "Añadir a favoritos"}
+  </button>
+
+  {/* Enviar a papelera */}
+  <button
+    onClick={async (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      try {
+        await fetch("/api/pages/trash", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: page.path }),
+        })
+      } finally {
+        setActiveContextMenu(null)
+        window.location.reload()
+      }
+    }}
+    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left"
+  >
+    <Trash2 size={14} />
+    Enviar a papelera
+  </button>
+</div>
+    
                         </>
                       )}
                     </div>
