@@ -33,7 +33,6 @@ export default async function DashboardPage() {
 
   const Pages = await PageModel();
 
-  // ✅ usa .select con string para evitar conflictos de proyección
   const docs = await Pages.find({ userId: me.id, isDeleted: { $ne: true } })
     .select("title path updatedAt content isFavorite userId -_id")
     .sort({ updatedAt: -1 })

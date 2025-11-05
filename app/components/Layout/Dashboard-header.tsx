@@ -9,19 +9,12 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({
-  sidebarOpen,
-  setSidebarOpen,
+
 }: DashboardHeaderProps) {
   return (
     <header className="flex items-center justify-between bg-background shadow-sm border-b border-border p-6">
       <div className="flex items-center gap-4">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="text-foreground" size={24} />
-        </button>
+
         <div
           onClick={() => (window.location.href = "/")}
           className="transition-transform duration-300 hover:rotate-12 hover:scale-110 cursor-pointer"
