@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { PageModel } from "@/lib/mongodb/models/Page";
 import type { IPage } from "@/lib/mongodb/models/Page";
 import { RestoreButton, DeleteForeverButton } from "../../components/Layout/PageActions";
+export const runtime = "nodejs";
 
 const DAYS = 7;
 

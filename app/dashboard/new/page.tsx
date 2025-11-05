@@ -6,6 +6,7 @@ import { customAlphabet } from "nanoid"
 import  { ImageIcon } from "lucide-react"
 import { PageModel } from "@/lib/mongodb/models/Page"
 import LogoGenio from "../../components/LogoGenio"
+export const runtime = "nodejs";
 
 const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 12)
 

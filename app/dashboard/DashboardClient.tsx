@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState } from "react"
 import Sidebar from "../components/Layout/Sidebar"
 import DashboardHeader from "../components/Layout/Dashboard-header"
+export const runtime = "nodejs";
 
 type RecentItem = {
   id: string

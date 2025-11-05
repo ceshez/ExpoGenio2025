@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { PageModel } from "@/lib/mongodb/models/Page";
 import type { IPage } from "@/lib/mongodb/models/Page";
 import { FavoriteButton, TrashButton } from "../../components/Layout/PageActions";
+export const runtime = "nodejs";
 
 export default async function FavoritesPage() {
   const session = await getServerSession(authOptions);

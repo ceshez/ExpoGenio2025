@@ -5,6 +5,7 @@ import DashboardClient from "./DashboardClient";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { PageModel } from "@/lib/mongodb/models/Page";
+export const runtime = "nodejs";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
