@@ -57,4 +57,4 @@ export default async function DashboardPage() {
 
   return <DashboardClient recentDesigns={recentDesigns} />;
 }
-
+export const dynamic = "force-dynamic";

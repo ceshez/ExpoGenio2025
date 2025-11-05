@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "postinstall": "prisma generate --no-engine",
+    "postinstall": "prisma generate",
     "prebuild": "rimraf node_modules/.prisma && prisma generate",
     "build": "next build",
     "start": "next start",
