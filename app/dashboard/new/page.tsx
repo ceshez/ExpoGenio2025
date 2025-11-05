@@ -4,39 +4,41 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { customAlphabet } from "nanoid"
 import  { ImageIcon } from "lucide-react"
+import { PageModel } from "@/lib/mongodb/models/Page"
 import LogoGenio from "../../components/LogoGenio"
 
 const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 12)
 
-export default async function NewSitePage() {
+export default function NewSitePage() {
   async function create(formData: FormData) {
-    "use server"
+    "use server";
+    const session = await getServerSession(authOptions);
+    const email = session?.user?.email;
+    if (!email) redirect("/login");
 
-    const session = await getServerSession(authOptions)
-    const email = session?.user?.email
-    if (!email) redirect("/login")
+    // 1) id desde Prisma
+    const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (!user) redirect("/login");
 
-    const user = await prisma.user.findUnique({ where: { email }, select: { id: true } })
-    if (!user) redirect("/login")
+    const title = (formData.get("title") as string)?.trim() || "Mi sitio";
 
-    const title = (formData.get("title") as string)?.trim() || "Mi sitio"
-
-    // Generar path aleatorio y comprobar colisión
-    let path = `/${nanoid()}`
-    while (await prisma.page.findUnique({ where: { path } })) {
-      path = `/${nanoid()}`
+    // 2) path único (global). Valida colisión en Mongo
+    const Pages = await PageModel();
+    let path = `/${nanoid(10)}`;
+    // si unique global:
+    while (await Pages.findOne({ path }, { projection: { _id: 1 } })) {
+      path = `/${nanoid(10)}`;
     }
 
-    await prisma.page.create({
-      data: {
-        title,
-        path, 
-        userId: user.id,
-        content: { root: { type: "container", props: { title }, children: [] } },
-      },
-    })
+    // 3) guarda en Mongo
+    await Pages.create({
+      userId: user.id,
+      title,
+      path,
+      content: { root: { type: "container", props: { title }, children: [] } },
+    });
 
-    redirect(`${path}/edit`) // middleware reescribe a /puck/<path>
+    redirect(`${path}/edit`); // el middleware reescribe a /puck/<path>
   }
 
   return (
