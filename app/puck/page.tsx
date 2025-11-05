@@ -7,6 +7,6 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Genio – Editor",
-  description: "Editor visual de páginas con Puck",
+  description: "Editor visual de páginas",
 };
 
