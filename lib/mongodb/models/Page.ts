@@ -21,7 +21,7 @@ const PageSchema = new Schema<IPage>({
   content:   { type: Schema.Types.Mixed, required: true },
   isFavorite:{ type: Boolean, default: false, index: true },
   isDeleted: { type: Boolean, default: false, index: true },
-  deletedAt: { type: Date, default: null, index: true },
+  deletedAt: { type: Date, default: null},
 }, { timestamps: true });
 
 // Auto-borrado 7 días DESPUÉS de entrar a papelera:

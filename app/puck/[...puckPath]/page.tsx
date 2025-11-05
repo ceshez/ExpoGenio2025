@@ -49,77 +49,65 @@ export const dynamic = "force-dynamic";
 
 //este codigo servira para despues cuando las rutas esten autenticadas
 // app/puck/[...puckPath]/page.tsx
-// app/puck/[...puckPath]/page.tsx
 import "@measured/puck/puck.css";
-import * as React from "react";
 import { Client } from "./client";
-
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-
-import { PageModel } from "@/lib/mongodb/models/Page";
-import type { IPage } from "@/lib/mongodb/models/Page";
+import { prisma } from "@/lib/prisma";
+import { PageModel, type IPage } from "@/lib/mongodb/models/Page";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type RouteParams = {
-  params: { puckPath?: string[] }; // <- NO es Promise
-};
+export default async function Page({
+  params,
+}: {
 
-export default async function Page({ params }: RouteParams) {
-  // 1) Exige login
+  params: Promise<{ puckPath?: string[] }>;
+}) {
+  // 1) Login requerido
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  // 2) Dueño actual 
+  // 2) Dueño actual (id en Prisma)
   const me = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true },
   });
   if (!me) redirect("/login");
 
-  // 3) Path desde la URL
-  const { puckPath = [] } = params || {};
+  // 3) NO usar params directamente: primero await
+  const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
-  // 4) Cargar página desde Mongo
+  // 4) Cargar página desde Mongo por path
   const Pages = await PageModel();
+  const page = (await Pages.findOne({ path }).lean()) as IPage | null;
 
-  const page = (await Pages.findOne({ path }).lean<IPage | null>()) ?? null;
+  // 5) Existe pero no es mía → 403
+  if (page && page.userId !== me.id) redirect("/forbidden");
 
-  // 5) solo el dueño puede editar
-  if (page && page.userId !== me.id) {
-    redirect("/forbidden");
-  }
-
-  const dataForEditor = page?.content ?? {};
-
-  // 6) Sitios recientes del dueño 
+  // 6) Sitios recientes del dueño (para el sidebar)
+  //    Solo seleccionamos campos necesarios
   const recentDocs = await Pages.find(
     { userId: me.id, isDeleted: { $ne: true } },
-    { _id: 0, title: 1, path: 1, updatedAt: 1 } // solo incluyo estos
+    { _id: 0, title: 1, path: 1, updatedAt: 1 }
   )
     .sort({ updatedAt: -1 })
-    .lean<IPage[]>();
+    .lean();
 
-  // 7) Mapear lo que necesita tu <Client />
-  const recentDesigns = recentDocs.map((r) => ({
-    id: r.path, // usamos el path como id visible
-    title: r.title || r.path,
-    path: r.path,
-
-    updatedAt: r.updatedAt ?? new Date(),
-  }));
-
-  // 8) Render del editor
+  // 7) Render del editor
   return (
     <Client
       path={path}
-      data={dataForEditor}
-      recentDesigns={recentDesigns}
+      data={(page?.content as any) ?? {}}
+      recentDesigns={recentDocs.map((r: any) => ({
+        id: r.path,
+        title: r.title || r.path,
+        path: r.path,
+        updatedAt: r.updatedAt ?? new Date(),
+      }))}
     />
   );
 }
