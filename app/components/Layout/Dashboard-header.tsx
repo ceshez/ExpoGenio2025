@@ -1,6 +1,5 @@
 "use client";
 
-import { Menu, Sparkles } from "lucide-react";
 import GenioLogo from "../LogoGenio";
 
 interface DashboardHeaderProps {
