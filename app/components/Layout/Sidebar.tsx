@@ -64,6 +64,16 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
   const visiblePages = showAllPages ? recentDesigns : recentDesigns.slice(0, PAGES_LIMIT)
   const hasMorePages = recentDesigns.length > PAGES_LIMIT
 
+  const fmtShortCR = new Intl.DateTimeFormat("es-CR", {
+    day: "numeric",
+    month: "short",
+    timeZone: "America/Costa_Rica",
+  })
+  const renderSidebarDate = (value: string) => {
+    const dt = new Date(value)
+    return isNaN(dt.getTime()) ? value : fmtShortCR.format(dt)
+  }
+
   return (
     <>
       {/* Icon Sidebar */}
@@ -85,9 +95,9 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
             </button>
           </Link>
           <Link href="/dashboard/projects">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Layout className="text-sidebar-foreground" size={20} />
-          </button>
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <Layout className="text-sidebar-foreground" size={20} />
+            </button>
           </Link>
           <Link href="/dashboard/new">
             <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
@@ -95,14 +105,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
             </button>
           </Link>
           <Link href="/dashboard/favorites">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Star className="text-sidebar-foreground" size={20} />
-          </button>
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <Star className="text-sidebar-foreground" size={20} />
+            </button>
           </Link>
           <Link href="/dashboard/deleted">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Trash2 className="text-sidebar-foreground" size={20} />
-          </button>
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <Trash2 className="text-sidebar-foreground" size={20} />
+            </button>
           </Link>
         </div>
 
@@ -190,10 +200,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-medium text-sidebar-foreground truncate">{page.title}</h3>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(page.updatedAt).toLocaleDateString("es-ES", {
-                          day: "numeric",
-                          month: "short",
-                        })}
+                        {renderSidebarDate(page.updatedAt)}
                       </p>
                     </div>
                     <div data-context-menu className="relative">
@@ -211,59 +218,54 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                       {activeContextMenu === page.id && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setActiveContextMenu(null)} />
-<div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-40 z-50">
-  {/* Toggle favoritos */}
-  <button
-    onClick={async (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      try {
-        await fetch("/api/pages/favorite", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            path: page.path,
-            // si no viene isFavorite desde el backend, asumimos false
-            favorite: !(page as any).isFavorite,
-          }),
-        })
-      } finally {
-        setActiveContextMenu(null)
-        window.location.reload()
-      }
-    }}
-    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left"
-  >
-    <Star
-      size={14}
-      className={(page as any).isFavorite ? "text-yellow-400 fill-yellow-400" : ""}
-    />
-    {(page as any).isFavorite ? "Quitar favorito" : "Añadir a favoritos"}
-  </button>
+                          <div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-40 z-50">
+                            {/* Toggle favoritos → SOLO mandamos path; el server hace el toggle */}
+                            <button
+                              onClick={async (e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                try {
+                                  await fetch("/api/pages/favorite", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ path: page.path }), // 👈
+                                  })
+                                } finally {
+                                  setActiveContextMenu(null)
+                                  window.location.reload()
+                                }
+                              }}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left"
+                            >
+                              <Star
+                                size={14}
+                                className={(page as any).isFavorite ? "text-yellow-400 fill-yellow-400" : ""}
+                              />
+                              {(page as any).isFavorite ? "Quitar favorito" : "Añadir a favoritos"}
+                            </button>
 
-  {/* Enviar a papelera */}
-  <button
-    onClick={async (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      try {
-        await fetch("/api/pages/trash", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ path: page.path }),
-        })
-      } finally {
-        setActiveContextMenu(null)
-        window.location.reload()
-      }
-    }}
-    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left"
-  >
-    <Trash2 size={14} />
-    Enviar a papelera
-  </button>
-</div>
-    
+                            {/* Enviar a papelera */}
+                            <button
+                              onClick={async (e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                try {
+                                  await fetch("/api/pages/trash", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ path: page.path }),
+                                  })
+                                } finally {
+                                  setActiveContextMenu(null)
+                                  window.location.reload()
+                                }
+                              }}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left"
+                            >
+                              <Trash2 size={14} />
+                              Enviar a papelera
+                            </button>
+                          </div>
                         </>
                       )}
                     </div>

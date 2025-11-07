@@ -39,7 +39,7 @@ export default function NewSitePage() {
       content: { root: { type: "container", props: { title }, children: [] } },
     });
 
-    redirect(`${path}/edit`); // el middleware reescribe a /puck/<path>
+    redirect(`${path}/edit`); 
   }
 
   return (
