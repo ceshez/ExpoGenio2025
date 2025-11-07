@@ -37,7 +37,6 @@ export default async function FavoritesPage() {
     { _id: 0, title: 1, path: 1, updatedAt: 1 }
   )
     .sort({ updatedAt: -1 })
-    .limit(40)
     .lean();
 
   // Para el grid de favoritos

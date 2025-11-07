@@ -65,10 +65,8 @@ export function Client({ path, data, recentDesigns = [] }: ClientProps) {
           href={path}
           target="_blank"
           rel="noopener noreferrer"
-className="px-4 py-2 rounded-lg bg-[#2E388E] text-white text-sm font-medium 
-hover:bg-[#257DC1] transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]"
-
-        >
+          className="px-4 py-2 rounded-lg bg-[#2E388E] text-white text-sm font-medium 
+          hover:bg-[#257DC1] transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]">
           Ver en vivo
         </Link>
         {children}

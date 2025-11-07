@@ -3,25 +3,62 @@
 
 import { useTransition } from "react";
 
-export function FavoriteButton({ path, isFavorite, onDone }: { path: string; isFavorite: boolean; onDone?: ()=>void }) {
+type FavMeta = {
+  id: string;
+  title: string;
+  path: string;
+  updatedAtText: string;
+};
+
+export function FavoriteButton({
+  path,
+  isFavorite,
+  meta,           
+  onDone,
+}: {
+  path: string;
+  isFavorite: boolean;
+  meta?: FavMeta; // id, title, path, updatedAtText
+  onDone?: () => void;
+}) {
   const [pending, start] = useTransition();
+
   return (
     <button
       disabled={pending}
-      onClick={() => start(async () => {
-        await fetch("/api/pages/favorite", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ path, favorite: !isFavorite })
-        });
-        onDone?.();
-      })}
+      onClick={() =>
+        start(async () => {
+          // Toggle en el server
+          await fetch("/api/pages/favorite", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ path }), 
+          });
+
+          if (typeof window !== "undefined" && meta) {
+            if (!isFavorite) {
+
+              window.dispatchEvent(
+                new CustomEvent("page:favorited", { detail: meta })
+              );
+            } else {
+              window.dispatchEvent(
+                new CustomEvent("page:unfavorited", { detail: { id: meta.id, path: meta.path } })
+              );
+            }
+          }
+
+          onDone?.();
+        })
+      }
       className={`px-3 py-1 rounded border ${isFavorite ? "bg-yellow-200" : "bg-white"} hover:bg-yellow-100`}
+      title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
     >
       {pending ? "..." : isFavorite ? "★ Quitar" : "☆ Favorito"}
     </button>
   );
 }
+
 
 export function TrashButton({ path, onDone }: { path: string; onDone?: ()=>void }) {
   const [pending, start] = useTransition();
