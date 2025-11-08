@@ -1,15 +1,17 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import OtpInput from "./OtpInput"
+import { useEffect, useState } from "react"
+import OtpInput from "@/components/OtpInput"
 import { Button } from "@/components/ui/button"
+import { Mail, CheckCircle, XCircle, Sparkles } from "lucide-react"
 
+// Interfaz de propiedades del modal de verificación
 interface ModalVerificacionProps {
-  open: boolean
-  onClose: () => void // not used while locked, but kept for API completeness
-  onVerify: (ok: boolean) => void
-  emailPreview?: string
-  illustrationSrc?: string // path in /public, e.g. "/otp-illustration.png"
+  open: boolean // Controla si el modal está visible
+  onClose: () => void // Función para cerrar el modal
+  onVerify: (ok: boolean) => void // Callback cuando se verifica el código (ok = true si es correcto)
+  emailPreview?: string // Email del usuario para mostrar en el modal
+  illustrationSrc?: string // Ruta de la imagen decorativa (opcional)
 }
 
 export default function ModalVerificacion({
@@ -19,134 +21,206 @@ export default function ModalVerificacion({
   emailPreview = "usuario@ejemplo.com",
   illustrationSrc = "/otp-illustration.png",
 }: ModalVerificacionProps) {
-  const [locked, setLocked] = useState(true) // modal locked until user requests code
+  // Estado para controlar si el modal está bloqueado (el usuario debe enviar código primero)
+  const [locked, setLocked] = useState(true)
+  // Estado para saber si ya se envió el código
   const [sent, setSent] = useState(false)
+  // Estado de carga durante operaciones asíncronas
   const [loading, setLoading] = useState(false)
+  // Mensaje de retroalimentación para el usuario
   const [message, setMessage] = useState<string | null>(null)
+  // Estado para saber si el código fue verificado exitosamente
+  const [verified, setVerified] = useState(false)
 
-  // Simulated correct code (for demo). You can change this value.
+  // Código correcto de ejemplo (en producción vendría del backend)
   const CORRECT_CODE = "12345"
 
+  // Reiniciar estados cuando se cierra el modal
   useEffect(() => {
     if (!open) {
-      // reset when closed
       setLocked(true)
       setSent(false)
       setMessage(null)
+      setVerified(false)
     }
   }, [open])
 
+  // Función para simular el envío del código por email
   function handleSendCode() {
     setLoading(true)
     setMessage(null)
+
+    // Simulación de llamada al backend (800ms)
     setTimeout(() => {
       setLoading(false)
       setSent(true)
-      setLocked(false) // user can now input code
+      setLocked(false) // Desbloquear inputs para que el usuario pueda ingresar el código
       setMessage(`Código enviado a ${emailPreview}`)
     }, 800)
   }
 
+  // Función que se ejecuta cuando el usuario completa los 5 dígitos del código
   function handleOtpComplete(code: string) {
     setLoading(true)
     setMessage(null)
+
+    // Simulación de verificación del código (700ms)
     setTimeout(() => {
       setLoading(false)
       if (code === CORRECT_CODE) {
-        setMessage("Código correcto ✅")
-        onVerify(true)
-        // optionally allow closing
+        setMessage("¡Código verificado correctamente!")
+        setVerified(true)
+        onVerify(true) // Notificar al componente padre que la verificación fue exitosa
       } else {
-        setMessage("Código incorrecto. Intenta de nuevo ❌")
+        setMessage("Código incorrecto. Por favor intenta de nuevo.")
         onVerify(false)
       }
     }, 700)
   }
 
-  // Prevent closing clicking backdrop while locked true
-  return open ? (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* backdrop blur + dark overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+  // No renderizar nada si el modal no está abierto
+  if (!open) return null
 
-      {/* modal container */}
-      <div className="relative z-10 w-[92%] max-w-4xl mx-auto">
-        <div className="bg-gradient-to-br from-white/60 to-purple-50/20 dark:from-neutral-900/60 dark:to-neutral-900/20 border border-white/30 dark:border-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex">
-          {/* Left: text + OTP */}
-          <div className="w-full md:w-2/3 p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-1">
-              Te enviamos un código!
-            </h2>
-            <p className="text-sm sm:text-base text-muted-foreground mb-6">
-              Revisa tu correo: <span className="font-medium">{emailPreview}</span>
-            </p>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Overlay oscuro con blur */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="mb-4">
-              <p className="text-xs text-muted-foreground mb-2">Introduce el código de 5 dígitos:</p>
-              <OtpInput length={5} onComplete={handleOtpComplete} />
-            </div>
-
-            {message && (
-              <div className="mb-4 text-sm">
-                <span
-                  className={`inline-block px-3 py-2 rounded-md ${
-                    message.includes("correcto")
-                      ? "bg-green-50 text-green-700"
-                      : message.includes("incorrecto")
-                      ? "bg-red-50 text-red-700"
-                      : "bg-blue-50 text-blue-700"
-                  }`}
-                >
-                  {message}
-                </span>
+      {/* Contenedor principal del modal */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto">
+        <div className="bg-card border border-purple-200/50 dark:border-purple-800/50 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="flex flex-col md:flex-row">
+            {/* Sección izquierda: contenido del modal */}
+            <div className="w-full md:w-3/5 p-6 sm:p-8 lg:p-10">
+              {/* Encabezado con ícono decorativo */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg">
+                  <Mail className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Verificación de Seguridad
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    Protegiendo tu cuenta
+                  </p>
+                </div>
               </div>
-            )}
 
-            <div className="flex gap-3 items-center mt-4">
-              <Button
-                variant="outline"
-                onClick={handleSendCode}
-                disabled={loading}
-                className="px-4 py-2"
-              >
-                {sent ? "Reenviar código" : "Enviar código"}
-              </Button>
+              {/* Descripción del proceso */}
+              <p className="text-sm sm:text-base text-foreground mb-6 leading-relaxed">
+                Hemos enviado un código de verificación de 5 dígitos a tu correo electrónico{" "}
+                <span className="font-semibold text-purple-600 dark:text-purple-400">{emailPreview}</span>
+              </p>
 
-              {/* While locked (no code requested) do not allow closing */}
-              {!locked && (
-                <Button
-                  onClick={() => {
-                    // allow closing when unlocked (optional)
-                    onClose()
-                  }}
-                  className="px-4 py-2"
-                >
-                  Cerrar
-                </Button>
+              {/* Sección del input OTP */}
+              <div className="mb-6">
+                <p className="text-xs sm:text-sm font-medium text-foreground mb-3">
+                  Introduce el código de verificación:
+                </p>
+                <OtpInput
+                  length={5}
+                  onComplete={handleOtpComplete}
+                  disabled={!sent || verified} // Deshabilitar si no se ha enviado código o ya fue verificado
+                />
+              </div>
+
+              {/* Mensaje de retroalimentación */}
+              {message && (
+                <div className="mb-6">
+                  <div
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
+                      message.includes("correctamente")
+                        ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800"
+                        : message.includes("incorrecto")
+                          ? "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800"
+                          : "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800"
+                    }`}
+                  >
+                    {message.includes("correctamente") ? (
+                      <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                    ) : message.includes("incorrecto") ? (
+                      <XCircle className="w-5 h-5 flex-shrink-0" />
+                    ) : (
+                      <Mail className="w-5 h-5 flex-shrink-0" />
+                    )}
+                    <span className="text-sm font-medium">{message}</span>
+                  </div>
+                </div>
               )}
 
-              {loading && <span className="text-sm text-muted-foreground">Procesando...</span>}
-            </div>
-          </div>
+              {/* Botones de acción */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1 h-11 border-2 border-border hover:bg-accent transition-all duration-300 bg-transparent"
+                >
+                  Cancelar
+                </Button>
 
-          {/* Right: illustration */}
-          <div className="hidden md:flex md:w-1/3 items-center justify-center bg-gradient-to-tr from-purple-600 to-purple-400">
-            <div className="p-6">
-              <div className="w-56 h-56 bg-white/10 rounded-lg p-4 flex items-center justify-center">
-                {/* Image placeholder - coloca tu imagen en public/otp-illustration.png */}
-                <img
-                  src={illustrationSrc}
-                  alt="Ilustración verificación"
-                  className="w-full h-full object-contain"
-                />
+                {/* Botón para enviar/reenviar código - se oculta cuando está verificado */}
+                {!verified && (
+                  <Button
+                    onClick={handleSendCode}
+                    disabled={loading}
+                    className="flex-1 h-11 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Enviando...
+                      </span>
+                    ) : sent ? (
+                      "Reenviar código"
+                    ) : (
+                      "Enviar código"
+                    )}
+                  </Button>
+                )}
+
+                {verified && (
+                  <Button
+                    onClick={onClose}
+                    className="flex-1 h-11 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    Continuar
+                  </Button>
+                )}
+              </div>
+
+              {/* Indicador de carga */}
+              {loading && (
+                <p className="text-center text-sm text-muted-foreground mt-4 flex items-center justify-center gap-2">
+                  <span className="w-3 h-3 bg-purple-600 rounded-full animate-pulse" />
+                  Procesando tu solicitud...
+                </p>
+              )}
+            </div>
+
+            {/* Sección derecha: ilustración decorativa (solo visible en desktop) */}
+            <div className="hidden md:flex md:w-2/5 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500" />
+              <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
+
+              <div className="relative z-10 flex items-center justify-center p-8">
+                <div className="w-full h-full bg-white/10 backdrop-blur-sm rounded-2xl p-6 flex items-center justify-center border border-white/20 shadow-2xl">
+                  <img
+                    src={illustrationSrc || "/placeholder.svg"}
+                    alt="Ilustración de verificación"
+                    className="w-full h-full object-contain drop-shadow-2xl"
+                    onError={(e) => {
+                      // Fallback si la imagen no carga
+                      e.currentTarget.style.display = "none"
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* note: modal cannot be closed by clicking backdrop while locked */}
-        {/* we intentionally do not render a close X if locked */}
       </div>
     </div>
-  ) : null
+  )
 }

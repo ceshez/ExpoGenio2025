@@ -2,14 +2,27 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 // Componentes de UI reutilizables
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 // Iconos de Lucide
-import { Palette, Moon, Sun, Upload, LinkIcon, ZoomIn, ZoomOut, Move, UserCircle, Trash2 } from "lucide-react"
+import {
+  Palette,
+  Moon,
+  Sun,
+  ChevronLeft,
+  ChevronRight,
+  Upload,
+  LinkIcon,
+  User,
+  Trash2,
+  ZoomIn,
+  ZoomOut,
+  Move,
+} from "lucide-react"
 
 // Props del componente
 interface SeccionAparienciaProps {
@@ -18,23 +31,43 @@ interface SeccionAparienciaProps {
 
 /**
  * Componente de la sección de Apariencia
- * Permite cambiar el tema (claro/oscuro) y gestionar el avatar del usuario
+ * Permite cambiar el tema (claro/oscuro), seleccionar avatar de 6 fotos predeterminadas
+ * y subir avatar personalizado con controles de zoom y posición
  */
 export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
   // Estado para el tema oscuro/claro
   const [esModoOscuro, setEsModoOscuro] = useState(false)
-  // URL del avatar (puede ser de archivo o URL externa)
-  const [urlAvatar, setUrlAvatar] = useState("")
-  // Archivo de avatar seleccionado
-  const [archivoAvatar, setArchivoAvatar] = useState<File | null>(null)
-  // Tipo de entrada: subir archivo o ingresar URL
-  const [tipoEntradaAvatar, setTipoEntradaAvatar] = useState<"subir" | "url">("subir")
 
-  // Estados para el editor de imagen
-  const [zoom, setZoom] = useState(1) // Nivel de zoom (0.5 a 3)
-  const [posicion, setPosicion] = useState({ x: 0, y: 0 }) // Posición de la imagen
-  const [estaArrastrando, setEstaArrastrando] = useState(false) // Si está arrastrando la imagen
-  const [inicioArrastre, setInicioArrastre] = useState({ x: 0, y: 0 }) // Posición inicial del arrastre
+  // Índice del avatar seleccionado (0-5)
+  const [indiceSeleccionado, setIndiceSeleccionado] = useState(0)
+
+  // Estado para el arrastre del carrusel
+  const [estaArrastrando, setEstaArrastrando] = useState(false)
+  const [posicionInicio, setPosicionInicio] = useState(0)
+  const [offsetArrastre, setOffsetArrastre] = useState(0)
+
+  const [metodoAvatar, setMetodoAvatar] = useState<"predeterminado" | "archivo" | "url">("predeterminado")
+  const [archivoAvatar, setArchivoAvatar] = useState<File | null>(null)
+  const [urlAvatar, setUrlAvatar] = useState("")
+  const [vistaPrevia, setVistaPrevia] = useState<string | null>(null)
+
+  const [zoom, setZoom] = useState(100)
+  const [posicionX, setPosicionX] = useState(50)
+  const [posicionY, setPosicionY] = useState(50)
+  const [arrastandoImagen, setArrastandoImagen] = useState(false)
+  const [inicioArrastreImagen, setInicioArrastreImagen] = useState({ x: 0, y: 0 })
+
+  const contenedorRef = useRef<HTMLDivElement>(null)
+
+  // 6 URLs de avatares predeterminados (placeholders - el usuario agregará las imágenes reales)
+  const avataresPredeterminados = [
+    "/avatars/avatar-1.png",
+    "/avatars/avatar-2.png",
+    "/avatars/avatar-3.png",
+    "/avatars/avatar-4.png",
+    "/avatars/avatar-5.png",
+    "/avatars/avatar-6.png",
+  ]
 
   /**
    * Efecto para detectar el tema actual al cargar el componente
@@ -59,123 +92,213 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
   }
 
   /**
-   * Maneja el cambio de archivo de avatar
-   * Lee el archivo y lo convierte a URL para previsualización
+   * Navegar al avatar anterior
+   */
+  const irAnterior = () => {
+    setIndiceSeleccionado((prev) => (prev === 0 ? avataresPredeterminados.length - 1 : prev - 1))
+  }
+
+  /**
+   * Navegar al avatar siguiente
+   */
+  const irSiguiente = () => {
+    setIndiceSeleccionado((prev) => (prev === avataresPredeterminados.length - 1 ? 0 : prev + 1))
+  }
+
+  /**
+   * Inicia el arrastre (mouse)
+   */
+  const manejarMouseAbajo = (e: React.MouseEvent) => {
+    setEstaArrastrando(true)
+    setPosicionInicio(e.clientX)
+    setOffsetArrastre(0)
+  }
+
+  /**
+   * Mueve durante el arrastre (mouse)
+   */
+  const manejarMovimientoMouse = (e: React.MouseEvent) => {
+    if (!estaArrastrando) return
+    const diferencia = e.clientX - posicionInicio
+    setOffsetArrastre(diferencia)
+  }
+
+  /**
+   * Finaliza el arrastre y determina dirección (mouse)
+   */
+  const manejarMouseArriba = () => {
+    if (!estaArrastrando) return
+    setEstaArrastrando(false)
+
+    // Si arrastró más de 50px, cambiar de avatar
+    if (offsetArrastre > 50) {
+      irAnterior()
+    } else if (offsetArrastre < -50) {
+      irSiguiente()
+    }
+
+    setOffsetArrastre(0)
+  }
+
+  /**
+   * Inicia el arrastre (táctil)
+   */
+  const manejarToqueInicio = (e: React.TouchEvent) => {
+    setEstaArrastrando(true)
+    setPosicionInicio(e.touches[0].clientX)
+    setOffsetArrastre(0)
+  }
+
+  /**
+   * Mueve durante el arrastre (táctil)
+   */
+  const manejarMovimientoToque = (e: React.TouchEvent) => {
+    if (!estaArrastrando) return
+    const diferencia = e.touches[0].clientX - posicionInicio
+    setOffsetArrastre(diferencia)
+  }
+
+  /**
+   * Finaliza el arrastre y determina dirección (táctil)
+   */
+  const manejarToqueFin = () => {
+    if (!estaArrastrando) return
+    setEstaArrastrando(false)
+
+    // Si arrastró más de 50px, cambiar de avatar
+    if (offsetArrastre > 50) {
+      irAnterior()
+    } else if (offsetArrastre < -50) {
+      irSiguiente()
+    }
+
+    setOffsetArrastre(0)
+  }
+
+  /**
+   * Manejador para seleccionar archivo
    */
   const manejarCambioArchivo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const archivo = e.target.files?.[0]
-    if (archivo) {
+    if (archivo && archivo.type.startsWith("image/")) {
       setArchivoAvatar(archivo)
+      setMetodoAvatar("archivo")
       const lector = new FileReader()
       lector.onloadend = () => {
-        setUrlAvatar(lector.result as string)
-        // Resetear zoom y posición al cargar nueva imagen
-        setZoom(1)
-        setPosicion({ x: 0, y: 0 })
+        setVistaPrevia(lector.result as string)
+        setZoom(100)
+        setPosicionX(50)
+        setPosicionY(50)
       }
       lector.readAsDataURL(archivo)
     }
   }
 
   /**
-   * Aumenta el nivel de zoom (máximo 300%)
+   * Manejador para URL de avatar
    */
-  const aumentarZoom = () => {
-    setZoom((prev) => Math.min(prev + 0.1, 3))
-  }
-
-  /**
-   * Disminuye el nivel de zoom (mínimo 50%)
-   */
-  const disminuirZoom = () => {
-    setZoom((prev) => Math.max(prev - 0.1, 0.5))
-  }
-
-  /**
-   * Maneja el cambio del slider de zoom
-   */
-  const manejarCambioZoom = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setZoom(Number(e.target.value))
-  }
-
-  /**
-   * Inicia el arrastre de la imagen (mouse)
-   */
-  const manejarMouseAbajo = (e: React.MouseEvent) => {
-    setEstaArrastrando(true)
-    setInicioArrastre({
-      x: e.clientX - posicion.x,
-      y: e.clientY - posicion.y,
-    })
-  }
-
-  /**
-   * Mueve la imagen mientras se arrastra (mouse)
-   */
-  const manejarMovimientoMouse = (e: React.MouseEvent) => {
-    if (estaArrastrando) {
-      setPosicion({
-        x: e.clientX - inicioArrastre.x,
-        y: e.clientY - inicioArrastre.y,
-      })
+  const manejarCambioUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value
+    setUrlAvatar(url)
+    if (url) {
+      setVistaPrevia(url)
+      setMetodoAvatar("url")
+      setZoom(100)
+      setPosicionX(50)
+      setPosicionY(50)
     }
   }
 
-  /**
-   * Finaliza el arrastre de la imagen (mouse)
-   */
-  const manejarMouseArriba = () => {
-    setEstaArrastrando(false)
-  }
-
-  /**
-   * Inicia el arrastre de la imagen (táctil)
-   */
-  const manejarToqueInicio = (e: React.TouchEvent) => {
-    const toque = e.touches[0]
-    setEstaArrastrando(true)
-    setInicioArrastre({
-      x: toque.clientX - posicion.x,
-      y: toque.clientY - posicion.y,
-    })
-  }
-
-  /**
-   * Mueve la imagen mientras se arrastra (táctil)
-   */
-  const manejarMovimientoToque = (e: React.TouchEvent) => {
-    if (estaArrastrando) {
-      const toque = e.touches[0]
-      setPosicion({
-        x: toque.clientX - inicioArrastre.x,
-        y: toque.clientY - inicioArrastre.y,
-      })
-    }
-  }
-
-  /**
-   * Finaliza el arrastre de la imagen (táctil)
-   */
-  const manejarToqueFin = () => {
-    setEstaArrastrando(false)
-  }
-
-  /**
-   * Restablece el zoom y la posición de la imagen a sus valores por defecto
-   */
-  const restablecerEditorImagen = () => {
-    setZoom(1)
-    setPosicion({ x: 0, y: 0 })
-  }
-
-  /**
-   * Elimina el avatar actual y resetea todos los estados relacionados
-   */
-  const manejarEliminarAvatar = () => {
-    setUrlAvatar("")
+  const eliminarFoto = () => {
     setArchivoAvatar(null)
-    setZoom(1)
-    setPosicion({ x: 0, y: 0 })
+    setUrlAvatar("")
+    setVistaPrevia(null)
+    setMetodoAvatar("predeterminado")
+    setZoom(100)
+    setPosicionX(50)
+    setPosicionY(50)
+  }
+
+  const iniciarArrastreImagen = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault()
+    setArrastandoImagen(true)
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
+    setInicioArrastreImagen({ x: clientX, y: clientY })
+  }
+
+  const moverImagen = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!arrastandoImagen) return
+    e.preventDefault()
+
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
+
+    const deltaX = (clientX - inicioArrastreImagen.x) * 0.5
+    const deltaY = (clientY - inicioArrastreImagen.y) * 0.5
+
+    setPosicionX((prev) => Math.max(0, Math.min(100, prev + deltaX)))
+    setPosicionY((prev) => Math.max(0, Math.min(100, prev + deltaY)))
+
+    setInicioArrastreImagen({ x: clientX, y: clientY })
+  }
+
+  const finalizarArrastreImagen = () => {
+    setArrastandoImagen(false)
+  }
+
+  useEffect(() => {
+    if (arrastandoImagen) {
+      const handleGlobalMouseMove = (e: MouseEvent) => moverImagen(e as any)
+      const handleGlobalMouseUp = () => finalizarArrastreImagen()
+      const handleGlobalTouchMove = (e: TouchEvent) => moverImagen(e as any)
+      const handleGlobalTouchEnd = () => finalizarArrastreImagen()
+
+      document.addEventListener("mousemove", handleGlobalMouseMove)
+      document.addEventListener("mouseup", handleGlobalMouseUp)
+      document.addEventListener("touchmove", handleGlobalTouchMove)
+      document.addEventListener("touchend", handleGlobalTouchEnd)
+
+      return () => {
+        document.removeEventListener("mousemove", handleGlobalMouseMove)
+        document.removeEventListener("mouseup", handleGlobalMouseUp)
+        document.removeEventListener("touchmove", handleGlobalTouchMove)
+        document.removeEventListener("touchend", handleGlobalTouchEnd)
+      }
+    }
+  }, [arrastandoImagen])
+
+  /**
+   * Obtener la vista previa del avatar según el método seleccionado
+   */
+  const obtenerVistaAvatar = () => {
+    if (metodoAvatar === "archivo" && vistaPrevia) return vistaPrevia
+    if (metodoAvatar === "url" && vistaPrevia) return vistaPrevia
+    if (metodoAvatar === "predeterminado") return avataresPredeterminados[indiceSeleccionado]
+    return null
+  }
+
+  /**
+   * Calcula el tamaño y opacidad basado en la distancia del centro
+   * @param indice - Índice del avatar en el array
+   * @returns Objeto con estilos de transformación y opacidad
+   */
+  const calcularEstiloAvatar = (indice: number) => {
+    const distanciaDelCentro = Math.abs(indice - indiceSeleccionado)
+
+    let escala = 0.6
+    if (distanciaDelCentro === 0) escala = 1.1
+    else if (distanciaDelCentro === 1) escala = 0.8
+
+    const opacidad = distanciaDelCentro === 0 ? 1 : distanciaDelCentro === 1 ? 0.6 : 0.4
+
+    const translateX = (indice - indiceSeleccionado) * 160 + offsetArrastre
+
+    return {
+      transform: `translateX(${translateX}px) scale(${escala})`,
+      opacity: opacidad,
+      zIndex: distanciaDelCentro === 0 ? 10 : 5 - distanciaDelCentro,
+    }
   }
 
   return (
@@ -228,214 +351,291 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
         </div>
       </Card>
 
-      {/* Card de cambio de avatar */}
-      <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-blue-50/5 dark:to-blue-950/5">
-        <div className="flex items-center gap-3 mb-4 sm:mb-6">
+      <Card className="p-4 sm:p-6 border-border/50 bg-card">
+        <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
-            <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-base sm:text-lg font-semibold">Cambiar Avatar</h3>
+          <h3 className="text-base sm:text-lg font-semibold">Foto de Perfil</h3>
         </div>
 
-        <div className="space-y-4 sm:space-y-6">
-          {/* Previsualización del avatar con editor */}
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <div
-                className={`relative w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg shadow-purple-500/30 bg-muted ${
-                  urlAvatar ? "cursor-move" : ""
-                } touch-none`}
-                onMouseDown={urlAvatar ? manejarMouseAbajo : undefined}
-                onMouseMove={urlAvatar ? manejarMovimientoMouse : undefined}
-                onMouseUp={urlAvatar ? manejarMouseArriba : undefined}
-                onMouseLeave={urlAvatar ? manejarMouseArriba : undefined}
-                onTouchStart={urlAvatar ? manejarToqueInicio : undefined}
-                onTouchMove={urlAvatar ? manejarMovimientoToque : undefined}
-                onTouchEnd={urlAvatar ? manejarToqueFin : undefined}
-              >
-                {urlAvatar ? (
-                  <>
-                    {/* Imagen del avatar con transformaciones de zoom y posición */}
-                    <img
-                      src={urlAvatar || "/placeholder.svg"}
-                      alt="Vista previa del avatar"
-                      className="absolute inset-0 w-full h-full object-cover select-none"
-                      style={{
-                        transform: `scale(${zoom}) translate(${posicion.x / zoom}px, ${posicion.y / zoom}px)`,
-                        transition: estaArrastrando ? "none" : "transform 0.1s ease-out",
-                      }}
-                      draggable={false}
-                    />
-                    {/* Icono de mover superpuesto */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <Move className="w-8 h-8 text-white/50 drop-shadow-lg" />
-                    </div>
-                  </>
-                ) : (
-                  // Icono de perfil por defecto cuando no hay avatar
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-950/30 dark:to-blue-950/30">
-                    <UserCircle className="w-32 h-32 sm:w-40 sm:h-40 text-purple-400 dark:text-purple-500" />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Controles de zoom (solo visible cuando hay imagen) */}
-            {urlAvatar && (
-              <>
-                <div className="space-y-3 bg-muted/50 p-3 sm:p-4 rounded-lg">
-                  {/* Etiqueta y porcentaje de zoom */}
-                  <div className="flex items-center justify-between gap-2">
-                    <Label className="text-xs sm:text-sm font-medium flex items-center gap-2">
-                      <ZoomOut className="w-4 h-4" />
-                      Zoom
-                    </Label>
-                    <span className="text-xs sm:text-sm font-mono text-muted-foreground">
-                      {Math.round(zoom * 100)}%
-                    </span>
-                  </div>
-                  {/* Controles de zoom: botones y slider */}
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={disminuirZoom}
-                      className="shrink-0 h-9 w-9 sm:h-10 sm:w-10 p-0 bg-transparent"
-                      disabled={zoom <= 0.5}
-                    >
-                      <ZoomOut className="w-4 h-4" />
-                    </Button>
-                    {/* Slider de zoom */}
-                    <input
-                    placeholder="null"
-                      type="range"
-                      min="0.5"
-                      max="3"
-                      step="0.1"
-                      value={zoom}
-                      onChange={manejarCambioZoom}
-                      className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:cursor-pointer"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={aumentarZoom}
-                      className="shrink-0 h-9 w-9 sm:h-10 sm:w-10 p-0 bg-transparent"
-                      disabled={zoom >= 3}
-                    >
-                      <ZoomIn className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  {/* Botón para restablecer posición y zoom */}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={restablecerEditorImagen}
-                    className="w-full text-xs sm:text-sm"
-                  >
-                    Restablecer posición y zoom
-                  </Button>
-                </div>
-
-                {/* Instrucciones de uso */}
-                <p className="text-xs sm:text-sm text-muted-foreground text-center">
-                  Arrastra la imagen para reposicionarla y usa el control de zoom para ajustar el tamaño
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Toggle entre subir archivo y URL */}
+        <div className="space-y-6">
           <div className="flex gap-2 p-1 bg-muted rounded-lg">
             <button
-              onClick={() => setTipoEntradaAvatar("subir")}
-              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-md transition-all duration-300 ${
-                tipoEntradaAvatar === "subir"
-                  ? "bg-background shadow-sm text-foreground"
+              onClick={() => setMetodoAvatar("predeterminado")}
+              className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                metodoAvatar === "predeterminado"
+                  ? "bg-background text-purple-600 shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm font-medium">Subir Archivo</span>
+              Avatares
             </button>
             <button
-              onClick={() => setTipoEntradaAvatar("url")}
-              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-md transition-all duration-300 ${
-                tipoEntradaAvatar === "url"
-                  ? "bg-background shadow-sm text-foreground"
+              onClick={() => setMetodoAvatar("archivo")}
+              className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                metodoAvatar === "archivo"
+                  ? "bg-background text-purple-600 shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <LinkIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm font-medium">URL de Imagen</span>
+              Subir
+            </button>
+            <button
+              onClick={() => setMetodoAvatar("url")}
+              className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                metodoAvatar === "url"
+                  ? "bg-background text-purple-600 shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              URL
             </button>
           </div>
 
-          {/* Input para subir archivo */}
-          {tipoEntradaAvatar === "subir" && (
-            <div className="space-y-2">
-              <Label htmlFor="avatar-subir" className="text-sm sm:text-base">
-                Selecciona una imagen
-              </Label>
-              <div className="relative">
+          {/* Contenedor del carrusel de avatares predeterminados */}
+          {metodoAvatar === "predeterminado" && (
+            <div className="space-y-6">
+              <div className="relative py-8">
+                {/* Botón anterior */}
+                <button
+                  onClick={irAnterior}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-background rounded-full shadow-lg hover:bg-accent transition-all duration-300 border"
+                  aria-label="Avatar anterior"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                {/* Contenedor de avatares con overflow oculto */}
+                <div
+                  ref={contenedorRef}
+                  className="relative h-52 overflow-hidden cursor-grab active:cursor-grabbing"
+                  onMouseDown={manejarMouseAbajo}
+                  onMouseMove={manejarMovimientoMouse}
+                  onMouseUp={manejarMouseArriba}
+                  onMouseLeave={manejarMouseArriba}
+                  onTouchStart={manejarToqueInicio}
+                  onTouchMove={manejarMovimientoToque}
+                  onTouchEnd={manejarToqueFin}
+                >
+                  {/* Renderizar todos los avatares con posicionamiento absoluto */}
+                  {avataresPredeterminados.map((avatar, indice) => {
+                    const estilos = calcularEstiloAvatar(indice)
+                    return (
+                      <div
+                        key={indice}
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none"
+                        style={estilos}
+                      >
+                        <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-500/20 bg-gradient-to-br from-purple-100 to-blue-100">
+                          <img
+                            src={avatar || "/placeholder.svg?height=176&width=176"}
+                            alt={`Avatar ${indice + 1}`}
+                            className="w-full h-full object-cover select-none"
+                            draggable={false}
+                            onError={(e) => {
+                              e.currentTarget.src = "/placeholder.svg?height=176&width=176"
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Botón siguiente */}
+                <button
+                  onClick={irSiguiente}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-background rounded-full shadow-lg hover:bg-accent transition-all duration-300 border"
+                  aria-label="Avatar siguiente"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Indicadores de posición */}
+              <div className="flex justify-center gap-2">
+                {avataresPredeterminados.map((_, indice) => (
+                  <button
+                    key={indice}
+                    onClick={() => setIndiceSeleccionado(indice)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      indice === indiceSeleccionado ? "w-8 bg-purple-500" : "w-2 bg-muted hover:bg-muted-foreground/30"
+                    }`}
+                    aria-label={`Seleccionar avatar ${indice + 1}`}
+                  />
+                ))}
+              </div>
+
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  Avatar seleccionado:{" "}
+                  <span className="font-semibold text-foreground">
+                    {indiceSeleccionado + 1} de {avataresPredeterminados.length}
+                  </span>
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Arrastra para cambiar de avatar o usa las flechas</p>
+              </div>
+            </div>
+          )}
+
+          {metodoAvatar === "archivo" && (
+            <div className="space-y-4">
+              <div className="flex flex-col items-center gap-4">
+                {vistaPrevia && (
+                  <div className="space-y-4 w-full">
+                    <div
+                      className="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-lg relative cursor-move select-none"
+                      onMouseDown={iniciarArrastreImagen}
+                      onTouchStart={iniciarArrastreImagen}
+                    >
+                      <img
+                        src={vistaPrevia || "/placeholder.svg"}
+                        alt="Vista previa"
+                        className="w-full h-full object-cover pointer-events-none select-none"
+                        draggable={false}
+                        style={{
+                          transform: `scale(${zoom / 100})`,
+                          objectPosition: `${posicionX}% ${posicionY}%`,
+                        }}
+                      />
+                    </div>
+
+                    {/* Controles de zoom y posición */}
+                    <div className="space-y-3 bg-muted p-4 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <ZoomOut className="w-4 h-4 text-muted-foreground" />
+                        <input
+                          type="range"
+                          min="50"
+                          max="200"
+                          value={zoom}
+                          onChange={(e) => setZoom(Number(e.target.value))}
+                          className="flex-1"
+                        />
+                        <ZoomIn className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium w-12 text-right">{zoom}%</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Move className="w-3 h-3" />
+                        Arrastra la imagen para ajustar la posición
+                      </p>
+                    </div>
+
+                    {/* Botón para eliminar foto */}
+                    <Button
+                      onClick={eliminarFoto}
+                      variant="outline"
+                      className="w-full border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 bg-transparent"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Eliminar Foto
+                    </Button>
+                  </div>
+                )}
+                <Label
+                  htmlFor="archivo-avatar"
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg cursor-pointer transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  Seleccionar Archivo
+                </Label>
                 <Input
-                  id="avatar-subir"
+                  id="archivo-avatar"
                   type="file"
                   accept="image/*"
                   onChange={manejarCambioArchivo}
-                  className="cursor-pointer text-xs sm:text-sm file:mr-2 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-950/30 dark:file:text-purple-400"
+                  className="hidden"
                 />
+                <p className="text-xs text-muted-foreground text-center">
+                  Formatos soportados: JPG, PNG, GIF (máx. 5MB)
+                </p>
               </div>
-              {archivoAvatar && (
-                <p className="text-xs sm:text-sm text-muted-foreground">Archivo seleccionado: {archivoAvatar.name}</p>
-              )}
             </div>
           )}
 
-          {/* Input para URL de imagen */}
-          {tipoEntradaAvatar === "url" && (
-            <div className="space-y-2">
-              <Label htmlFor="avatar-url" className="text-sm sm:text-base">
-                URL de la imagen
-              </Label>
-              <Input
-                id="avatar-url"
-                type="url"
-                placeholder="https://ejemplo.com/imagen.jpg"
-                value={urlAvatar}
-                onChange={(e) => {
-                  setUrlAvatar(e.target.value)
-                  setZoom(1)
-                  setPosicion({ x: 0, y: 0 })
-                }}
-                className="transition-all duration-300 focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
-              />
-              <p className="text-xs text-muted-foreground">Ingresa la URL completa de tu imagen de perfil</p>
+          {metodoAvatar === "url" && (
+            <div className="space-y-4">
+              <div className="flex flex-col items-center gap-4">
+                {vistaPrevia && (
+                  <div className="space-y-4 w-full">
+                    <div
+                      className="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-lg relative cursor-move select-none"
+                      onMouseDown={iniciarArrastreImagen}
+                      onTouchStart={iniciarArrastreImagen}
+                    >
+                      <img
+                        src={vistaPrevia || "/placeholder.svg?height=192&width=192"}
+                        alt="Vista previa"
+                        className="w-full h-full object-cover pointer-events-none select-none"
+                        draggable={false}
+                        style={{
+                          transform: `scale(${zoom / 100})`,
+                          objectPosition: `${posicionX}% ${posicionY}%`,
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.src = "/placeholder.svg?height=192&width=192"
+                        }}
+                      />
+                    </div>
+
+                    {/* Controles de zoom y posición */}
+                    <div className="space-y-3 bg-muted p-4 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <ZoomOut className="w-4 h-4 text-muted-foreground" />
+                        <input
+                          type="range"
+                          min="50"
+                          max="200"
+                          value={zoom}
+                          onChange={(e) => setZoom(Number(e.target.value))}
+                          className="flex-1"
+                        />
+                        <ZoomIn className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium w-12 text-right">{zoom}%</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Move className="w-3 h-3" />
+                        Arrastra la imagen para ajustar la posición
+                      </p>
+                    </div>
+
+                    {/* Botón para eliminar foto */}
+                    <Button
+                      onClick={eliminarFoto}
+                      variant="outline"
+                      className="w-full border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 bg-transparent"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Eliminar Foto
+                    </Button>
+                  </div>
+                )}
+                <div className="w-full space-y-2">
+                  <Label htmlFor="url-avatar" className="flex items-center gap-2">
+                    <LinkIcon className="w-4 h-4" />
+                    URL de la Imagen
+                  </Label>
+                  <Input
+                    id="url-avatar"
+                    type="url"
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                    value={urlAvatar}
+                    onChange={manejarCambioUrl}
+                    className="w-full"
+                  />
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Botones de acción: eliminar y guardar */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            {urlAvatar && (
-              <Button
-                onClick={manejarEliminarAvatar}
-                variant="outline"
-                className="w-full sm:flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/30 transition-all duration-300 text-sm sm:text-base bg-transparent"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Eliminar Foto
-              </Button>
-            )}
-            <Button
-              onClick={onGuardar}
-              className={`${urlAvatar ? "w-full sm:flex-1" : "w-full"} bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 text-sm sm:text-base`}
-            >
-              Guardar Avatar
-            </Button>
-          </div>
+          {/* Botón de guardar */}
+          <Button
+            onClick={onGuardar}
+            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 text-sm sm:text-base h-11"
+          >
+            Guardar Cambios
+          </Button>
         </div>
       </Card>
     </div>
