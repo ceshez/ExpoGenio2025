@@ -94,11 +94,11 @@ export default function ModalVerificacion({
             <div className="w-full md:w-3/5 p-6 sm:p-8 lg:p-10">
               {/* Encabezado con ícono decorativo */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg">
+                <div className="p-3 bg-linear-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg">
                   <Mail className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Verificación de Seguridad
                   </h2>
                   <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">
@@ -139,11 +139,11 @@ export default function ModalVerificacion({
                     }`}
                   >
                     {message.includes("correctamente") ? (
-                      <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 shrink-0" />
                     ) : message.includes("incorrecto") ? (
-                      <XCircle className="w-5 h-5 flex-shrink-0" />
+                      <XCircle className="w-5 h-5 shrink-0" />
                     ) : (
-                      <Mail className="w-5 h-5 flex-shrink-0" />
+                      <Mail className="w-5 h-5 shrink-0" />
                     )}
                     <span className="text-sm font-medium">{message}</span>
                   </div>
@@ -165,7 +165,7 @@ export default function ModalVerificacion({
                   <Button
                     onClick={handleSendCode}
                     disabled={loading}
-                    className="flex-1 h-11 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="flex-1 h-11 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -183,7 +183,7 @@ export default function ModalVerificacion({
                 {verified && (
                   <Button
                     onClick={onClose}
-                    className="flex-1 h-11 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="flex-1 h-11 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Continuar
                   </Button>
@@ -201,7 +201,7 @@ export default function ModalVerificacion({
 
             {/* Sección derecha: ilustración decorativa (solo visible en desktop) */}
             <div className="hidden md:flex md:w-2/5 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500" />
+              <div className="absolute inset-0 bg-linear-to-br from-purple-600 via-purple-500 to-pink-500" />
               <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
 
               <div className="relative z-10 flex items-center justify-center p-8">

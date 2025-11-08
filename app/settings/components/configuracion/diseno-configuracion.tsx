@@ -39,7 +39,7 @@ export function DisenoConfiguracion() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-50/20 dark:bg-background">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-purple-50/20 dark:bg-background">
       {/* Contenedor principal con padding responsivo */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
         {/* Encabezado de la página */}
@@ -55,7 +55,7 @@ export function DisenoConfiguracion() {
         {/* Layout principal: sidebar + contenido */}
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           {/* Sidebar de navegación */}
-          <aside className="lg:w-64 flex-shrink-0">
+          <aside className="lg:w-64 shrink-0">
             {/* Navegación móvil: tabs horizontales con scroll */}
             <nav className="lg:hidden bg-card/50 backdrop-blur-sm border border-border rounded-xl p-2 shadow-sm overflow-x-auto">
               <div className="flex gap-2 min-w-max">
@@ -67,7 +67,7 @@ export function DisenoConfiguracion() {
                       onClick={() => setSeccionActiva(seccion.id)}
                       className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-300 whitespace-nowrap text-sm sm:text-base ${
                         seccionActiva === seccion.id
-                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
+                          ? "bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
                           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                     >
@@ -89,7 +89,7 @@ export function DisenoConfiguracion() {
                     onClick={() => setSeccionActiva(seccion.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
                       seccionActiva === seccion.id
-                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
+                        ? "bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30"
                         : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >

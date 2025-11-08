@@ -315,7 +315,7 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
       </div>
 
       {/* Card de toggle de modo oscuro */}
-      <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-purple-50/5 dark:to-purple-950/5">
+      <Card className="p-4 sm:p-6 border-border/50 bg-linear-to-br from-card to-purple-50/5 dark:to-purple-950/5">
         <div className="flex items-center justify-between gap-4">
           {/* Información del modo oscuro */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -427,7 +427,7 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
                         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none"
                         style={estilos}
                       >
-                        <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-500/20 bg-gradient-to-br from-purple-100 to-blue-100">
+                        <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-500/20 bg-linear-to-br from-purple-100 to-blue-100">
                           <img
                             src={avatar || "/placeholder.svg?height=176&width=176"}
                             alt={`Avatar ${indice + 1}`}
@@ -505,13 +505,18 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
                     <div className="space-y-3 bg-muted p-4 rounded-xl">
                       <div className="flex items-center gap-3">
                         <ZoomOut className="w-4 h-4 text-muted-foreground" />
+                        <Label htmlFor="zoom-control-archivo" className="sr-only">
+                          Control de zoom
+                        </Label>
                         <input
+                          id="zoom-control-archivo"
                           type="range"
                           min="50"
                           max="200"
                           value={zoom}
                           onChange={(e) => setZoom(Number(e.target.value))}
                           className="flex-1"
+                          aria-label="Ajustar nivel de zoom de la imagen"
                         />
                         <ZoomIn className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm font-medium w-12 text-right">{zoom}%</span>
@@ -583,13 +588,18 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
                     <div className="space-y-3 bg-muted p-4 rounded-xl">
                       <div className="flex items-center gap-3">
                         <ZoomOut className="w-4 h-4 text-muted-foreground" />
+                        <Label htmlFor="zoom-control-url" className="sr-only">
+                          Control de zoom
+                        </Label>
                         <input
+                          id="zoom-control-url"
                           type="range"
                           min="50"
                           max="200"
                           value={zoom}
                           onChange={(e) => setZoom(Number(e.target.value))}
                           className="flex-1"
+                          aria-label="Ajustar nivel de zoom de la imagen"
                         />
                         <ZoomIn className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm font-medium w-12 text-right">{zoom}%</span>
@@ -632,7 +642,7 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
           {/* Botón de guardar */}
           <Button
             onClick={onGuardar}
-            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 text-sm sm:text-base h-11"
+            className="w-full bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 text-sm sm:text-base h-11"
           >
             Guardar Cambios
           </Button>

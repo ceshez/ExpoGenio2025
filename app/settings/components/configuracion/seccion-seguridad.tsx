@@ -95,7 +95,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
       </div>
 
       {/* Card de cambio de contraseña */}
-      <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-purple-50/5 dark:to-purple-950/5">
+      <Card className="p-4 sm:p-6 border-border/50 bg-linear-to-br from-card to-purple-50/5 dark:to-purple-950/5">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <div className="p-2 bg-purple-100 dark:bg-purple-950/30 rounded-lg">
             <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
@@ -159,7 +159,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
             {!codigoValidado || ultimoTipo !== "password" ? (
               <Button
                 onClick={() => handleAbrirModal("password")}
-                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
+                className="flex-1 bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
               >
                 Enviar código
               </Button>
@@ -169,7 +169,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
             {codigoValidado && ultimoTipo === "password" && (
               <Button
                 onClick={handleActualizarPassword}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
+                className="flex-1 bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
               >
                 Actualizar Contraseña
               </Button>
@@ -179,7 +179,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
       </Card>
 
       {/* Card de cambio de correo */}
-      <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-blue-50/5 dark:to-blue-950/5">
+      <Card className="p-4 sm:p-6 border-border/50 bg-linear-to-br from-card to-blue-50/5 dark:to-blue-950/5">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
             <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
@@ -223,7 +223,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
             {!codigoValidado || ultimoTipo !== "email" ? (
               <Button
                 onClick={() => handleAbrirModal("email")}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
+                className="flex-1 bg-linear-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
               >
                 Enviar código
               </Button>
@@ -233,7 +233,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
             {codigoValidado && ultimoTipo === "email" && (
               <Button
                 onClick={handleActualizarCorreo}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-700 hover:from-blue-700 hover:to-cyan-800 text-white shadow-lg transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
+                className="flex-1 bg-linear-to-r from-blue-600 to-cyan-700 hover:from-blue-700 hover:to-cyan-800 text-white shadow-lg transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
               >
                 Actualizar Correo
               </Button>

@@ -108,7 +108,8 @@ export default function OtpInput({
       {vals.map((v, i) => (
         <input
           key={i}
-          ref={(el) => (inputsRef.current[i] = el)}
+          ref={(el) => {
+         if (el) inputsRef.current[i] = el;}}
           value={v}
           onChange={(e) => handleChange(e, i)}
           onKeyDown={(e) => handleKeyDown(e, i)}
