@@ -36,7 +36,7 @@ export function FavoriteButton({
           onDone?.();
         })
       }
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border-2 ${
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border-2 hover: cursor-pointer${
         isFavorite
           ? "bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100 hover:border-amber-400"
           : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-amber-300"
@@ -76,7 +76,7 @@ export function TrashButton({ path, onDone }: { path: string; onDone?: () => voi
           onDone?.();
         })
       }
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border-2 bg-white border-slate-200 text-slate-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 disabled:opacity-60 disabled:cursor-not-allowed ${
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 border-2 bg-white border-slate-200 text-slate-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 disabled:opacity-60 disabled:cursor-not-allowed${
         pending ? "animate-pulse" : ""
       }`}
     >
@@ -132,7 +132,6 @@ export function RestoreButton({ path, onDone }: { path: string; onDone?: () => v
   );
 }
 
-/** NUEVO: solo dispara el evento para que la página abra el modal */
 export function DeleteForeverButton({ path }: CommonProps) {
   return (
     <button
