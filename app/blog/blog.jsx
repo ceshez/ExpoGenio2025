@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import LogoGenio from "../components/LogoGenio"
 const Blog = () => {
   return (
-    <section className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
+    <section className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-white to-gray-50">
         <div className=" my-10 mt-18 ml-4 flex items-center gap-8 max-w-7xl mx-auto ">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-800" >
                 Lo mas reciente de GENIO
