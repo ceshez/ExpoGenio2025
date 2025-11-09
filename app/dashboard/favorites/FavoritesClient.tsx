@@ -1,4 +1,3 @@
-// app/dashboard/favorites/FavoritesClient.tsx (CLIENT)
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,12 +11,11 @@ type RecentItem = {
   id: string;
   title: string;
   path: string;
-  updatedAtText: string; // viene del server en formato CR
+  updatedAtText: string;
+  isFavorite?: boolean;
 };
 
-type FavoriteItem = RecentItem & {
-  isFavorite: boolean; // true en esta vista
-};
+type FavoriteItem = RecentItem & { isFavorite: boolean };
 
 export default function FavoritesClient({
   recentDesigns,
@@ -27,14 +25,43 @@ export default function FavoritesClient({
   favorites: FavoriteItem[];
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [items, setItems] = useState<FavoriteItem[]>(() => [...favorites]);
 
-  // Estado local para que el grid reaccione sin refrescar
-  const [favItems, setFavItems] = useState<FavoriteItem[]>(favorites);
+  useEffect(() => setItems(favorites), [favorites]);
 
-  // Si el server rehidrata con cambios, sincroniza
+  // Eventos globales para mantenerse en sync sin refrescar
   useEffect(() => {
-    setFavItems(favorites);
-  }, [favorites]);
+    const onFav = (e: Event) => {
+      const { path } = (e as CustomEvent<{ path: string }>).detail || {};
+      if (!path) return;
+      const fromRecent = recentDesigns.find((r) => r.path === path);
+      if (fromRecent && !items.some((i) => i.path === path)) {
+        setItems((prev) => [
+          { ...fromRecent, isFavorite: true } as FavoriteItem,
+          ...prev,
+        ]);
+      }
+    };
+    const onUnfav = (e: Event) => {
+      const { path } = (e as CustomEvent<{ path: string }>).detail || {};
+      if (!path) return;
+      setItems((prev) => prev.filter((i) => i.path !== path));
+    };
+    const onTrash = (e: Event) => {
+      const { path } = (e as CustomEvent<{ path: string }>).detail || {};
+      if (!path) return;
+      setItems((prev) => prev.filter((i) => i.path !== path));
+    };
+
+    window.addEventListener("page:favorited", onFav as EventListener);
+    window.addEventListener("page:unfavorited", onUnfav as EventListener);
+    window.addEventListener("page:trashed", onTrash as EventListener);
+    return () => {
+      window.removeEventListener("page:favorited", onFav as EventListener);
+      window.removeEventListener("page:unfavorited", onUnfav as EventListener);
+      window.removeEventListener("page:trashed", onTrash as EventListener);
+    };
+  }, [items, recentDesigns]);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -45,7 +72,8 @@ export default function FavoritesClient({
           id: r.id,
           title: r.title,
           path: r.path,
-          updatedAt: r.updatedAtText, // el Sidebar espera 'updatedAt' string
+          updatedAt: r.updatedAtText,
+          isFavorite: !!r.isFavorite,
         }))}
       />
 
@@ -59,11 +87,14 @@ export default function FavoritesClient({
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Favoritos</h1>
-                <p className="text-sm text-muted-foreground mt-1">Tus páginas marcadas con estrella</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Tus páginas marcadas con estrella
+                </p>
               </div>
+              <div />
             </div>
 
-            {favItems.length === 0 ? (
+            {items.length === 0 ? (
               <div className="text-center py-16 px-4 rounded-2xl border-2 border-dashed border-border bg-muted/30">
                 <p className="text-muted-foreground text-lg">
                   No tienes páginas favoritas. Marca alguna desde “Recientes”.
@@ -71,9 +102,9 @@ export default function FavoritesClient({
               </div>
             ) : (
               <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                {favItems.map((p) => (
+                {items.map((p) => (
                   <div
-                    key={p.id}
+                    key={p.path}
                     className="group rounded-2xl border border-border bg-card shadow-sm hover:shadow-xl hover:shadow-fuchsia-500/10 transition-all duration-300 overflow-hidden hover:-translate-y-1"
                   >
                     <Link href={`${p.path}/edit`}>
@@ -84,30 +115,41 @@ export default function FavoritesClient({
                     </Link>
 
                     <div className="p-4">
-                      {/* Título + estrella amarilla (solo display) */}
-                      <div className="flex items-start gap-2">
-                        <h3 className="font-semibold text-foreground truncate text-lg mb-1 flex-1">
-                          {p.title}
-                        </h3>
-                        <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                      </div>
+                      {/* ⭐ al inicio del título */}
+                      <h3 className="font-semibold text-foreground truncate text-lg mb-1 flex items-center gap-1">
+                        {p.isFavorite && (
+                          <Star size={14} className="text-yellow-400 fill-yellow-400 shrink-0" />
+                        )}
+                        <span className="truncate">{p.title}</span>
+                      </h3>
 
                       <p className="text-xs text-muted-foreground mb-4" suppressHydrationWarning>
                         Editado {p.updatedAtText}
                       </p>
 
                       <div className="flex gap-2">
-                        {/* Aquí el toggle quita de favoritos y SACAMOS la carta al instante */}
                         <FavoriteButton
                           path={p.path}
-                          isFavorite={true}
+                          isFavorite={!!p.isFavorite}
+                          meta={{
+                            id: p.id,
+                            title: p.title,
+                            path: p.path,
+                            updatedAtText: p.updatedAtText,
+                          }}
                           onDone={() => {
-                            // UI optimista: eliminar la card localmente
-                            setFavItems((prev) => prev.filter((x) => x.id !== p.id));
+                            // - page:unfavorited -> lo quita
                           }}
                         />
-                        <TrashButton path={p.path} />
-
+                        <TrashButton
+                          path={p.path}
+                          onDone={() => {
+                            setItems((prev) => prev.filter((i) => i.path !== p.path));
+                            window.dispatchEvent(
+                              new CustomEvent("page:trashed", { detail: { path: p.path } })
+                            );
+                          }}
+                        />
                         <Link
                           href={p.path}
                           className="ml-auto text-sm px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors font-medium"
@@ -132,3 +174,4 @@ export default function FavoritesClient({
     </div>
   );
 }
+

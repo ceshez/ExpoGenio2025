@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   const Pages = await PageModel();
 
-  // 👇 IMPORTANTE: usa findOne (no find) y tipa el lean
+
   const existing = await Pages.findOne({ path: payload.path })
     .select({ _id: 1, userId: 1, title: 1 })
     .lean<IPage | null>();
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
           payload.title ??
           existing?.title ??
           (payload.path.replace(/^\//, "") || "Mi sitio"),
-        content: payload.data, // guarda el árbol completo de Puck
+        content: payload.data, 
         isDeleted: false,
         updatedAt: new Date(),
       },
