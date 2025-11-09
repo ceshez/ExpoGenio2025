@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 // Iconos de Lucide
-import { Lock, Mail, ShieldCheck, Eye, EyeOff, Shield } from "lucide-react"
+import { Lock, Mail, Eye, EyeOff, Shield } from "lucide-react"
 import ModalVerificacion from "@/components/ModalVerificacion"
 
 // Props del componente
@@ -248,6 +248,7 @@ export function SeccionSeguridad({ onGuardar }: SeccionSeguridadProps) {
         onVerify={handleVerificacionResultado}
         emailPreview={ultimoTipo === "email" ? nuevoCorreo || "nuevo@ejemplo.com" : "usuario@ejemplo.com"}
         illustrationSrc="/otp-illustration.png"
+        type={ultimoTipo || "email"}
       />
     </div>
   )
