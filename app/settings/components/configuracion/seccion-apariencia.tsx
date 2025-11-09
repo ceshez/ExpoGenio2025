@@ -294,14 +294,36 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
     const translateX = (indice - indiceSeleccionado) * 160 + offsetArrastre
 
     return {
-      transform: `translateX(${translateX}px) scale(${escala})`,
-      opacity: opacidad,
-      zIndex: distanciaDelCentro === 0 ? 10 : 5 - distanciaDelCentro,
-    }
+      "--translate-x": `${translateX}px`,
+      "--scale": escala.toString(),
+      "--opacity": opacidad.toString(),
+      "--z-index": (distanciaDelCentro === 0 ? 10 : 5 - distanciaDelCentro).toString(),
+    } as React.CSSProperties
+  }
+
+  const obtenerEstilosImagen = () => {
+    return {
+      "--zoom-scale": (zoom / 100).toString(),
+      "--position-x": `${posicionX}%`,
+      "--position-y": `${posicionY}%`,
+    } as React.CSSProperties
   }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">
+      <style jsx>{`
+        .avatar-carousel-item {
+          transform: translateX(var(--translate-x)) scale(var(--scale));
+          opacity: var(--opacity);
+          z-index: var(--z-index);
+        }
+        
+        .avatar-preview-image {
+          transform: scale(var(--zoom-scale));
+          object-position: var(--position-x) var(--position-y);
+        }
+      `}</style>
+
       {/* Encabezado de la sección */}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold mb-2 flex items-center gap-2">
@@ -423,7 +445,7 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
                     return (
                       <div
                         key={indice}
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none"
+                        className="avatar-carousel-item absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none"
                         style={estilos}
                       >
                         <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl shadow-purple-500/20 bg-linear-to-br from-purple-100 to-blue-100">
@@ -487,16 +509,13 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
                       className="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-lg relative cursor-move select-none"
                       onMouseDown={iniciarArrastreImagen}
                       onTouchStart={iniciarArrastreImagen}
+                      style={obtenerEstilosImagen()}
                     >
                       <img
                         src={vistaPrevia || "/placeholder.svg"}
                         alt="Vista previa"
-                        className="w-full h-full object-cover pointer-events-none select-none"
+                        className="avatar-preview-image w-full h-full object-cover pointer-events-none select-none"
                         draggable={false}
-                        style={{
-                          transform: `scale(${zoom / 100})`,
-                          objectPosition: `${posicionX}% ${posicionY}%`,
-                        }}
                       />
                     </div>
 
@@ -567,16 +586,13 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
                       className="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-purple-500 shadow-lg relative cursor-move select-none"
                       onMouseDown={iniciarArrastreImagen}
                       onTouchStart={iniciarArrastreImagen}
+                      style={obtenerEstilosImagen()}
                     >
                       <img
                         src={vistaPrevia || "/placeholder.svg?height=192&width=192"}
                         alt="Vista previa"
-                        className="w-full h-full object-cover pointer-events-none select-none"
+                        className="avatar-preview-image w-full h-full object-cover pointer-events-none select-none"
                         draggable={false}
-                        style={{
-                          transform: `scale(${zoom / 100})`,
-                          objectPosition: `${posicionX}% ${posicionY}%`,
-                        }}
                         onError={(e) => {
                           e.currentTarget.src = "/placeholder.svg?height=192&width=192"
                         }}

@@ -84,7 +84,7 @@ export function SeccionPerfil({ onGuardar }: SeccionPerfilProps) {
       </div>
 
       {/* Card de información personal */}
-      <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-purple-50/5 dark:to-purple-950/5">
+      <Card className="p-4 sm:p-6 border-border/50 bg-linear-to-br from-card to-purple-50/5 dark:to-purple-950/5">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <div className="p-2 bg-purple-100 dark:bg-purple-950/30 rounded-lg">
             <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
@@ -165,7 +165,7 @@ export function SeccionPerfil({ onGuardar }: SeccionPerfilProps) {
       </Card>
 
       {/* Card de información adicional */}
-      <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-blue-50/5 dark:to-blue-950/5">
+      <Card className="p-4 sm:p-6 border-border/50 bg-linear-to-br from-card to-blue-50/5 dark:to-blue-950/5">
         <div className="flex items-center gap-3 mb-4 sm:mb-6">
           <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
             <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
@@ -277,7 +277,7 @@ export function SeccionPerfil({ onGuardar }: SeccionPerfilProps) {
       <div className="flex justify-end">
         <Button
           onClick={onGuardar}
-          className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 px-6 sm:px-8 text-sm sm:text-base"
+          className="w-full sm:w-auto bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/30 transition-all duration-300 px-6 sm:px-8 text-sm sm:text-base"
         >
           Guardar Cambios
         </Button>
