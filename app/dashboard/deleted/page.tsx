@@ -50,15 +50,14 @@ export default async function DeletedPage() {
 
   const recentDocs = await Pages.find(
     { userId: me.id, isDeleted: { $ne: true } },
-    { _id: 0, title: 1, path: 1, updatedAt: 1 }
+    { _id: 0, title: 1, path: 1, updatedAt: 1, isFavorite: 1 }
   )
     .sort({ updatedAt: -1 })
     .lean();
 
-  // Papelera
   const trashDocs = await Pages.find(
     { userId: me.id, isDeleted: true },
-    { _id: 0, title: 1, path: 1, deletedAt: 1, updatedAt: 1 }
+    { _id: 0, title: 1, path: 1, deletedAt: 1, updatedAt: 1, isFavorite: 1 }
   )
     .sort({ deletedAt: -1 })
     .lean();
@@ -67,7 +66,8 @@ export default async function DeletedPage() {
     id: d.path,
     title: d.title || d.path.replace("/", ""),
     path: d.path,
-    updatedAt: formatCR(d.updatedAt),   // ← DeletedClient espera `updatedAt` (string)
+    updatedAt: formatCR(d.updatedAt), 
+    isFavorite: !!d.isFavorite,       
   }));
 
   const items = trashDocs.map((d: any) => {
@@ -76,9 +76,10 @@ export default async function DeletedPage() {
       id: d.path,
       title: d.title || d.path.replace("/", ""),
       path: d.path,
-      deletedAtText: formatCR(d.deletedAt), // ← seguro
+      deletedAtText: formatCR(d.deletedAt),
       left,
       canDeleteForever: left === 0,
+      isFavorite: !!d.isFavorite,      
     };
   });
 

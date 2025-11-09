@@ -1,4 +1,4 @@
-// app/dashboard/favorites/page.tsx (SERVER)
+// app/dashboard/favorites/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
@@ -24,30 +24,22 @@ export default async function FavoritesPage() {
     where: { email: session.user.email },
     select: { id: true },
   });
-
-  if (!me) {
-    return <div className="p-8 text-center">Usuario no encontrado.</div>;
-  }
+  if (!me) return <div className="p-8 text-center">Usuario no encontrado.</div>;
 
   const Pages = await PageModel();
 
-  // Para el Sidebar: recientes (todas no borradas)
+
   const recentDocs = await Pages.find(
     { userId: me.id, isDeleted: { $ne: true } },
-    { _id: 0, title: 1, path: 1, updatedAt: 1 }
-  )
-    .sort({ updatedAt: -1 })
-    .lean();
+    { _id: 0, title: 1, path: 1, updatedAt: 1, isFavorite: 1 }
+  ).sort({ updatedAt: -1 }).lean();
 
-  // Para el grid de favoritos
+
   const favDocs = await Pages.find(
     { userId: me.id, isDeleted: { $ne: true }, isFavorite: true },
     { _id: 0, title: 1, path: 1, updatedAt: 1, isFavorite: 1 }
-  )
-    .sort({ updatedAt: -1 })
-    .lean();
+  ).sort({ updatedAt: -1 }).lean();
 
-  // Formato Costa Rica
   const fmt = new Intl.DateTimeFormat("es-CR", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -59,6 +51,7 @@ export default async function FavoritesPage() {
     title: d.title || d.path.replace("/", ""),
     path: d.path,
     updatedAtText: fmt.format(new Date(d.updatedAt)),
+    isFavorite: !!d.isFavorite, 
   }));
 
   const favorites = favDocs.map((d: any) => ({
@@ -66,7 +59,7 @@ export default async function FavoritesPage() {
     title: d.title || d.path.replace("/", ""),
     path: d.path,
     updatedAtText: fmt.format(new Date(d.updatedAt)),
-    isFavorite: !!d.isFavorite,
+    isFavorite: true,
   }));
 
   return <FavoritesClient recentDesigns={recentDesigns} favorites={favorites} />;

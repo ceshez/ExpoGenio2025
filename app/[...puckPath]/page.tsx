@@ -11,7 +11,6 @@
  */
 
 // app/[...puckPath]/page.tsx
-// app/[...puckPath]/page.tsx
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -20,7 +19,7 @@ import type { Metadata } from "next";
 import { Client as Viewer } from "./client";
 import { PageModel, type IPage } from "@/lib/mongodb/models/Page";
 
-// Util para sacar un título desde el contenido de Puck (fallback)
+
 function titleFromContent(content: any): string | undefined {
   try {
     return content?.root?.props?.title;
@@ -34,7 +33,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ puckPath?: string[] }>;
 }): Promise<Metadata> {
-  // 👇 En tu proyecto, params es Promise. ¡Siempre await!
+
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
@@ -57,7 +56,7 @@ export default async function Page({
 }: {
   params: Promise<{ puckPath?: string[] }>;
 }) {
-  // 👇 Igual aquí: await params antes de usar puckPath
+  // await params antes de usar puckPath
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
@@ -71,7 +70,7 @@ export default async function Page({
   const content = rec?.content ?? rec?.data;
   if (!content) return notFound();
 
-  // Asegurar objeto plano (evitar prototipos de Mongoose)
+  // Asegura objeto plano 
   const safe = JSON.parse(JSON.stringify(content));
 
   return <Viewer data={safe as any} />;
