@@ -5,8 +5,8 @@ import Image from "next/image";
 
 export default function ConfirmDeleteModal({
   open,
-  title = "Eliminar página",
-  description = "Esta acción es permanente. No podrás recuperar la página.",
+  title = "Estás seguro de eliminar esta página?",
+  description = "Esta acción es permanente si la eliminas no la podrás recuperar.",
   imageSrc = "../../GIO-mascota/GIO2.0.svg",
   onCancel,
   onConfirm,

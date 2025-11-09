@@ -1,54 +1,55 @@
 // lib/auth.ts
-import { compare } from "bcryptjs";
-import CredentialsProvider from "next-auth/providers/credentials";
-import type { NextAuthOptions } from "next-auth";
-import { prisma } from "@/lib/prisma";
+import type { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { z } from "zod"
+import { prisma } from "@/lib/prisma"
+import { usePreAuthToken } from "@/lib/2fa" // <- asegúrate de tenerla (consume y borra el PreAuthToken)
+
+const FinalStepSchema = z.object({
+  otpToken: z.string().min(1),
+})
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        otpToken: { label: "OtpToken", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        // Solo paso final: crear sesión con otpToken válido
+        const parsed = FinalStepSchema.safeParse(credentials)
+        if (!parsed.success) return null
+        const { otpToken } = parsed.data
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (!user) return null;
+        // Consume el pre-auth token y obtiene el userId
+        const userId = await usePreAuthToken(otpToken)
+        if (!userId) return null
 
-        const ok = await compare(credentials.password, user.password);
-        if (!ok) return null;
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user) return null
 
         return {
           id: user.id.toString(),
           email: user.email,
           name: user.name,
-        };
+        }
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/login",
-  },
+  session: { strategy: "jwt" },
+  pages: { signIn: "/login" },
   callbacks: {
-    // Mete el id del usuario en el JWT
     async jwt({ token, user }) {
-      if (user?.id) token.uid = user.id; 
-      return token;
+      if (user?.id) token.uid = user.id 
+      return token
     },
-    // Expone el id en la session (session.user.id)
     async session({ session, token }) {
       if (token?.uid && session.user) {
-        (session.user as any).id = token.uid;
+        ;(session.user as any).id = token.uid 
       }
-      return session;
+      return session
     },
   },
-};
+  secret: process.env.NEXTAUTH_SECRET,
+}
