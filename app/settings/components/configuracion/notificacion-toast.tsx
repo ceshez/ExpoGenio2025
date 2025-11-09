@@ -20,7 +20,7 @@ export function NotificacionToast({ mostrar }: NotificacionToastProps) {
       }`}
     >
       {/* Card del toast con gradiente verde y efecto glassmorphism */}
-      <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl shadow-green-500/40 flex items-center gap-3 backdrop-blur-sm border border-green-400/20">
+      <div className="bg-linear-to-r from-green-500 to-emerald-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl shadow-green-500/40 flex items-center gap-3 backdrop-blur-sm border border-green-400/20">
         {/* Icono de check con fondo semi-transparente */}
         <div className="bg-white/20 rounded-full p-1">
           <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />

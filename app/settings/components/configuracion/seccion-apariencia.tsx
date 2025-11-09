@@ -59,14 +59,13 @@ export function SeccionApariencia({ onGuardar }: SeccionAparienciaProps) {
 
   const contenedorRef = useRef<HTMLDivElement>(null)
 
-  // 6 URLs de avatares predeterminados (placeholders - el usuario agregará las imágenes reales)
   const avataresPredeterminados = [
-    "/avatars/avatar-1.png",
-    "/avatars/avatar-2.png",
-    "/avatars/avatar-3.png",
-    "/avatars/avatar-4.png",
-    "/avatars/avatar-5.png",
-    "/avatars/avatar-6.png",
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-9vZjTgvjCJZH7f5LIGxbYMj0bGqC9T.png", // Enojado
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-IJkCYJExEzfEMwCjtTfs4y0TpgQvQw.png", // Enamorado
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-i1xickxQjSfCGPAmpaW3SVGpF89WWU.png", // Feliz
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4-h697p6a5z6bSEhGzrfE6mKIAzXEPm0.png", // Triste
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5-51WsJgHlXMA3BAocDcic9yN28titGH.png", // Pensativo
+    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/6-wDxtkBTBKLL8CfGzfwdSP9S2mokyyN.png", // Reflexión
   ]
 
   /**
