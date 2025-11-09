@@ -1,7 +1,7 @@
 "use client"
 import Dashboard from "../dashboard"
 import { useState } from "react"
-import { Upload, X, Video } from "lucide-react"
+import { X, Video, Upload } from "lucide-react"
 
 export default function VideosAdmin() {
   const [openModal, setOpenModal] = useState(false)
@@ -9,112 +9,110 @@ export default function VideosAdmin() {
   return (
     <div className="flex min-h-screen">
       <Dashboard />
+        <main className="flex-1 p-8 bg-white">
+          <h1 className="text-2xl font-bold text-shadow-purple-800">Gestión de Videos</h1>
+          <p className="mt-2 text-purple-700">
+            Administra tus videos, actualiza información o elimina contenido.
+          </p>
 
-      <main className="flex-1 p-8 bg-[#faf7fc]">
-        <h1 className="text-2xl font-bold text-[#563761]">Gestión de Videos</h1>
-        <p className="mt-2 text-[#7c5c9b]">
-          Administra tus videos, actualiza información o elimina contenido.
-        </p>
-
-        <div className="mt-8">
-          <button
-            onClick={() => setOpenModal(true)}
-            className="px-4 py-2 bg-purple-700 text-white rounded-md hover:opacity-90"
-          >
+          <div className="mt-8">
+            <button onClick={() => setOpenModal(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              >
             Nuevo video
-          </button>
+            </button>
 
-          {/* MODAL */}
+          {/* modal completo */}
           {openModal && (
-            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 relative border border-[#E2C9ED]">
-                {/* BOTÓN CERRAR */}
-                <button
-                  onClick={() => setOpenModal(false)}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-6 relative border">
 
-                <h2 className="text-xl font-bold text-[#563761] mb-6">Agregar nuevo video</h2>
+              {/* Boton pa cerrar */}
+              <button onClick={() => setOpenModal(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <X className="w-5 h-5" />
+              </button>
 
+              <h2 className="text-xl font-semibold text-purple-700 mb-6">
+                Agregar nuevo video
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{/* dividirlo en 2 columnas */}
                 <form className="space-y-5">
-                  {/* TÍTULO */}
                   <div>
-                    <label className="block text-sm font-medium text-[#563761] mb-1">Título</label>
-                    <input
-                      type="text"
-                      placeholder="Ej: Tutorial de Genio Drag & Drop"
-                      className="w-full border border-[#E2C9ED] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-purple-700 focus:outline-none"
+                    <label className="block text-sm font-medium text-purple-900 mb-1">
+                      Título 
+                    </label>
+                    <input type="text" placeholder="Ej: Tutorial de Genio"
+                      className="w-full border border-purple-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-purple-600"
                     />
                   </div>
 
-                  {/* DESCRIPCIÓN */}
                   <div>
-                    <label className="block text-sm font-medium text-[#563761] mb-1">
-                      Descripción corta
+                    <label className="block text-sm font-medium text-purple-900 mb-1">
+                      Descripción 
                     </label>
-                    <textarea
-                      placeholder="Describe brevemente el video..."
-                      className="w-full border border-[#E2C9ED] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-fuchsia-600 focus:outline-none"
+                    <textarea placeholder="Describe brevemente el contenido del video…"
+                      className="w-full border border-purple-300 rounded-md px-3 py-2 text-sm h-28 resize-none focus:ring-2 focus:ring-purple-600"
                     />
                   </div>
 
-                  {/* MINIATURA */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#563761] mb-1">
-                      Miniatura
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <label className="cursor-pointer flex items-center gap-2 bg-[#EADAF2] text-[#563761] px-4 py-2 rounded-md hover:bg-[#E2C9ED] transition">
-                        <Upload className="w-4 h-4" />
-                        <span>Subir imagen</span>
-                        <input type="file" className="hidden" />
-                      </label>
-                      <span className="text-sm text-gray-500">.png, .jpg, .svg</span>
-                    </div>
-                  </div>
-
-                  {/* VIDEO */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#563761] mb-1">
-                      Archivo de video
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <label className="cursor-pointer flex items-center gap-2 bg-[#EADAF2] text-[#563761] px-4 py-2 rounded-md hover:bg-[#E2C9ED] transition">
-                        <Video className="w-4 h-4" />
-                        <span>Subir video</span>
-                        <input type="file" className="hidden" accept="video/*" />
-                      </label>
-                      <span className="text-sm text-gray-500">.mp4, .mov, .webm</span>
-                    </div>
-                  </div>
-
-                  {/* BOTONES */}
-                  <div className="flex justify-end gap-3 pt-4 border-t border-[#EADAF2]">
-                    <button
-                      type="button"
-                      onClick={() => setOpenModal(false)}
-                      className="px-4 py-2 text-[#563761] bg-gray-200 rounded-md hover:bg-gray-400"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-purple-500 text-white rounded-md hover:opacity-90"
-                    >
-                      Guardar
-                    </button>
-                  </div>
                 </form>
+
+                <div className="space-y-4">
+                  <div className="w-full h-40 rounded-lg bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <Video className="w-10 h-10 text-gray-500" />
+                    {/* si ya hay archivo del thumnail se agrega:
+                <img src="thumbnailUrl" className="w-full h-full object-cover" />
+                    */}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-purple-900 mb-1">
+                      Archivo del video 
+                    </label>
+                    <input type="file" placeholder="https://youtube.com/..."
+                      className="w-full border border-purple-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-purple-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-purple-900 mb-1">
+                      Miniatura 
+                    </label>
+                    <input type="text" placeholder="https://imagen.com/miniatura.png"
+                      className="w-full border border-purple-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-purple-600"
+                    />
+                  </div>
+
+                </div>
+
               </div>
-            </div>
-          )}
+
+              {/* Botones */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setOpenModal(false)}
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                >
+                  Guardar
+                </button>
+              </div>
+
+    </div>
+  </div>
+)}
 
           {/* TABLA */}
-          <div className="mt-10 border border-[#EADAF2] rounded-lg overflow-hidden shadow-sm">
+          <div className="mt-10 border border-l-white rounded-lg overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-[#EADAF2] text-[#563761]">
+              <thead className="bg-purple-200 text-slate-900">
                 <tr>
                   <th className="p-3 font-semibold">Miniatura</th>
                   <th className="p-3 font-semibold">Título</th>
@@ -126,9 +124,9 @@ export default function VideosAdmin() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-t border-[#EADAF2] hover:bg-[#f9f5fb]">
+                <tr className="border-t border-purple-200 hover:bg-purple-50">
                   <td className="p-3">
-                    <div className="w-14 h-10 bg-[#EADAF2] rounded flex items-center justify-center text-[#563761]">
+                    <div className="w-14 h-10 bg-purple-200 rounded flex items-center justify-center text-purple-700">
                       <Video className="w-5 h-5" />
                     </div>
                   </td>
@@ -136,19 +134,20 @@ export default function VideosAdmin() {
                   <td className="p-3">Carlos Sánchez</td>
                   <td className="p-3">01/12/2025</td>
                   <td className="p-3 text-sm text-gray-700">
-                    Aprende cómo arrastrar y organizar elementos dentro del editor visual de Genio.
+                    Aprende a arrastrar elementos en Genio.
                   </td>
                   <td className="p-3">
-                    <button className="text-[#9E30D4] hover:underline">Descargar</button>
+                    <button className="text-purple-600 hover:underline">Ver</button>
                   </td>
                   <td className="p-3 text-right space-x-2">
-                    <button className="text-[#9E30D4] hover:underline">Editar</button>
+                    <button className="text-purple-600 hover:underline">Editar</button>
                     <button className="text-red-500 hover:underline">Eliminar</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+
         </div>
       </main>
     </div>

@@ -8,10 +8,10 @@ export default function Dashboard() {
   const pathname = usePathname()
 
   const items = [
-    { id: "start", label: "Inicio", icon: Home, href: "/Admin" },
+    { id: "start", label: "Inicio", icon: Home, href: "/Admin/start" },
     { id: "blog", label: "Blog", icon: FileText, href: "/Admin/blog" },
     { id: "video", label: "Videos", icon: VideoIcon, href: "/Admin/videos" },
-    { id: "socio", label: "Socios", icon: Boxes, href: "/Admin/socios" },
+    { id: "socio", label: "Socios", icon: Boxes, href: "/Admin/partners" },
     { id: "releases", label: "Actualizaciones", icon: RefreshCw, href: "/Admin/releases" },
   ]
 

@@ -16,13 +16,13 @@ const Footer = () => {
     },
     {
       title: "Recursos",
-      links: ["Blog", "Tutoriales", "Documentación", "Comunidad"],
-      ref:["blog", "tutorial", "documentation", "community"],
+      links: ["Blog", "Tutoriales", "Documentación"],
+      ref:["blog", "tutorial", "documentation"],
     },
     {
       title: "Empresa",
-      links: ["Mision", "Socios", "Contacto"],
-      ref:["mision", "partners", "contact"],
+      links: ["Socios", "Contacto"],
+      ref:["partners", "contact"],
     },
   ]
 
@@ -45,7 +45,7 @@ const Footer = () => {
              <div className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
               <LogoGenio variant="simplified"/>
             </div>
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GENIO</span>
+              <span className="bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GENIO</span>
             </a>
             <p className="text-gray-400 mb-6">
               La plataforma más fácil para crear sitios web profesionales sin necesidad de programación.
@@ -66,7 +66,7 @@ const Footer = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all hover:scale-105 flex items-center gap-2"
+                  className="px-4 py-2 bg-linear-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all hover:scale-105 flex items-center gap-2"
                 >
                   <Send className="w-4 h-4" />
                 </button>
