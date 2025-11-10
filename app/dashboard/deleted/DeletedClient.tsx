@@ -111,7 +111,7 @@ export default function DeletedClient({
                 <p className="text-muted-foreground text-lg">No hay páginas en la papelera.</p>
               </div>
             ) : (
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((p) => (
                   <div
                     key={p.id}
@@ -154,18 +154,6 @@ export default function DeletedClient({
                         {/* Abre modal mediante evento */}
                         <DeleteForeverButton path={p.path} />
 
-                        <Link
-                          href={p.path}
-                          className="ml-auto text-sm px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors font-medium"
-                        >
-                          Ver
-                        </Link>
-                        <Link
-                          href={`${p.path}/edit`}
-                          className="text-sm px-3 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white hover:from-fuchsia-600 hover:to-purple-700 transition-all font-medium shadow-md shadow-fuchsia-500/20"
-                        >
-                          Editar
-                        </Link>
                       </div>
                     </div>
                   </div>
@@ -185,7 +173,7 @@ export default function DeletedClient({
         }}
         onConfirm={handleConfirmDelete}
         loading={loading}
-        title="Eliminar página"
+        title="Estas seguro de eliminar esta página definitivamente?"
         description="Esta acción es permanente. No podrás recuperar la página."
         imageSrc={Sure.src}
       />

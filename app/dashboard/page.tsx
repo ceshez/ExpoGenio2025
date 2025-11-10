@@ -2,9 +2,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import DashboardClient from "./DashboardClient";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { PageModel } from "@/lib/mongodb/models/Page";
+import { redirect } from "next/navigation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,12 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
-    return (
-      <div className="p-8 text-center">
-        <p>No has iniciado sesión.</p>
-        <Link href="/login" className="text-purple-600 underline">Ir al login</Link>
-      </div>
-    );
+    redirect("/login");
   }
 
   const me = await prisma.user.findUnique({
