@@ -8,7 +8,7 @@ import { PageModel } from "@/lib/mongodb/models/Page"
 import LogoGenio from "../../components/LogoGenio"
 export const runtime = "nodejs";
 
-const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 12)
+const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 12)
 
 export default function NewSitePage() {
   async function create(formData: FormData) {
@@ -17,21 +17,21 @@ export default function NewSitePage() {
     const email = session?.user?.email;
     if (!email) redirect("/login");
 
-    // 1) id desde Prisma
+    // id desde Prisma
     const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
     if (!user) redirect("/login");
 
     const title = (formData.get("title") as string)?.trim() || "Mi sitio";
 
-    // 2) path único (global). Valida colisión en Mongo
+    // path único (global). Valida colisión en Mongo
     const Pages = await PageModel();
     let path = `/${nanoid(10)}`;
-    // si unique global:
+
     while (await Pages.findOne({ path }, { projection: { _id: 1 } })) {
       path = `/${nanoid(10)}`;
     }
 
-    // 3) guarda en Mongo
+    // guarda en Mongo
     await Pages.create({
       userId: user.id,
       title,
@@ -39,7 +39,7 @@ export default function NewSitePage() {
       content: { root: { type: "container", props: { title }, children: [] } },
     });
 
-    redirect(`${path}/edit`); // el middleware reescribe a /puck/<path>
+    redirect(`${path}/edit`); 
   }
 
   return (

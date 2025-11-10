@@ -22,6 +22,7 @@ interface RecentPage {
   title: string
   path: string
   updatedAt: string
+  isFavorite?: boolean
 }
 
 interface SidebarProps {
@@ -30,26 +31,56 @@ interface SidebarProps {
   recentDesigns: RecentPage[]
 }
 
-export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarProps) {
+export default function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [activeContextMenu, setActiveContextMenu] = useState<string | null>(null)
   const [showAllPages, setShowAllPages] = useState(false)
+  const [items, setItems] = useState<RecentPage[]>(() => [...recentDesigns])
   const PAGES_LIMIT = 7
 
+  // Sync inicial/SSR → estado local toma el valor real del server (incluye isFavorite)
   useEffect(() => {
-    console.log("Sidebar sidebarOpen state:", sidebarOpen)
-  }, [sidebarOpen])
+    setItems(recentDesigns)
+  }, [recentDesigns])
+
+  // Listeners globales: mantienen Sidebar en sync si otros módulos cambian algo
+  useEffect(() => {
+    const onFavorited = (e: Event) => {
+      const { path } = (e as CustomEvent<{ path: string }>).detail || {}
+      if (!path) return
+      setItems(prev => prev.map(p => (p.path === path ? { ...p, isFavorite: true } : p)))
+    }
+    const onUnfavorited = (e: Event) => {
+      const { path } = (e as CustomEvent<{ path: string }>).detail || {}
+      if (!path) return
+      setItems(prev => prev.map(p => (p.path === path ? { ...p, isFavorite: false } : p)))
+    }
+    const onTrashed = (e: Event) => {
+      const { path } = (e as CustomEvent<{ path: string }>).detail || {}
+      if (!path) return
+      setItems(prev => prev.filter(p => p.path !== path))
+    }
+    const onRestored = (_e: Event) => {
+      // Si quieres, aquí podrías re-fetch general. Por ahora, se reflejará al navegar.
+    }
+
+    window.addEventListener("page:favorited", onFavorited as EventListener)
+    window.addEventListener("page:unfavorited", onUnfavorited as EventListener)
+    window.addEventListener("page:trashed", onTrashed as EventListener)
+    window.addEventListener("page:restored", onRestored as EventListener)
+    return () => {
+      window.removeEventListener("page:favorited", onFavorited as EventListener)
+      window.removeEventListener("page:unfavorited", onUnfavorited as EventListener)
+      window.removeEventListener("page:trashed", onTrashed as EventListener)
+      window.removeEventListener("page:restored", onRestored as EventListener)
+    }
+  }, [])
 
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as HTMLElement
-    if (!target.closest("[data-user-menu]")) {
-      setUserMenuOpen(false)
-    }
-    if (!target.closest("[data-context-menu]")) {
-      setActiveContextMenu(null)
-    }
+    if (!target.closest("[data-user-menu]")) setUserMenuOpen(false)
+    if (!target.closest("[data-context-menu]")) setActiveContextMenu(null)
   }
-
   useEffect(() => {
     if (userMenuOpen || activeContextMenu) {
       document.addEventListener("click", handleClickOutside)
@@ -57,12 +88,20 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
     }
   }, [userMenuOpen, activeContextMenu])
 
-  const handleBurgerClick = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+  const handleBurgerClick = () => setSidebarOpen(!sidebarOpen)
 
-  const visiblePages = showAllPages ? recentDesigns : recentDesigns.slice(0, PAGES_LIMIT)
-  const hasMorePages = recentDesigns.length > PAGES_LIMIT
+  const visiblePages = showAllPages ? items : items.slice(0, PAGES_LIMIT)
+  const hasMorePages = items.length > PAGES_LIMIT
+
+  const fmtShortCR = new Intl.DateTimeFormat("es-CR", {
+    day: "numeric",
+    month: "short",
+    timeZone: "America/Costa_Rica",
+  })
+  const renderSidebarDate = (value: string) => {
+    const dt = new Date(value)
+    return isNaN(dt.getTime()) ? value : fmtShortCR.format(dt)
+  }
 
   return (
     <>
@@ -84,25 +123,20 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
               <Home className="text-sidebar-foreground" size={20} />
             </button>
           </Link>
-          <Link href="/dashboard/projects">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Layout className="text-sidebar-foreground" size={20} />
-          </button>
-          </Link>
           <Link href="/dashboard/new">
             <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
               <CircleFadingPlus className="text-sidebar-foreground" size={20} />
             </button>
           </Link>
           <Link href="/dashboard/favorites">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Star className="text-sidebar-foreground" size={20} />
-          </button>
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <Star className="text-sidebar-foreground" size={20} />
+            </button>
           </Link>
           <Link href="/dashboard/deleted">
-          <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
-            <Trash2 className="text-sidebar-foreground" size={20} />
-          </button>
+            <button className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer">
+              <Trash2 className="text-sidebar-foreground" size={20} />
+            </button>
           </Link>
         </div>
 
@@ -111,7 +145,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
             <button
               onClick={(e) => {
                 e.stopPropagation()
-                console.log("User menu clicked, current state:", userMenuOpen)
                 setUserMenuOpen(!userMenuOpen)
               }}
               className="p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 w-full"
@@ -187,15 +220,20 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                     <div className="w-12 h-8 rounded-md bg-muted flex-shrink-0 shadow-sm flex items-center justify-center">
                       <Layout size={14} className="text-muted-foreground" />
                     </div>
+
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-sidebar-foreground truncate">{page.title}</h3>
+                      {/* ⭐ al INICIO + elipsis del título */}
+                      <h3 className="text-sm font-medium text-sidebar-foreground truncate flex items-center gap-1">
+                        {page.isFavorite && (
+                          <Star size={12} className="text-yellow-400 fill-yellow-400 shrink-0" />
+                        )}
+                        <span className="truncate">{page.title}</span>
+                      </h3>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(page.updatedAt).toLocaleDateString("es-ES", {
-                          day: "numeric",
-                          month: "short",
-                        })}
+                        {renderSidebarDate(page.updatedAt)}
                       </p>
                     </div>
+
                     <div data-context-menu className="relative">
                       <button
                         onClick={(e) => {
@@ -203,7 +241,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                           e.stopPropagation()
                           setActiveContextMenu(activeContextMenu === page.id ? null : page.id)
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-sidebar-accent transition-all duration-200 cursor-pointer"
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 cursor-pointer"
                       >
                         <MoreHorizontal size={14} className="text-muted-foreground" />
                       </button>
@@ -211,59 +249,76 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                       {activeContextMenu === page.id && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setActiveContextMenu(null)} />
-<div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-40 z-50">
-  {/* Toggle favoritos */}
-  <button
-    onClick={async (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      try {
-        await fetch("/api/pages/favorite", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            path: page.path,
-            // si no viene isFavorite desde el backend, asumimos false
-            favorite: !(page as any).isFavorite,
-          }),
-        })
-      } finally {
-        setActiveContextMenu(null)
-        window.location.reload()
-      }
-    }}
-    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left"
-  >
-    <Star
-      size={14}
-      className={(page as any).isFavorite ? "text-yellow-400 fill-yellow-400" : ""}
-    />
-    {(page as any).isFavorite ? "Quitar favorito" : "Añadir a favoritos"}
-  </button>
+                          <div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border py-1 w-44 z-50">
+                            {/* Toggle favoritos → usa respuesta del server (estado real) */}
+                            <button
+                              onClick={async (e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                try {
+                                  const res = await fetch("/api/pages/favorite", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ path: page.path }),
+                                  })
+                                  const data: { ok?: boolean; isFavorite?: boolean } = await res.json()
 
-  {/* Enviar a papelera */}
-  <button
-    onClick={async (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      try {
-        await fetch("/api/pages/trash", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ path: page.path }),
-        })
-      } finally {
-        setActiveContextMenu(null)
-        window.location.reload()
-      }
-    }}
-    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left"
-  >
-    <Trash2 size={14} />
-    Enviar a papelera
-  </button>
-</div>
-    
+                                  if (data?.ok) {
+                                    // Actualiza con el valor REAL del server
+                                    setItems(prev =>
+                                      prev.map(p =>
+                                        p.id === page.id ? { ...p, isFavorite: !!data.isFavorite } : p
+                                      )
+                                    )
+
+                                    // Avisar al resto
+                                    window.dispatchEvent(
+                                      new CustomEvent(
+                                        data.isFavorite ? "page:favorited" : "page:unfavorited",
+                                        { detail: { path: page.path } }
+                                      )
+                                    )
+                                  }
+                                } finally {
+                                  setActiveContextMenu(null)
+                                }
+                              }}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-popover-foreground hover:bg-accent transition-colors cursor-pointer text-left"
+                            >
+                              <Star
+                                size={14}
+                                className={page.isFavorite ? "text-yellow-400 fill-yellow-400" : ""}
+                              />
+                              {page.isFavorite ? "Quitar favorito" : "Añadir a favoritos"}
+                            </button>
+
+                            {/* Enviar a papelera → actualiza Sidebar y notifica */}
+                            <button
+                              onClick={async (e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                try {
+                                  await fetch("/api/pages/trash", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ path: page.path }),
+                                  })
+
+                                  // Quitar del Sidebar inmediatamente
+                                  setItems(prev => prev.filter(p => p.id !== page.id))
+
+                                  // Notificar a Deleted/Favorites/Dashboard
+                                  window.dispatchEvent(new CustomEvent("page:trashed", { detail: { path: page.path } }))
+                                } finally {
+                                  setActiveContextMenu(null)
+                                }
+                              }}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer text-left"
+                            >
+                              <Trash2 size={14} />
+                              Enviar a papelera
+                            </button>
+                          </div>
                         </>
                       )}
                     </div>
@@ -271,7 +326,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                 </div>
               ))}
 
-              {recentDesigns.length === 0 && (
+              {items.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">No hay sitios recientes</p>
               )}
 
@@ -280,7 +335,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
                   onClick={() => setShowAllPages(!showAllPages)}
                   className="w-full mt-2 p-3 text-sm text-primary hover:bg-sidebar-accent rounded-lg transition-colors font-medium"
                 >
-                  {showAllPages ? "Ver menos" : `Ver más (${recentDesigns.length - PAGES_LIMIT})`}
+                  {showAllPages ? "Ver menos" : `Ver más (${items.length - PAGES_LIMIT})`}
                 </button>
               )}
             </div>
@@ -290,5 +345,3 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, recentDesigns }: SidebarP
     </>
   )
 }
-
-export default Sidebar

@@ -12,43 +12,67 @@
 
 // app/[...puckPath]/page.tsx
 export const runtime = "nodejs";
-import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Client as Viewer } from "./client"; // o tu componente de render público
+import { Client as Viewer } from "./client";
+import { PageModel, type IPage } from "@/lib/mongodb/models/Page";
+
+
+function titleFromContent(content: any): string | undefined {
+  try {
+    return content?.root?.props?.title;
+  } catch {
+    return undefined;
+  }
+}
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ puckPath: string[] }>;
+  params: Promise<{ puckPath?: string[] }>;
 }): Promise<Metadata> {
+
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
-  const rec = await prisma.page.findUnique({
-    where: { path },
-    select: { title: true, content: true },
-  });
+
+  const Pages = await PageModel();
+  const rec = (await Pages.findOne(
+    { path, isDeleted: { $ne: true } },
+    { _id: 0, title: 1, content: 1, data: 1 }
+  ).lean()) as Pick<IPage, "title" | "content"> & { data?: any } | null;
+
+  const content = rec?.content ?? (rec as any)?.data;
+  const fallbackTitle = titleFromContent(content) ?? "Genio";
+
   return {
-    title: rec?.title ?? (rec?.content as any)?.root?.props?.title ?? "Genio",
+    title: rec?.title ?? fallbackTitle,
   };
 }
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ puckPath: string[] }>;
+  params: Promise<{ puckPath?: string[] }>;
 }) {
+  // await params antes de usar puckPath
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
-  const rec = await prisma.page.findUnique({
-    where: { path },
-    select: { content: true },
-  });
+  const Pages = await PageModel();
+  const rec = (await Pages.findOne(
+    { path, isDeleted: { $ne: true } },
+    { _id: 0, content: 1, data: 1 }
+  ).lean()) as Pick<IPage, "content"> & { data?: any } | null;
 
-  if (!rec?.content) return notFound();
-  return <Viewer data={rec.content as any} />;
+  // Preferimos `content`, pero soportamos docs antiguos con `data`
+  const content = rec?.content ?? rec?.data;
+  if (!content) return notFound();
+
+  // Asegura objeto plano 
+  const safe = JSON.parse(JSON.stringify(content));
+
+  return <Viewer data={safe as any} />;
 }
-
-export const dynamic = "force-dynamic";
 

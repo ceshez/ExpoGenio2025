@@ -22,51 +22,57 @@ enum Role {
 }
 
 model User {
-  id              Int      @id @default(autoincrement())
-  email           String   @unique
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
   password        String
   name            String
   lastName        String
 
   // NUEVOS 
-  role            Role     @default(USER)
-  recoveryEmail   String?  @unique
+  role            Role      @default(USER)
+  recoveryEmail   String?   @unique
   photoUrl        String?
   photoBase64     String?
 
   // Verificación y 2FA
   emailVerifiedAt DateTime?
-  twoFAEnabled    Boolean  @default(false)
-  twoFAMethod     String?  // "email" | "totp"
+  twoFAEnabled    Boolean   @default(false)
+  twoFAMethod     String?   // "email" | "totp"
 
+  favorites       Favorite[]
 
-  // (conservar mientras se migra a Mongo)
-  pages           Page[]
-
-  favorites       Favorite[] // favoritos (referencia a Mongo por string IDs/paths)
-}
-// (Opcional) mantener  mientras se migra a Mongo
-// Cuando se terminde de migrar a Mongo,se eliminara este modelo
-model Page {
-  id        Int      @id @default(autoincrement())
-  title     String
-  path      String   @unique
-  content   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  // relaciones 2FA
+  twoFactorToken  TwoFactorToken?
+  preAuthToken    PreAuthToken?
 }
 
-// Tabla de favoritos (apunta a Mongo)
-// Guarda el "tipo" y "ref" (ObjectId string o path slug)
 model Favorite {
   id        Int      @id @default(autoincrement())
   userId    Int
   kind      String   // "page" | "blog" | "tutorial" | "news" | "update"
-  ref       String   // p.ej. ObjectId como string, o path
+  ref       String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId, kind, ref], name: "favorites_user_kind_ref_idx")
+}
+
+// Guarda el OTP hasheado para login por correo
+model TwoFactorToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Token opaco previo a completar 2FA (permite terminar el signIn sin reingresar password)
+model PreAuthToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

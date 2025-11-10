@@ -1,9 +1,8 @@
 "use client"
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, CheckCircle, AlertCircle, Sparkles } from "lucide-react"
+import { Eye, EyeOff, CheckCircle, AlertCircle,  } from "lucide-react"
 import { cn } from "@/lib/utils"
 import LogoGenio from '../components/LogoGenio'
 
@@ -134,31 +133,44 @@ export function AuthForm() {
   }
 
 const handleLogin = async (e) => {
-  e.preventDefault()
-  setIsLoading(true)
+  e.preventDefault();
+  setIsLoading(true);
 
   try {
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: loginData.email,
-      password: loginData.password,
-    })
+    const res = await fetch("/api/auth/2fa/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: loginData.email,
+        password: loginData.password,
+      }),
+    });
 
-    if (result?.error) {
-      showModal("error", result.error || "Error al iniciar sesión")
-      return
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      // Si el backend manda un mensaje personalizado, úsalo
+      const msg =
+        data?.error ||
+        (res.status === 401
+          ? "Usuario o contraseña incorrectos"
+          : "Error al iniciar sesión");
+      showModal("error", msg);
+      return;
     }
 
-    showModal("success", "Inicio de sesión exitoso. Redirigiendo...")
+    showModal("success", "Te enviamos un código de 6 dígitos al correo.");
     setTimeout(() => {
-      window.location.href = "/dashboard"
-    }, 1000)
-  } catch (err) {
-    showModal("error", "Error de red")
+      window.location.href = "/login/2fa";
+    }, 800);
+  } catch {
+    showModal("error", "Error de red");
   } finally {
-    setIsLoading(false)
+    setIsLoading(false);
   }
-}
+};
+
+
 
 const handleRegister = async (e) => {
   e.preventDefault()

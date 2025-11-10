@@ -1,14 +1,15 @@
 // app/puck/api/route.ts
 export const runtime = "nodejs";
+
 import { revalidatePath } from "next/cache";
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
+import { PageModel, type IPage } from "@/lib/mongodb/models/Page";
 
 type PuckPayload = { path: string; data: any; title?: string };
 
 export async function POST(req: NextRequest) {
-  // 1) Identidad con NextAuth
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -22,7 +23,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 2) Payload del editor
   let payload: PuckPayload;
   try {
     payload = await req.json();
@@ -33,33 +33,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
 
-  // 3) Si existe, debe ser MÍO; si no, 403. Si no existe, créalo para mí.
-  const existing = await prisma.page.findUnique({
-    where: { path: payload.path }, // path es único global
-    select: { id: true, userId: true },
-  });
+  const Pages = await PageModel();
+
+
+  const existing = await Pages.findOne({ path: payload.path })
+    .select({ _id: 1, userId: 1, title: 1 })
+    .lean<IPage | null>();
 
   if (existing && existing.userId !== me.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const saved = existing
-    ? await prisma.page.update({
-        where: { id: existing.id },
-        data: {
-          title: payload.title ?? undefined,
-          content: payload.data,
-        },
-      })
-    : await prisma.page.create({
-        data: {
-          title: payload.title ?? (payload.path.replace(/^\//, "") || "Mi sitio"),
-          path: payload.path,
-          content: payload.data,
-          userId: me.id, 
-        },
-      });
+  await Pages.updateOne(
+    { path: payload.path },
+    {
+      $set: {
+        userId: me.id,
+        title:
+          payload.title ??
+          existing?.title ??
+          (payload.path.replace(/^\//, "") || "Mi sitio"),
+        content: payload.data, 
+        isDeleted: false,
+        updatedAt: new Date(),
+      },
+      $setOnInsert: { createdAt: new Date() },
+    },
+    { upsert: true }
+  );
 
   revalidatePath(payload.path);
-  return NextResponse.json({ status: "ok", page: saved });
+  return NextResponse.json({ status: "ok" });
 }
