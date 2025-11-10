@@ -149,7 +149,6 @@ const handleLogin = async (e) => {
     const data = await res.json();
 
     if (!res.ok || !data.ok) {
-      // Si el backend manda un mensaje personalizado, úsalo
       const msg =
         data?.error ||
         (res.status === 401

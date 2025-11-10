@@ -94,7 +94,6 @@ export default function DashboardClient({ recentDesigns }: { recentDesigns: Rece
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ path: p.path }),
     });
-    // Optimista: sacarlo de inmediato
     setItems((prev) => prev.filter((it) => it.path !== p.path));
     window.dispatchEvent(new CustomEvent("page:trashed", { detail: { path: p.path } }));
   }
@@ -138,7 +137,7 @@ export default function DashboardClient({ recentDesigns }: { recentDesigns: Rece
                 <p className="text-muted-foreground text-lg">Aún no tienes páginas. Crea la primera.</p>
               </div>
             ) : (
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((p) => (
                   <div
                     key={p.path}

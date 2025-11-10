@@ -88,7 +88,7 @@ export default function FavoritesClient({
               <div>
                 <h1 className="text-3xl font-bold text-foreground">Favoritos</h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Tus páginas marcadas con estrella
+                  Tus páginas marcadas como favoritas
                 </p>
               </div>
               <div />
@@ -101,7 +101,7 @@ export default function FavoritesClient({
                 </p>
               </div>
             ) : (
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((p) => (
                   <div
                     key={p.path}
@@ -127,42 +127,51 @@ export default function FavoritesClient({
                         Editado {p.updatedAtText}
                       </p>
 
-                      <div className="flex gap-2">
-                        <FavoriteButton
-                          path={p.path}
-                          isFavorite={!!p.isFavorite}
-                          meta={{
-                            id: p.id,
-                            title: p.title,
-                            path: p.path,
-                            updatedAtText: p.updatedAtText,
-                          }}
-                          onDone={() => {
-                            // - page:unfavorited -> lo quita
-                          }}
-                        />
-                        <TrashButton
-                          path={p.path}
-                          onDone={() => {
-                            setItems((prev) => prev.filter((i) => i.path !== p.path));
-                            window.dispatchEvent(
-                              new CustomEvent("page:trashed", { detail: { path: p.path } })
-                            );
-                          }}
-                        />
+                     <div className="min-w-0 flex flex-wrap items-center gap-2 sm:gap-3">
+                      {/* Botones de acción: favoritos y eliminar */}
+                      <div className="shrink-0">
+                      <FavoriteButton
+                        path={p.path}
+                        isFavorite={!!p.isFavorite}
+                        meta={{
+        id: p.id,
+        title: p.title,
+        path: p.path,
+        updatedAtText: p.updatedAtText,
+                        }}
+                        onDone={() => {
+                        // - page:unfavorited -> lo quita
+                      }}
+                      />
+                      </div>
+
+                      {/* Contenedor de Ver y Editar */}
+                      <div
+                      className="
+                        flex flex-col sm:flex-row gap-2 
+                        w-full sm:w-auto 
+                        sm:ml-auto 
+                        justify-start sm:justify-end 
+                        md:w-full lg:w-full
+                      "
+                    >
+                        {/* Ver */}
                         <Link
                           href={p.path}
-                          className="ml-auto text-sm px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors font-medium"
+                          className="flex-1 text-center text-sm px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors font-medium"
                         >
                           Ver
                         </Link>
+
+                        {/* Editar */}
                         <Link
                           href={`${p.path}/edit`}
-                          className="text-sm px-3 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white hover:from-fuchsia-600 hover:to-purple-700 transition-all font-medium shadow-md shadow-fuchsia-500/20"
+                          className="flex-1 text-center text-sm px-3 py-2 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white hover:from-fuchsia-600 hover:to-purple-700 transition-all font-medium shadow-md shadow-fuchsia-500/20"
                         >
                           Editar
                         </Link>
                       </div>
+                    </div>
                     </div>
                   </div>
                 ))}
