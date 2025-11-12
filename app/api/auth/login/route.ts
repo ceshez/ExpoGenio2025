@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Credenciales inválidas" }, { status: 401 });
     }
 
-    // 3) Firmar JWT
+    //Firmar JWT
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET!,

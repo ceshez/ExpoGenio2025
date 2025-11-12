@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, CheckCircle, AlertCircle,  } from "lucide-react"
 import { cn } from "@/lib/utils"
 import LogoGenio from '../components/LogoGenio'
+import Success from "../GIO-mascota/emote-like.svg"
+import Error from "../GIO-mascota/Error-Head.svg"
 
 
 function Modal({ isOpen, onClose, type, message }) {
@@ -16,9 +18,9 @@ function Modal({ isOpen, onClose, type, message }) {
         <div className="text-center">
           <div className="mb-4">
             {type === "success" ? (
-              <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
+              Success ? <img src={Success.src} alt="Success" className="w-32 h-32 mx-auto" /> : <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
             ) : (
-              <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+              Error ? <img src={Error.src} alt="Error" className="w-32 h-32 mx-auto" /> : <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
             )}
           </div>
           <h3 className="text-xl font-bold mb-3 text-gray-900">{type === "success" ? "¡Éxito!" : "¡Error!"}</h3>
