@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   try {
-    // 1) Lee token desde Authorization o cookie
+    // Lee token desde Authorization o cookie
     const auth = req.headers.get("authorization");
     const bearer = auth?.startsWith("Bearer ") ? auth.split(" ")[1] : null;
 
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     const token = bearer ?? tokenFromCookie;
     if (!token) return NextResponse.json({ error: "No auth" }, { status: 401 });
 
-    // 2) Verifica y regresa usuario
+    // Verifica y regresa usuario
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };
     const user = await prisma.user.findUnique({
       where: { id: Number(decoded.id) },

@@ -2,6 +2,8 @@
 
 import type { Data } from "@measured/puck";
 import { Puck } from "@measured/puck";
+import { createAiPlugin } from "@puckeditor/plugin-ai";
+import "@puckeditor/plugin-ai/styles.css";
 import config from "../../../puck.config";
 import Sidebar from "../../components/Layout/Sidebar";
 import { useState } from "react";
@@ -22,6 +24,8 @@ type ClientProps = {
   data: Partial<Data>;
   recentDesigns?: RecentItem[];
 };
+
+const aiPlugin = createAiPlugin();
 
 export function Client({ path, data, recentDesigns = [] }: ClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -49,6 +53,7 @@ export function Client({ path, data, recentDesigns = [] }: ClientProps) {
       <main className="flex-1 overflow-hidden">
         <div className="h-screen overflow-auto">
           <Puck
+            plugins={[aiPlugin]}
             config={config}
             data={data}
             onPublish={async (data) => {

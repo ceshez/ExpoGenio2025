@@ -214,14 +214,14 @@ export default function DashboardClient({ recentDesigns }: { recentDesigns: Rece
 
                     <div className="p-4">
                       {/* ⭐ al inicio del título */}
-                      <h3 className="font-semibold text-foreground truncate text-lg mb-1 flex items-center gap-1">
+                      <h3 className="font-semibold text-foreground truncate text-lg flex items-center gap-1">
                         {p.isFavorite && (
                           <Star size={14} className="text-yellow-400 fill-yellow-400 shrink-0" />
                         )}
                         <span className="truncate">{p.title || p.path}</span>
                       </h3>
 
-                      <p className="text-xs text-muted-foreground mb-4" suppressHydrationWarning>
+                      <p className="text-xs text-muted-foreground py-2" suppressHydrationWarning>
                         Editado {p.updatedAtText}
                       </p>
 
