@@ -3,11 +3,12 @@ import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { customAlphabet } from "nanoid"
-import  { ImageIcon } from "lucide-react"
+import { ImageIcon } from "lucide-react"
 import { PageModel } from "@/lib/mongodb/models/Page"
 import LogoGenio from "../../components/LogoGenio"
-export const runtime = "nodejs";
+import Script from "next/script"
 
+export const runtime = "nodejs";
 const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 12)
 
 export default function NewSitePage() {
@@ -17,21 +18,17 @@ export default function NewSitePage() {
     const email = session?.user?.email;
     if (!email) redirect("/login");
 
-    // id desde Prisma
     const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
     if (!user) redirect("/login");
 
     const title = (formData.get("title") as string)?.trim() || "Mi sitio";
 
-    // path único (global). Valida colisión en Mongo
     const Pages = await PageModel();
     let path = `/${nanoid(10)}`;
-
     while (await Pages.findOne({ path }, { projection: { _id: 1 } })) {
       path = `/${nanoid(10)}`;
     }
 
-    // guarda en Mongo
     await Pages.create({
       userId: user.id,
       title,
@@ -44,9 +41,43 @@ export default function NewSitePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 flex items-center justify-center p-4">
+      {/*  Script global para deshabilitar submit al enviar cualquier form con data-disable-on-submit */}
+      <Script id="disable-submit-once" strategy="afterInteractive">{`
+        (function(){
+          // Capturamos submit en captura para correr antes de navegaciones
+          document.addEventListener('submit', function(e){
+            var form = e.target;
+            if (!form || !form.matches || !form.matches('[data-disable-on-submit]')) return;
+
+            // Evita doble envío inmediato
+            if (form.__submitting) { e.preventDefault(); return; }
+            form.__submitting = true;
+
+            // Deshabilita todos los botones de submit del form
+            var submits = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+            submits.forEach(function(btn){
+              if (!btn) return;
+              btn.disabled = true;
+              btn.setAttribute('aria-busy','true');
+              // Cambia texto visible si es <button>
+              if (btn.tagName === 'BUTTON') {
+                if (btn.__origText == null) btn.__origText = btn.textContent;
+                btn.textContent = 'Creando...';
+              }
+              // Añade clases utilitarias si usas Tailwind
+              btn.classList.add('opacity-60','cursor-not-allowed');
+            });
+
+            // También bloquea clicks extra en el form
+            form.style.pointerEvents = 'none';
+          }, true);
+        })();
+      `}</Script>
+
       <div className="w-full max-w-2xl">
         <form
           action={create}
+          data-disable-on-submit //activa el comportamiento del script
           className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden"
         >
           {/* Header*/}
@@ -60,7 +91,6 @@ export default function NewSitePage() {
 
           {/*Formulario*/}
           <div className="p-8 space-y-6">
-            {/* imagen de ejempolo/ no funciona */}
             <div className="space-y-3">
               <label className="block text-sm font-semibold text-gray-800">
                 Imagen de portada

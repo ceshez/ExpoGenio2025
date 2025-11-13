@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 // Imágenes
-import SendImg from "../../GIO-mascota/gio-send.png"
+import SendImg from "../../GIO-mascota/GIO-Mail.svg"
 import ErrorImg from "../../GIO-mascota/GIO2.0-error.svg"
 import SuccessImg from "../../GIO-mascota/emote-like.svg"
 

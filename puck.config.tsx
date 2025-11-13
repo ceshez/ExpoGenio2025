@@ -147,7 +147,10 @@ export const config: Config<Props> = {
 
   components: {
     /* Encabezado */
-    Header: {
+    Header: { 
+      ai: {
+        instructions: "Always place this first",
+      },
       fields: {
         titulo: { type: "text" },
         logoUrl: { type: "text" },

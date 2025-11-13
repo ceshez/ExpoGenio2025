@@ -66,29 +66,29 @@ export default async function Page({
 
   params: Promise<{ puckPath?: string[] }>;
 }) {
-  // 1) Login requerido
+  //Login requerido
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  // 2) Dueño actual (id en Prisma)
+  //Dueño actual (id en Prisma)
   const me = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true },
   });
   if (!me) redirect("/login");
 
-  // 3) NO usar params directamente: primero await
+  // NO usar params directamente: primero await
   const { puckPath = [] } = await params;
   const path = `/${puckPath.join("/")}`;
 
-  // 4) Cargar página desde Mongo por path
+  // Cargar página desde Mongo por path
   const Pages = await PageModel();
   const page = (await Pages.findOne({ path }).lean()) as IPage | null;
 
-  // 5) Existe pero no es mía → 403
+  // Existe pero no es mía → 403
   if (page && page.userId !== me.id) redirect("/forbidden");
 
-  // 6) Sitios recientes del dueño (para el sidebar)
+  // Sitios recientes del dueño (para el sidebar)
   //    Solo seleccionamos campos necesarios
   const recentDocs = await Pages.find(
     { userId: me.id, isDeleted: { $ne: true } },
@@ -97,7 +97,7 @@ export default async function Page({
     .sort({ updatedAt: -1 })
     .lean();
 
-  // 7) Render del editor
+  // Render del editor
   return (
     <Client
       path={path}
