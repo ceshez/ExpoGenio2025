@@ -59,7 +59,7 @@ export default function InteractiveName() {
     >
       {/* Encabezado */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-4">
+        <h2 className="text-3xl md:text-5xl font-bold bg-linear-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-4">
           ¿Qué significa GENIO?
         </h2>
         <p className="text-gray-700 text-lg max-w-2xl mx-auto">
@@ -81,7 +81,7 @@ export default function InteractiveName() {
           >
             {/* Letra principal */}
             <motion.div
-              className={`text-7xl md:text-9xl font-black bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent tracking-tight relative z-10`}
+              className={`text-7xl md:text-9xl font-black bg-linear-to-br ${item.gradient} bg-clip-text text-transparent tracking-tight relative z-10`}
               animate={{
                 filter:
                   hoveredIndex === i
@@ -97,7 +97,7 @@ export default function InteractiveName() {
 
             {/* Fondo animado grande */}
             <motion.div
-              className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-full blur-3xl -z-10`}
+              className={`absolute inset-0 bg-linear-to-br ${item.gradient} rounded-full blur-3xl -z-10`}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{
                 opacity: hoveredIndex === i ? 0.2 : 0,
@@ -108,7 +108,7 @@ export default function InteractiveName() {
 
             {/* Fondo animado mediano */}
             <motion.div
-              className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-full blur-2xl -z-10`}
+              className={`absolute inset-0 bg-linear-to-br ${item.gradient} rounded-full blur-2xl -z-10`}
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{
                 opacity: hoveredIndex === i ? 0.25 : 0,
@@ -134,7 +134,7 @@ export default function InteractiveName() {
 
                 {/* Contenido */}
                 <div className="relative bg-white/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border border-purple-200/30">
-                  <div className={`text-lg font-bold bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent mb-2`}>
+                  <div className={`text-lg font-bold bg-linear-to-r ${item.gradient} bg-clip-text text-transparent mb-2`}>
                     {item.title}
                   </div>
                   <div className="text-gray-600 text-sm leading-relaxed">{item.desc}</div>

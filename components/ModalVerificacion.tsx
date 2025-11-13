@@ -33,7 +33,7 @@ export default function ModalVerificacion({
   const [showNotification, setShowNotification] = useState(false)
   const [notificationType, setNotificationType] = useState<"success" | "error" | "loading">("loading")
 
-  const CORRECT_CODE = "12345"
+  const CORRECT_CODE = "123456"
 
   const getRobotImage = () => {
     if (message?.includes("incorrecto")) {
@@ -142,7 +142,7 @@ export default function ModalVerificacion({
                 </div>
 
                 <p className="text-sm sm:text-base text-gray-700 mb-6 leading-relaxed animate-in slide-in-from-left duration-500 delay-100">
-                  Hemos enviado un código de verificación de 5 dígitos a tu correo electrónico{" "}
+                  Hemos enviado un código de verificación de 6 dígitos a tu correo electrónico{" "}
                   <span className="font-semibold text-purple-600">{emailPreview}</span>
                 </p>
 
@@ -150,7 +150,7 @@ export default function ModalVerificacion({
                   <p className="text-xs sm:text-sm font-medium text-gray-700 mb-3">
                     Introduce el código de verificación:
                   </p>
-                  <OtpInput length={5} onComplete={handleOtpComplete} disabled={!sent || verified} />
+                  <OtpInput length={6} onComplete={handleOtpComplete} disabled={!sent || verified} />
                 </div>
 
                 {message && (
