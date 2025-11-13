@@ -2,6 +2,7 @@
 import "./styles.css";
 import BotpressWidget from "./components/Chatbot/BotpressWidget";
 import { ThemeProvider } from "@/context/theme-context";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const setInitialTheme = `
 (function() {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           {children}
           <BotpressWidget />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
