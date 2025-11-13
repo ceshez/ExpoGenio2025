@@ -238,7 +238,7 @@ export default function AuthForm() {
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 min-h-screen flex items-center justify-center py-8">
         <div className="relative w-full h-auto md:h-[600px] bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
           
-          <div className="scale-75 px-2 py-2 top-3 left-3 md:scale-100 md:px-4 md:py-3 md:top-6 md:left-6 absolute z-40 flex items-center space-x-3 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-white/30">
+          <div className="scale-75 px-2 py-2 top-3 left-3 md:scale-100 md:px-4 md:py-3 md:top-6 md:left-6 absolute z-40 flex items-center space-x-3 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 hidden sm:flex">
             <div onClick={() => (window.location.href = "/")} className="transition-transform duration-300 hover:rotate-12 hover:scale-110 cursor-pointer">
               <LogoGenio variant="simplified" />
             </div>
