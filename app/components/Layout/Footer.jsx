@@ -12,7 +12,7 @@ const Footer = () => {
     {
       title: "Producto",
       links: ["Características", "Plantillas", "Precios", "Demo", "Actualizaciones"],
-      ref:["caracteristicas", "templates", "pricing", "demo", "updates"],
+      ref:["characteristics", "plantillas", "pricing", "demo", "releases"],
     },
     {
       title: "Recursos",
@@ -21,8 +21,8 @@ const Footer = () => {
     },
     {
       title: "Empresa",
-      links: ["Socios", "Contacto"],
-      ref:["partners", "contact"],
+      links: ["Socios", "Contacto", "ExpoPyme"],
+      ref:["partners", "contacts", "pymes"],
     },
   ]
 
