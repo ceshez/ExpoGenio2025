@@ -12,17 +12,17 @@ const Footer = () => {
     {
       title: "Producto",
       links: ["Características", "Plantillas", "Precios", "Demo", "Actualizaciones"],
-      ref:["characteristics", "plantillas", "pricing", "demo", "releases"],
+      ref:["caracteristicas", "plantillas", "pricing", "demo", "updates"],
     },
     {
       title: "Recursos",
-      links: ["Blog", "Tutoriales", "Documentación"],
-      ref:["blog", "tutorial", "documentation"],
+      links: ["Blog", "Tutoriales", "Documentación", "Comunidad"],
+      ref:["blog", "tutorial", "documentation", "community"],
     },
     {
       title: "Empresa",
-      links: ["Socios", "Contacto", "ExpoPyme"],
-      ref:["partners", "contacts", "pymes"],
+      links: ["Mision", "Socios", "Contacto"],
+      ref:["mision", "partners", "contact"],
     },
   ]
 
@@ -45,7 +45,7 @@ const Footer = () => {
              <div className="transition-transform duration-300 hover:rotate-12 hover:scale-110">
               <LogoGenio variant="simplified"/>
             </div>
-              <span className="bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GENIO</span>
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GENIO</span>
             </a>
             <p className="text-gray-400 mb-6">
               La plataforma más fácil para crear sitios web profesionales sin necesidad de programación.
@@ -66,7 +66,7 @@ const Footer = () => {
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-linear-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all hover:scale-105 flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all hover:scale-105 flex items-center gap-2"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -82,7 +82,9 @@ const Footer = () => {
                 <Facebook className="w-5 h-5 text-gray-400 group-hover:text-white" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/genio_expo25"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 hover:-translate-y-1 transition-all group"
               >
                 <Instagram className="w-5 h-5 text-gray-400 group-hover:text-white" />
@@ -99,6 +101,7 @@ const Footer = () => {
               >
                 <Linkedin className="w-5 h-5 text-gray-400 group-hover:text-white" />
               </a>
+              
             </div>
           </div>
 
@@ -127,6 +130,19 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm">© 2025 Genio. Todos los derechos reservados.</p>
             <div className="flex gap-6">
+              <div className="flex justify-end mt-6">
+              <a
+                href="/play"
+                className="w-14 h-14 opacity-70 hover:opacity-100 hover:scale-110 transition-all cursor-pointer"
+              >
+                <img
+                  src="/sprites/gio_ship.png"
+                  alt="Gio"
+                  className="w-full h-full object-contain"
+                />
+              </a>
+            </div>
+
               {["Términos", "Privacidad", "Cookies"].map((link, index) => (
                 <a key={index} href="#" className="text-gray-400 hover:text-purple-300 text-sm transition-colors">
                   {link}

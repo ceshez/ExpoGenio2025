@@ -1,5 +1,11 @@
 import Template from "./Plantillas"
+import Footer from "../components/Layout/Footer"
+export default function Page() {
+  return (
+    <main>
+      <Template />
+        <Footer/>
 
-export default function Plantillas() {
-  return <Template />
+    </main>
+  )
 }
