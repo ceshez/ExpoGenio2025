@@ -1,182 +1,336 @@
 // puck.config.tsx
 import * as React from "react";
-import { type Config } from "@measured/puck";
+import { type Config } from "@puckeditor/core";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Bolt, Eye, Target, ShieldCheck, Rocket, Lightbulb,
-  HeartHandshake, Scale, Star, UserRound, Link as LinkIcon
+  HeartHandshake, Scale, Star, UserRound, Link as LinkIcon,
+  ChevronDown, CheckCircle2, Quote, Phone, Mail, MapPin,
+  Instagram, Twitter, Facebook, Linkedin, Youtube,
+  ShoppingBag, Award, TrendingUp, Users, Clock,
 } from "lucide-react";
 
-/* ---------- utilidades de clases ---------- */
-const gridCols = (n: number) =>
-  ({
-    1:"grid-cols-1",2:"grid-cols-2",3:"grid-cols-3",4:"grid-cols-4",5:"grid-cols-5",6:"grid-cols-6",
-    7:"grid-cols-7",8:"grid-cols-8",9:"grid-cols-9",10:"grid-cols-10",11:"grid-cols-11",12:"grid-cols-12"
-  }[Math.max(1, Math.min(12, n))] || "grid-cols-3");
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
 
-const gaps: Record<string,string> = { "0":"gap-0","1":"gap-1","2":"gap-2","3":"gap-3","4":"gap-4","6":"gap-6","8":"gap-8","12":"gap-12" };
-const pads: Record<string,string> = {
-  "0":"p-0", xs:"p-2", sm:"p-4", md:"p-6", lg:"p-8", xl:"p-12",
-  "y-sm":"py-6", "y-md":"py-10", "y-lg":"py-16",
+const pads: Record<string, string> = {
+  "0": "p-0", xs: "p-2", sm: "p-4", md: "p-6", lg: "p-8", xl: "p-12",
+  "y-sm": "py-8", "y-md": "py-16", "y-lg": "py-24", "y-xl": "py-32",
 };
 const pad = (v: string) => pads[v] || "p-0";
 
+const gaps: Record<string, string> = {
+  "0": "gap-0", "2": "gap-2", "4": "gap-4", "6": "gap-6",
+  "8": "gap-8", "10": "gap-10", "12": "gap-12",
+};
+
+const gridCols = (n: number) =>
+  (["","grid-cols-1","grid-cols-2","grid-cols-3","grid-cols-4",
+    "grid-cols-5","grid-cols-6"][Math.max(1, Math.min(6, n))] || "grid-cols-3");
+
 const bgOpts = [
-  "bg-white","bg-gray-50","bg-gray-100","bg-gray-900","bg-black",
-  "bg-purple-600","bg-purple-700","bg-blue-600","bg-blue-700",
-  "bg-emerald-600","bg-red-600","bg-orange-500","bg-yellow-400","bg-pink-600",
+  "bg-white", "bg-gray-50", "bg-gray-100", "bg-gray-900", "bg-black",
+  "bg-slate-50", "bg-slate-800", "bg-slate-900",
+  "bg-zinc-50", "bg-zinc-900",
+  "bg-stone-50", "bg-stone-900",
+  "bg-blue-600", "bg-blue-950",
+  "bg-emerald-600", "bg-emerald-950",
+  "bg-rose-600", "bg-amber-400",
 ];
-const textOpts = ["text-black","text-gray-900","text-gray-700","text-white","text-gray-100"];
-const borderOpts = ["","border border-gray-200","border border-gray-300","border-t border-gray-200","border-b border-gray-200","ring-1 ring-gray-200"];
-const shadowOpts = ["","shadow-sm","shadow","shadow-md","shadow-lg"];
 
-/* ---------- tipos ---------- */
-type Props = {
-  Texto: { contenido: string; };
-  Parrafo: { contenidoparrafo: string; };
-  Header: {
-    titulo: string; logoUrl: string;
-    nav: { label: string; url: string }[];
-    fondo: string; texto: string; padding: string; borde: string; sombra: string;
-  };
-  Video: {
-    url: string;
-    poster: string;
-    caption: string;
+const textOpts = [
+  "text-gray-900", "text-gray-700", "text-gray-500",
+  "text-white", "text-gray-100",
+  "text-slate-900", "text-slate-100",
+];
 
-    autoplay: "si" | "no";
-    loop: "si" | "no";
-    controls: "si" | "no";
-    muted: "si" | "no";
+const borderOpts = [
+  "", "border border-gray-100", "border border-gray-200",
+  "border border-gray-300", "border-t border-gray-100",
+  "border-b border-gray-100", "ring-1 ring-gray-100",
+];
 
-    variante: "simple" | "card" | "framed";
-    ratio: "16/9" | "4/3" | "1/1" | "9/16";
-    fit: "cover" | "contain";
+const shadowOpts = ["", "shadow-sm", "shadow", "shadow-md", "shadow-lg", "shadow-xl"];
 
-    radio: "sm" | "md" | "lg" | "xl";
-    borde: string;
-    sombra: string;
+const roundOpts = [
+  { label: "Sin borde", value: "" },
+  { label: "sm", value: "rounded-sm" },
+  { label: "md", value: "rounded-md" },
+  { label: "lg", value: "rounded-lg" },
+  { label: "xl", value: "rounded-xl" },
+  { label: "2xl", value: "rounded-2xl" },
+  { label: "3xl", value: "rounded-3xl" },
+  { label: "Full", value: "rounded-full" },
+];
 
-    alineacion: "start" | "center" | "end";
-    ancho: "max-w-sm" | "max-w-md" | "max-w-lg" | "max-w-2xl" | "max-w-4xl" | "max-w-none";
-
-    fondo: string;
-    texto: string;
-    padding: string;
-  };
-  Grid: {
-    items: any[]; columnas: number; gap: string; colorFondo: string; padding: string;
-  };
-  Boton: {
-    label: string; url: string;
-    alineacion: "start" | "center" | "end";
-    fondo: string; texto: string; borde: string; sombra: string; tam: "sm" | "md" | "lg";
-  };
-  CartaProducto: {
-    imagenUrl: string; titulo: string; descripcion: string;
-    precio: string; moneda: "CRC" | "USD" | "EUR";
-    botonLabel: string; botonUrl: string; botonAlineacion: "start" | "center" | "end";
-    layout: "vertical" | "horizontal";
-    fondo: string; texto: string; padding: string; borde: string; sombra: string;
-  };
-  Hero: {
-    titulo: string; descripcion: string; ctaLabel: string; ctaUrl: string; imagenUrl: string;
-    fondo: string; texto: string; padding: string;
-  };
-  SeccionTexto: {
-    nivel: "h1"|"h2"|"h3"|"h4"|"h5"|"h6";
-    titulo: string; contenido: string; fondo: string; texto: string; padding: string; borde: string; sombra: string;
-  };
-  MisionVision: {
-    variante: "dos-col" | "tarjetas";
-    items: { icono: string; titulo: string; texto: string }[];
-    fondo: string; texto: string; padding: string;
-  };
-  MisionVisionValores: {
-    items: { icono: string; titulo: string; texto: string }[];
-    fondo: string; texto: string; padding: string;
-  };
-  Carrusel: {
-    slides: { tipo: "image" | "video"; url: string; caption?: string }[];
-    fondo: string; texto: string; padding: string; borde: string; sombra: string;
-  };
-  Imagen: { url: string; alt: string; borde: string; sombra: string; radio: "sm"|"md"|"lg"|"xl" };
-  Galeria: {
-    contenido: any[]; columnasDesktop: number; gap: string; fondo: string; padding: string;
-  };
-  FlexBox: {
-    contenido: any[]; direccion: "row"|"column"; alineacion: "start"|"center"|"end"|"between"; gap: string;
-    fondo: string; padding: string;
-  };
-  CartaPerfil: {
-    fotoUrl: string; nombre: string; rol: string; bio: string;
-    fondo: string; texto: string; padding: string; borde: string; sombra: string;
-    links: { label: string; url: string }[];
-  };
-  Espacio: { ancho: "auto"|"1/4"|"1/3"|"1/2"|"2/3"|"3/4"|"full"; alto: "0"|"2"|"4"|"6"|"8"|"12"|"16" };
-  Carta: {
-     titulo: string; 
-     descripcion: string 
-     padding: number;
-     variante: string;
-     colorDeFondo: string;
-  };
-};
-
-/* ---------- iconos ---------- */
 const ICONS: Record<string, React.ReactElement> = {
-  bolt: <Bolt className="w-6 h-6" />,
-  eye: <Eye className="w-6 h-6" />,
-  target: <Target className="w-6 h-6" />,
-  shield: <ShieldCheck className="w-6 h-6" />,
-  rocket: <Rocket className="w-6 h-6" />,
-  idea: <Lightbulb className="w-6 h-6" />,
-  handshake: <HeartHandshake className="w-6 h-6" />,
-  scale: <Scale className="w-6 h-6" />,
-  star: <Star className="w-6 h-6" />,
+  bolt: <Bolt className="w-5 h-5" />,
+  eye: <Eye className="w-5 h-5" />,
+  target: <Target className="w-5 h-5" />,
+  shield: <ShieldCheck className="w-5 h-5" />,
+  rocket: <Rocket className="w-5 h-5" />,
+  idea: <Lightbulb className="w-5 h-5" />,
+  handshake: <HeartHandshake className="w-5 h-5" />,
+  scale: <Scale className="w-5 h-5" />,
+  star: <Star className="w-5 h-5" />,
+  award: <Award className="w-5 h-5" />,
+  trending: <TrendingUp className="w-5 h-5" />,
+  users: <Users className="w-5 h-5" />,
+  clock: <Clock className="w-5 h-5" />,
+  bag: <ShoppingBag className="w-5 h-5" />,
+  check: <CheckCircle2 className="w-5 h-5" />,
 };
 
-/* ---------- config ---------- */
+/* ============================================================
+   COMPONENTES REACT SEPARADOS (para los que usan hooks)
+   ============================================================ */
+
+/* --- Hero con palabras rotativas --- */
+const HeroAnimadoRender = ({
+  titulo, palabras, descripcion, ctaLabel, ctaUrl,
+  ctaSecLabel, ctaSecUrl, imagenUrl, fondo, texto, padding,
+}: {
+  titulo: string; palabras: { texto: string }[];
+  descripcion: string; ctaLabel: string; ctaUrl: string;
+  ctaSecLabel: string; ctaSecUrl: string; imagenUrl: string;
+  fondo: string; texto: string; padding: string;
+}) => {
+  const [idx, setIdx] = React.useState(0);
+  const lista = palabras?.length ? palabras : [{ texto: "increíble" }];
+
+  React.useEffect(() => {
+    const t = setInterval(() => setIdx(i => (i + 1) % lista.length), 2200);
+    return () => clearInterval(t);
+  }, [lista.length]);
+
+  return (
+    <section className={`${fondo} ${texto} ${pad(padding)} overflow-hidden`}>
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-sm font-semibold tracking-widest uppercase opacity-50 mb-4"
+          >
+            Bienvenido
+          </motion.p>
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+            {titulo}{" "}
+            <span className="inline-block relative">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={idx}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.35 }}
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-500"
+                >
+                  {lista[idx].texto}
+                </motion.span>
+              </AnimatePresence>
+            </span>
+          </h1>
+          <p className="text-lg opacity-70 mb-8 max-w-md leading-relaxed">{descripcion}</p>
+          <div className="flex flex-wrap gap-3">
+            {ctaLabel && (
+              <a href={ctaUrl} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                {ctaLabel}
+              </a>
+            )}
+            {ctaSecLabel && (
+              <a href={ctaSecUrl} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-current font-semibold opacity-70 hover:opacity-100 transition-all">
+                {ctaSecLabel}
+              </a>
+            )}
+          </div>
+        </div>
+        {imagenUrl && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 to-emerald-500/20 rounded-3xl blur-2xl" />
+            <img src={imagenUrl} alt={titulo} className="relative rounded-2xl w-full object-cover shadow-2xl aspect-[4/3]" />
+          </motion.div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+/* --- Carrusel --- */
+const CarruselRender = ({
+  slides, fondo, texto, padding, borde, sombra,
+}: {
+  slides: { tipo: "image" | "video"; url: string; caption?: string }[];
+  fondo: string; texto: string; padding: string; borde: string; sombra: string;
+}) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const scroll = (d: number) =>
+    ref.current?.scrollBy({ left: d * (ref.current.clientWidth * 0.85), behavior: "smooth" });
+
+  return (
+    <section className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} overflow-hidden`}>
+      <div className="relative">
+        <div ref={ref} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2">
+          {slides?.map((s, i) => (
+            <div key={i} className="snap-center shrink-0 basis-full md:basis-[75%]">
+              {s.tipo === "image"
+                ? (s.url
+                  ? <img className="w-full h-[400px] object-cover rounded-2xl" src={s.url} alt={s.caption || ""} />
+                  : <div className="w-full h-[400px] bg-gray-100 rounded-2xl" />)
+                : (s.url
+                  ? <video className="w-full h-[400px] object-cover rounded-2xl" src={s.url} controls />
+                  : <div className="w-full h-[400px] bg-gray-100 rounded-2xl" />)}
+              {s.caption && <p className="mt-3 text-center text-sm opacity-60">{s.caption}</p>}
+            </div>
+          ))}
+        </div>
+        <button onClick={() => scroll(-1)} className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 rounded-full bg-white shadow-lg p-2.5 hover:scale-110 transition-transform z-10">‹</button>
+        <button onClick={() => scroll(1)} className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 rounded-full bg-white shadow-lg p-2.5 hover:scale-110 transition-transform z-10">›</button>
+      </div>
+    </section>
+  );
+};
+
+/* --- FAQ Accordion --- */
+const FAQRender = ({
+  items, titulo, fondo, texto, padding,
+}: {
+  items: { pregunta: string; respuesta: string }[];
+  titulo: string; fondo: string; texto: string; padding: string;
+}) => {
+  const [open, setOpen] = React.useState<number | null>(null);
+  return (
+    <section className={`${fondo} ${texto} ${pad(padding)}`}>
+      <div className="max-w-3xl mx-auto">
+        {titulo && <h2 className="text-3xl font-bold mb-10 text-center">{titulo}</h2>}
+        <div className="space-y-3">
+          {items?.map((item, i) => (
+            <div key={i} className="border border-gray-200 rounded-2xl overflow-hidden">
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="w-full flex items-center justify-between px-6 py-4 text-left font-semibold hover:bg-gray-50 transition-colors"
+              >
+                <span>{item.pregunta}</span>
+                <motion.span animate={{ rotate: open === i ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown className="w-4 h-4 opacity-50" />
+                </motion.span>
+              </button>
+              <AnimatePresence>
+                {open === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="px-6 pb-5 text-gray-600 leading-relaxed">{item.respuesta}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ============================================================
+   TIPOS
+   ============================================================ */
+type Props = {
+  Texto: { contenido: string; nivel: "h1"|"h2"|"h3"|"h4"; alineacion: "left"|"center"|"right"; fondo: string; texto: string; padding: string; };
+  Parrafo: { contenido: string; tamaño: "sm"|"base"|"lg"|"xl"; alineacion: "left"|"center"|"right"; fondo: string; texto: string; padding: string; maxAncho: "sm"|"lg"|"2xl"|"4xl"|"none"; };
+  Header: { titulo: string; logoUrl: string; nav: { label: string; url: string }[]; fondo: string; texto: string; padding: string; borde: string; sombra: string; estilo: "simple"|"centrado"; };
+  Hero: { titulo: string; descripcion: string; ctaLabel: string; ctaUrl: string; ctaSecLabel: string; ctaSecUrl: string; imagenUrl: string; fondo: string; texto: string; padding: string; };
+  HeroAnimado: { titulo: string; palabras: { texto: string }[]; descripcion: string; ctaLabel: string; ctaUrl: string; ctaSecLabel: string; ctaSecUrl: string; imagenUrl: string; fondo: string; texto: string; padding: string; };
+  Boton: { label: string; url: string; alineacion: "left"|"center"|"right"; variante: "solido"|"outline"|"ghost"; fondo: string; texto: string; tam: "sm"|"md"|"lg"; radio: string; sombra: string; };
+  SeccionTexto: { titulo: string; subtitulo: string; contenido: string; nivel: "h1"|"h2"|"h3"; alineacion: "left"|"center"|"right"; fondo: string; texto: string; padding: string; };
+  Imagen: { url: string; alt: string; radio: string; borde: string; sombra: string; aspecto: "auto"|"square"|"video"|"portrait"; };
+  Espacio: { alto: "2"|"4"|"6"|"8"|"12"|"16"|"24"|"32"; };
+  Grid: { items: any[]; columnas: number; gap: string; colorFondo: string; padding: string; };
+  FlexBox: { contenido: any[]; direccion: "row"|"column"; alineacion: "start"|"center"|"end"|"between"; gap: string; fondo: string; padding: string; };
+  Galeria: { contenido: any[]; columnasDesktop: number; gap: string; fondo: string; padding: string; };
+  Carrusel: { slides: { tipo: "image"|"video"; url: string; caption?: string }[]; fondo: string; texto: string; padding: string; borde: string; sombra: string; };
+  Video: { url: string; poster: string; caption: string; autoplay: "si"|"no"; loop: "si"|"no"; controls: "si"|"no"; muted: "si"|"no"; variante: "simple"|"card"|"framed"; ratio: "16/9"|"4/3"|"1/1"; radio: string; borde: string; sombra: string; alineacion: "start"|"center"|"end"; ancho: "max-w-sm"|"max-w-md"|"max-w-lg"|"max-w-2xl"|"max-w-4xl"|"max-w-none"; fondo: string; texto: string; padding: string; };
+  MisionVision: { variante: "dos-col"|"tarjetas"; items: { icono: string; titulo: string; texto: string }[]; fondo: string; texto: string; padding: string; };
+  MisionVisionValores: { items: { icono: string; titulo: string; texto: string }[]; fondo: string; texto: string; padding: string; };
+  CartaPerfil: { fotoUrl: string; nombre: string; rol: string; bio: string; fondo: string; texto: string; padding: string; borde: string; sombra: string; radio: string; links: { label: string; url: string }[]; };
+  CartaProducto: { imagenUrl: string; titulo: string; descripcion: string; precio: string; moneda: "CRC"|"USD"|"EUR"; badge: string; botonLabel: string; botonUrl: string; layout: "vertical"|"horizontal"; fondo: string; texto: string; padding: string; borde: string; sombra: string; radio: string; };
+  BannerCTA: { titulo: string; descripcion: string; ctaLabel: string; ctaUrl: string; ctaSecLabel: string; ctaSecUrl: string; fondo: string; texto: string; padding: string; alineacion: "left"|"center"; };
+  Estadisticas: { items: { numero: string; sufijo: string; descripcion: string; icono: string }[]; fondo: string; texto: string; padding: string; columnas: number; };
+  Caracteristicas: { titulo: string; subtitulo: string; items: { icono: string; titulo: string; descripcion: string }[]; variante: "grid"|"lista"|"alternado"; fondo: string; texto: string; padding: string; };
+  TestimonioCard: { nombre: string; rol: string; empresa: string; fotoUrl: string; texto: string; estrellas: number; fondo: string; texto_color: string; padding: string; borde: string; sombra: string; radio: string; };
+  TestimoniosGrid: { titulo: string; items: { nombre: string; rol: string; texto: string; estrellas: number; fotoUrl: string }[]; fondo: string; texto: string; padding: string; };
+  PrecioCard: { titulo: string; precio: string; moneda: "CRC"|"USD"|"EUR"; periodo: "mes"|"año"|"único"; descripcion: string; caracteristicas: { texto: string }[]; ctaLabel: string; ctaUrl: string; destacado: "si"|"no"; fondo: string; texto: string; padding: string; radio: string; };
+  FAQAccordion: { titulo: string; items: { pregunta: string; respuesta: string }[]; fondo: string; texto: string; padding: string; };
+  ContactoInfo: { titulo: string; descripcion: string; telefono: string; email: string; direccion: string; redes: { tipo: "instagram"|"twitter"|"facebook"|"linkedin"|"youtube"; url: string }[]; fondo: string; texto: string; padding: string; };
+  LogoGrid: { titulo: string; logos: { url: string; nombre: string }[]; fondo: string; padding: string; };
+  Timeline: { titulo: string; items: { año: string; titulo: string; descripcion: string }[]; fondo: string; texto: string; padding: string; };
+  Divisor: { estilo: "linea"|"puntos"|"ondas"; fondo: string; padding: string; };
+  Footer: { nombre: string; descripcion: string; columnas: { titulo: string; links: { label: string; url: string }[] }[]; redes: { tipo: "instagram"|"twitter"|"facebook"|"linkedin"|"youtube"; url: string }[]; copyright: string; fondo: string; texto: string; padding: string; };
+};
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
 export const config: Config<Props> = {
   categories: {
-    Escritura: { title: "Escritura", components: ["Header","Texto","Parrafo","Hero","SeccionTexto","Boton","Carta"] },
-    Layout: { title: "Layout", components: ["Grid","FlexBox","Galeria","Espacio","MisionVision","MisionVisionValores"] },
-    Negocios: { title: "Negocios", components: ["CartaProducto","CartaPerfil"] },
-    Multimedia: { title: "Multimedia", components: ["Carrusel","Imagen","Video"] },
+    Estructura: { title: "Estructura", components: ["Header","Footer","Espacio","Divisor","Grid","FlexBox"] },
+    Heroes: { title: "Heroes", components: ["Hero","HeroAnimado","BannerCTA"] },
+    Contenido: { title: "Contenido", components: ["Texto","Parrafo","SeccionTexto","Caracteristicas","Estadisticas","Timeline"] },
+    Multimedia: { title: "Multimedia", components: ["Imagen","Galeria","Carrusel","Video"] },
+    Negocios: { title: "Negocios", components: ["CartaProducto","PrecioCard","LogoGrid"] },
+    Social: { title: "Social", components: ["TestimonioCard","TestimoniosGrid","CartaPerfil","FAQAccordion","ContactoInfo"] },
+    Acciones: { title: "Acciones", components: ["Boton"] },
     others: { title: "Otros" },
   },
 
   components: {
-    /* Encabezado */
-    Header: { 
-      ai: {
-        instructions: "Always place this first",
-      },
+
+    /* ── HEADER ──────────────────────────────────────────── */
+    Header: {
       fields: {
         titulo: { type: "text" },
         logoUrl: { type: "text" },
-        nav: { type: "array", arrayFields: { label:{ type:"text" }, url:{ type:"text" } }, defaultItemProps:{ label:"Enlace", url:"#"} },
-        fondo: { type: "select", options: bgOpts.map(v=>({label:v,value:v})) },
-        texto: { type: "select", options: textOpts.map(v=>({label:v,value:v})) },
-        padding: { type: "select", options: Object.keys(pads).map(v=>({label:v,value:v})) },
-        borde: { type: "select", options: borderOpts.map(v=>({label:v||"Sin borde",value:v})) },
-        sombra:{ type:"select", options: shadowOpts.map(v=>({label:v||"Sin sombra",value:v})) },
+        nav: { type: "array", arrayFields: { label: { type: "text" }, url: { type: "text" } }, defaultItemProps: { label: "Enlace", url: "#" } },
+        estilo: { type: "select", options: [{ label: "Simple", value: "simple" }, { label: "Centrado", value: "centrado" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
       },
       defaultProps: {
-        titulo: "GENIO", logoUrl: "",
-        nav: [{label:"Inicio",url:"#"}, {label:"Servicios",url:"#"}, {label:"Contacto",url:"#"}],
-        fondo: "bg-white", texto: "text-gray-900", padding: "sm", borde: "border-b border-gray-200", sombra: "",
+        titulo: "Mi Empresa", logoUrl: "",
+        nav: [{ label: "Inicio", url: "#" }, { label: "Servicios", url: "#" }, { label: "Contacto", url: "#" }],
+        estilo: "simple", fondo: "bg-white", texto: "text-gray-900", padding: "sm",
+        borde: "border-b border-gray-100", sombra: "",
       },
-      render: ({ titulo, logoUrl, nav, fondo, texto, padding, borde, sombra }) => (
-        <header className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra}`}>
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+      render: ({ titulo, logoUrl, nav, estilo, fondo, texto, padding, borde, sombra }) => (
+        <header className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} sticky top-0 z-50`}>
+          <div className={`max-w-6xl mx-auto flex items-center gap-6 ${estilo === "centrado" ? "flex-col" : "justify-between"}`}>
             <div className="flex items-center gap-3">
-              {logoUrl ? <img src={logoUrl} alt={titulo} className="h-10 w-auto" /> : null}
-              <span className="text-xl font-bold">{titulo}</span>
+              {logoUrl
+                ? <img src={logoUrl} alt={titulo} className="h-9 w-auto" />
+                : <span className="text-lg font-black tracking-tight">{titulo}</span>}
             </div>
-            {!!nav?.length && (
-              <nav className="hidden md:block">
-                <ul className="flex items-center gap-6">
-                  {nav.map((n,i)=>(<li key={i}><a className="hover:underline" href={n.url}>{n.label}</a></li>))}
+            {nav?.length > 0 && (
+              <nav>
+                <ul className={`flex items-center gap-6 ${estilo === "centrado" ? "justify-center" : ""}`}>
+                  {nav.map((n, i) => (
+                    <li key={i}>
+                      <a href={n.url} className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">{n.label}</a>
+                    </li>
+                  ))}
                 </ul>
               </nav>
             )}
@@ -184,610 +338,1155 @@ export const config: Config<Props> = {
         </header>
       ),
     },
-    Texto: {
-      fields: {
-        contenido: { type: "textarea" },
-      },
-      defaultProps: {
-        contenido: "Encabezado",
-      },
-      render: ({ contenido }) => (
-        <div className="text-4xl font-bold p-4">
-          <h1>{contenido}</h1>
-        </div>
-      ),
-    },
-        Parrafo: {
-      fields: {
-        contenidoparrafo: { type: "textarea" },
-      },
-      defaultProps: {
-        contenidoparrafo: "Este es un párrafo de ejemplo para mostrar cómo se ve el texto en este componente.",
-      },
-      render: ({ contenidoparrafo }) => (
-        <div className="text-xl font-light p-4">
-          <p>{contenidoparrafo}</p>
-        </div>
-      ),
-    },
 
-    /* Grid */
-    Grid: {
+    /* ── FOOTER ──────────────────────────────────────────── */
+    Footer: {
       fields: {
-        items: { type: "slot" },
-        columnas: { type: "number" },
-        gap: { type: "select", options: Object.keys(gaps).map(v=>({label:v,value:v})) },
-        colorFondo: { type: "select", options: bgOpts.map(v=>({label:v,value:v})) },
-        padding: { type: "select", options: Object.keys(pads).map(v=>({label:v,value:v})) },
-      },
-      defaultProps: { items: [], columnas: 3, gap: "4", colorFondo: "bg-white", padding: "0" },
-      render: ({ items: Items, columnas, gap, colorFondo, padding }) => (
-        <div className={`${colorFondo} ${pad(padding)}`}>
-          <Items className={`grid ${gridCols(Number(columnas))} ${gaps[gap] || gaps["4"]}`} />
-        </div>
-      ),
-    },
-
-    /* Botón */
-    Boton: {
-      fields: {
-        label:{ type:"text" }, url:{ type:"text" },
-        alineacion:{ type:"select", options:[{label:"Izquierda",value:"start"},{label:"Centro",value:"center"},{label:"Derecha",value:"end"}]},
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v}))},
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v}))},
-        borde:{ type:"select", options:borderOpts.map(v=>({label:v||"Sin borde",value:v}))},
-        sombra:{ type:"select", options:shadowOpts.map(v=>({label:v||"Sin sombra",value:v}))},
-        tam:{ type:"select", options:[{label:"sm",value:"sm"},{label:"md",value:"md"},{label:"lg",value:"lg"}]},
-      },
-      defaultProps: {
-        label: "Llévame", url:"#", alineacion:"start",
-        fondo:"bg-purple-600", texto:"text-white", borde:"", sombra:"shadow", tam:"md",
-      },
-      render: ({ label, url, alineacion, fondo, texto, borde, sombra, tam }) => {
-        const size = tam==="sm"?"px-3 py-2":tam==="lg"?"px-6 py-3":"px-4 py-2";
-        const align = alineacion==="center"?"justify-center":alineacion==="end"?"justify-end":"justify-start";
-        return (
-          <div className={`flex ${align}`}>
-            <a href={url} className={`inline-flex rounded-lg ${size} ${fondo} ${texto} ${borde} ${sombra} hover:opacity-90 transition`}>
-              {label}
-            </a>
-          </div>
-        );
-      }
-    },
-
-    /* CartaProducto */
-    CartaProducto: {
-      fields: {
-        imagenUrl:{ type:"text" }, titulo:{ type:"text" }, descripcion:{ type:"textarea" },
-        precio:{ type:"text" },
-        moneda:{ type:"select", options:[{label:"₡ CRC",value:"CRC"},{label:"$ USD",value:"USD"},{label:"€ EUR",value:"EUR"}]},
-        botonLabel:{ type:"text" }, botonUrl:{ type:"text" },
-        botonAlineacion:{ type:"select", options:[{label:"Izquierda",value:"start"},{label:"Centro",value:"center"},{label:"Derecha",value:"end"}]},
-        layout:{ type:"radio", options:[{label:"Vertical",value:"vertical"},{label:"Horizontal",value:"horizontal"}]},
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v})) },
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v})) },
-        padding:{ type:"select", options:Object.keys(pads).map(v=>({label:v,value:v})) },
-        borde:{ type:"select", options:borderOpts.map(v=>({label:v||"Sin borde",value:v})) },
-        sombra:{ type:"select", options:shadowOpts.map(v=>({label:v||"Sin sombra",value:v})) },
-      },
-      defaultProps: {
-        imagenUrl:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
-        titulo:"Nombre del producto",
-        descripcion:"Descripción corta que resalte beneficios.",
-        precio:"19,900", moneda:"CRC",
-        botonLabel:"Comprar", botonUrl:"#", botonAlineacion:"start",
-        layout:"horizontal",
-        fondo:"bg-white", texto:"text-gray-900", padding:"md", borde:"border border-gray-200", sombra:"shadow-sm",
-      },
-      render: (p) => {
-        const symbol = p.moneda==="CRC"?"₡":p.moneda==="EUR"?"€":"$";
-        const align = p.botonAlineacion==="center"?"justify-center":p.botonAlineacion==="end"?"justify-end":"justify-start";
-        return (
-          <div className={`${p.fondo} ${p.texto} ${pad(p.padding)} ${p.borde} ${p.sombra} rounded-xl`}>
-            <div className={p.layout==="horizontal"?"flex gap-6":""}>
-              {p.imagenUrl ? (
-                <img
-                  src={p.imagenUrl}
-                  alt={p.titulo}
-                  className={p.layout==="horizontal"?"w-1/3 rounded-lg object-cover":"w-full rounded-lg object-cover mb-4"}
-                />
-              ) : <div className="w-full h-40 bg-gray-100 rounded-lg mb-4" />}
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold">{p.titulo}</h3>
-                <p className="text-gray-600 mt-1">{p.descripcion}</p>
-                {p.precio && <p className="mt-3 text-xl font-bold">{symbol}{p.precio}</p>}
-                <div className={`mt-4 flex ${align}`}>
-                  <a href={p.botonUrl} className="inline-flex rounded-lg px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 transition">
-                    {p.botonLabel}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      },
-    },
-
-    /* Hero (compacto) */
-    Hero: {
-      fields: {
-        titulo:{ type:"text" }, descripcion:{ type:"textarea" },
-        ctaLabel:{ type:"text" }, ctaUrl:{ type:"text" }, imagenUrl:{ type:"text" },
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v}))},
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v}))},
-        padding:{ type:"select", options:[{label:"y-sm",value:"y-sm"},{label:"y-md",value:"y-md"},{label:"y-lg",value:"y-lg"}]},
-      },
-      defaultProps: {
-        titulo:"Esta pagina fue creada con Genio",
-        descripcion:"Genio ayuda a las pequeñas y medianas empresas a crear su presencia en línea de manera fácil y rápida.",
-        ctaLabel:"Comenzar", ctaUrl:"#",
-        imagenUrl:"https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
-        fondo:"bg-gray-50", texto:"text-gray-900", padding:"y-lg",
-      },
-      render: ({ titulo, descripcion, ctaLabel, ctaUrl, imagenUrl, fondo, texto, padding }) => (
-        <section className={`${fondo} ${texto} ${pad(padding)}`}>
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h1 className="text-4xl font-extrabold">{titulo}</h1>
-              <p className="mt-4 text-lg text-gray-600">{descripcion}</p>
-              <div className="mt-6">
-                <a href={ctaUrl} className="inline-flex px-5 py-3 rounded-lg bg-purple-600 text-white hover:bg-purple-700">
-                  {ctaLabel}
-                </a>
-              </div>
-            </div>
-            {imagenUrl ? <img src={imagenUrl} alt={titulo} className="rounded-2xl w-full object-cover shadow-lg" /> : null}
-          </div>
-        </section>
-      ),
-    },
-
-    /* Sección de texto */
-    SeccionTexto: {
-      fields: {
-        nivel:{ type:"select", options:["h1","h2","h3","h4","h5","h6"].map(v=>({label:v,value:v})) },
-        titulo:{ type:"text" }, contenido:{ type:"textarea" },
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v})) },
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v})) },
-        padding:{ type:"select", options:Object.keys(pads).map(v=>({label:v,value:v})) },
-        borde:{ type:"select", options:borderOpts.map(v=>({label:v||"Sin borde",value:v})) },
-        sombra:{ type:"select", options:shadowOpts.map(v=>({label:v||"Sin sombra",value:v})) },
-      },
-      defaultProps: { nivel:"h2", titulo:"Sección", contenido:"Texto descriptivo.", fondo:"bg-white", texto:"text-gray-900", padding:"md", borde:"", sombra:"" },
-      render: ({ nivel, titulo, contenido, fondo, texto, padding, borde, sombra }) => {
-        const Tag = nivel as keyof React.JSX.IntrinsicElements;
-        return (
-          <section className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra}`}>
-            {React.createElement(Tag, { className: "text-2xl md:text-3xl font-bold mb-3" }, titulo)}
-            <p className="text-gray-600">{contenido}</p>
-          </section>
-        );
-      },
-    },
-
-    /* Misión / Visión */
-    MisionVision: {
-      fields: {
-        variante:{ type:"select", options:[{label:"2 columnas",value:"dos-col"},{label:"Tarjetas",value:"tarjetas"}] },
-        items:{
-          type:"array",
-          arrayFields:{
-            icono:{ type:"select", options:Object.keys(ICONS).map(v=>({label:v,value:v})) },
-            titulo:{ type:"text" }, texto:{ type:"textarea" },
+        nombre: { type: "text" },
+        descripcion: { type: "textarea" },
+        columnas: {
+          type: "array",
+          arrayFields: {
+            titulo: { type: "text" },
+            links: { type: "array", arrayFields: { label: { type: "text" }, url: { type: "text" } }, defaultItemProps: { label: "Enlace", url: "#" } },
           },
-          defaultItemProps:{ icono:"target", titulo:"Misión", texto:"Describe tu misión." },
+          defaultItemProps: { titulo: "Columna", links: [] },
         },
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v})) },
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v})) },
-        padding:{ type:"select", options:[{label:"sm",value:"sm"},{label:"lg",value:"lg"}] },
-      },
-      defaultProps: {
-        variante:"dos-col",
-        items:[
-          { icono:"target", titulo:"Nuestra Misión", texto:"Impulsar PYMES con presencia digital." },
-          { icono:"eye", titulo:"Nuestra Visión", texto:"Ser la herramienta más fácil para vender." },
-        ],
-        fondo:"bg-white", texto:"text-gray-900", padding:"lg",
-      },
-      render: ({ variante, items, fondo, texto, padding }) => (
-        <section className={`${fondo} ${texto} ${pad(padding)}`}>
-          <div className={variante==="tarjetas"?"max-w-7xl mx-auto grid md:grid-cols-2 gap-6":"max-w-7xl mx-auto grid md:grid-cols-2 gap-10"}>
-            {items?.map((it,i)=>(
-              <div key={i} className={variante==="tarjetas"?"rounded-xl border border-gray-200 p-6 bg-white shadow-sm":"flex items-start gap-4"}>
-                <div className="text-purple-600">{ICONS[it.icono] || ICONS["idea"]}</div>
-                <div>
-                  <h3 className="text-xl font-semibold">{it.titulo}</h3>
-                  <p className="text-gray-600 mt-1">{it.texto}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      ),
-    },
-
-    /* Misión / Visión / Valores */
-    MisionVisionValores: {
-      fields: {
-        items:{
-          type:"array",
-          arrayFields:{
-            icono:{ type:"select", options:Object.keys(ICONS).map(v=>({label:v,value:v})) },
-            titulo:{ type:"text" }, texto:{ type:"textarea" },
+        redes: {
+          type: "array",
+          arrayFields: {
+            tipo: { type: "select", options: ["instagram","twitter","facebook","linkedin","youtube"].map(v => ({ label: v, value: v })) },
+            url: { type: "text" },
           },
-          defaultItemProps:{ icono:"star", titulo:"Valor", texto:"Explica el valor." },
+          defaultItemProps: { tipo: "instagram", url: "#" },
         },
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v})) },
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v})) },
-        padding:{ type:"select", options:[{label:"sm",value:"sm"},{label:"lg",value:"lg"}] },
+        copyright: { type: "text" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
       },
       defaultProps: {
-        items:[
-          { icono:"handshake", titulo:"Compromiso", texto:"Acompañamos a nuestros clientes." },
-          { icono:"scale", titulo:"Integridad", texto:"Hacemos lo correcto." },
-          { icono:"star", titulo:"Excelencia", texto:"Buscamos el máximo valor." },
+        nombre: "Mi Empresa",
+        descripcion: "Construyendo tu presencia digital.",
+        columnas: [
+          { titulo: "Empresa", links: [{ label: "Nosotros", url: "#" }, { label: "Servicios", url: "#" }] },
+          { titulo: "Soporte", links: [{ label: "FAQ", url: "#" }, { label: "Contacto", url: "#" }] },
         ],
-        fondo:"bg-white", texto:"text-gray-900", padding:"lg",
+        redes: [{ tipo: "instagram", url: "#" }],
+        copyright: `© ${new Date().getFullYear()} Mi Empresa. Todos los derechos reservados.`,
+        fondo: "bg-gray-900", texto: "text-white", padding: "y-md",
       },
-      render: ({ items, fondo, texto, padding }) => (
-        <section className={`${fondo} ${texto} ${pad(padding)}`}>
-          <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
-            {items?.map((it,i)=>(
-              <div key={i} className="rounded-xl border border-gray-200 p-6 bg-white shadow-sm flex gap-4">
-                <div className="text-purple-600">{ICONS[it.icono] || ICONS["star"]}</div>
-                <div>
-                  <h3 className="text-lg font-semibold">{it.titulo}</h3>
-                  <p className="text-gray-600 mt-1">{it.texto}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      ),
-    },
-
-    /* Carrusel (con flechas y snap) */
-    Carrusel: {
-      fields: {
-        slides:{
-          type:"array",
-          arrayFields:{
-            tipo:{ type:"radio", options:[{label:"Imagen",value:"image"},{label:"Video",value:"video"}]},
-            url:{ type:"text" }, caption:{ type:"text" },
-          },
-          defaultItemProps:{ tipo:"image", url:"", caption:"" },
-        },
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v}))},
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v}))},
-        padding:{ type:"select", options:[{label:"0",value:"0"},{label:"sm",value:"sm"},{label:"lg",value:"lg"}]},
-        borde:{ type:"select", options:borderOpts.map(v=>({label:v||"Sin borde",value:v}))},
-        sombra:{ type:"select", options:shadowOpts.map(v=>({label:v||"Sin sombra",value:v}))},
-      },
-      defaultProps: {
-        slides:[
-          { tipo:"image", url:"https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=1600&q=80&auto=format&fit=crop", caption:"Primera" },
-          { tipo:"image", url:"https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?w=1600&q=80&auto=format&fit=crop", caption:"Segunda" },
-        ],
-        fondo:"bg-white", texto:"text-gray-900", padding:"sm", borde:"", sombra:"",
-      },
-      render: ({ slides, fondo, texto, padding, borde, sombra }) => {
-        const ref = React.useRef<HTMLDivElement>(null);
-        const scrollBy = (d:number) => ref.current?.scrollBy({ left: d*(ref.current.clientWidth*0.8), behavior:"smooth" });
+      render: ({ nombre, descripcion, columnas, redes, copyright, fondo, texto, padding }) => {
+        const REDES_ICONS: Record<string, React.ReactElement> = {
+          instagram: <Instagram className="w-4 h-4" />,
+          twitter: <Twitter className="w-4 h-4" />,
+          facebook: <Facebook className="w-4 h-4" />,
+          linkedin: <Linkedin className="w-4 h-4" />,
+          youtube: <Youtube className="w-4 h-4" />,
+        };
         return (
-          <section className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} overflow-hidden relative`}>
-            <div className="relative overflow-hidden">
-              <div ref={ref} className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
-                {slides?.map((s,i)=>(
-                  <div key={i} className="snap-center shrink-0 basis-full md:basis-[70%]">
-                    {s.tipo==="image"
-                      ? (s.url ? <img className="w-full h-[360px] object-cover rounded-xl" src={s.url} alt={s.caption||""} /> : <div className="w-full h-[360px] bg-gray-100 rounded-xl" />)
-                      : (s.url ? <video className="w-full h-[360px] object-cover rounded-xl" src={s.url} controls/> : <div className="w-full h-[360px] bg-gray-100 rounded-xl" />)}
-                    {s.caption && <p className="mt-2 text-center text-sm text-gray-600">{s.caption}</p>}
+          <footer className={`${fondo} ${texto} ${pad(padding)}`}>
+            <div className="max-w-6xl mx-auto">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+                <div className="lg:col-span-1">
+                  <p className="font-black text-lg mb-3">{nombre}</p>
+                  <p className="text-sm opacity-50 leading-relaxed">{descripcion}</p>
+                  {redes?.length > 0 && (
+                    <div className="flex gap-3 mt-5">
+                      {redes.map((r, i) => (
+                        <a key={i} href={r.url} className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                          {REDES_ICONS[r.tipo]}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {columnas?.map((col, i) => (
+                  <div key={i}>
+                    <p className="font-semibold text-sm mb-4 opacity-70 tracking-wide uppercase">{col.titulo}</p>
+                    <ul className="space-y-2.5">
+                      {col.links?.map((l, j) => (
+                        <li key={j}><a href={l.url} className="text-sm opacity-50 hover:opacity-100 transition-opacity">{l.label}</a></li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
-              <button onClick={()=>scrollBy(-1)} className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 hover:bg-white shadow p-2">‹</button>
-              <button onClick={()=>scrollBy(1)} className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 hover:bg-white shadow p-2">›</button>
+              <div className="border-t border-white/10 pt-6 text-sm opacity-40">{copyright}</div>
+            </div>
+          </footer>
+        );
+      },
+    },
+
+    /* ── HERO (estático) ─────────────────────────────────── */
+    Hero: {
+      fields: {
+        titulo: { type: "text" },
+        descripcion: { type: "textarea" },
+        ctaLabel: { type: "text" }, ctaUrl: { type: "text" },
+        ctaSecLabel: { type: "text" }, ctaSecUrl: { type: "text" },
+        imagenUrl: { type: "text" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Tu negocio en línea",
+        descripcion: "Crea tu presencia digital de manera fácil, rápida y profesional.",
+        ctaLabel: "Comenzar ahora", ctaUrl: "#",
+        ctaSecLabel: "Ver más", ctaSecUrl: "#",
+        imagenUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&auto=format&fit=crop",
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, descripcion, ctaLabel, ctaUrl, ctaSecLabel, ctaSecUrl, imagenUrl, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-5">{titulo}</h1>
+              <p className="text-lg opacity-60 mb-8 leading-relaxed max-w-md">{descripcion}</p>
+              <div className="flex flex-wrap gap-3">
+                {ctaLabel && (
+                  <a href={ctaUrl} className="inline-flex px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-all shadow-lg hover:-translate-y-0.5">
+                    {ctaLabel}
+                  </a>
+                )}
+                {ctaSecLabel && (
+                  <a href={ctaSecUrl} className="inline-flex px-6 py-3 rounded-xl border border-current font-semibold opacity-60 hover:opacity-100 transition-all">
+                    {ctaSecLabel}
+                  </a>
+                )}
+              </div>
+            </div>
+            {imagenUrl && (
+              <div className="relative">
+                <div className="absolute -inset-3 bg-gradient-to-br from-gray-200 to-gray-100 rounded-3xl" />
+                <img src={imagenUrl} alt={titulo} className="relative rounded-2xl w-full object-cover shadow-xl aspect-[4/3]" />
+              </div>
+            )}
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── HERO ANIMADO ────────────────────────────────────── */
+    HeroAnimado: {
+      fields: {
+        titulo: { type: "text" },
+        palabras: { type: "array", arrayFields: { texto: { type: "text" } }, defaultItemProps: { texto: "increíble" } },
+        descripcion: { type: "textarea" },
+        ctaLabel: { type: "text" }, ctaUrl: { type: "text" },
+        ctaSecLabel: { type: "text" }, ctaSecUrl: { type: "text" },
+        imagenUrl: { type: "text" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Tu negocio,",
+        palabras: [{ texto: "más visible" }, { texto: "más rápido" }, { texto: "más profesional" }],
+        descripcion: "Crea tu sitio web en minutos. Sin código, sin complicaciones.",
+        ctaLabel: "Empezar gratis", ctaUrl: "#",
+        ctaSecLabel: "Ver demo", ctaSecUrl: "#",
+        imagenUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&auto=format&fit=crop",
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-xl",
+      },
+      render: (props) => <HeroAnimadoRender {...props} />,
+    },
+
+    /* ── BANNER CTA ──────────────────────────────────────── */
+    BannerCTA: {
+      fields: {
+        titulo: { type: "text" },
+        descripcion: { type: "textarea" },
+        ctaLabel: { type: "text" }, ctaUrl: { type: "text" },
+        ctaSecLabel: { type: "text" }, ctaSecUrl: { type: "text" },
+        alineacion: { type: "select", options: [{ label: "Izquierda", value: "left" }, { label: "Centro", value: "center" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "¿Listo para dar el siguiente paso?",
+        descripcion: "Únete a cientos de negocios que ya confían en nosotros.",
+        ctaLabel: "Comenzar ahora", ctaUrl: "#",
+        ctaSecLabel: "", ctaSecUrl: "#",
+        alineacion: "center",
+        fondo: "bg-gray-900", texto: "text-white", padding: "y-lg",
+      },
+      render: ({ titulo, descripcion, ctaLabel, ctaUrl, ctaSecLabel, ctaSecUrl, alineacion, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className={`max-w-4xl mx-auto ${alineacion === "center" ? "text-center" : ""}`}>
+            <h2 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">{titulo}</h2>
+            {descripcion && <p className="text-lg opacity-60 mb-8 max-w-xl mx-auto">{descripcion}</p>}
+            <div className={`flex flex-wrap gap-3 ${alineacion === "center" ? "justify-center" : ""}`}>
+              {ctaLabel && (
+                <a href={ctaUrl} className="inline-flex px-7 py-3.5 rounded-xl bg-white text-gray-900 font-bold hover:bg-gray-100 transition-all shadow-lg hover:-translate-y-0.5">
+                  {ctaLabel}
+                </a>
+              )}
+              {ctaSecLabel && (
+                <a href={ctaSecUrl} className="inline-flex px-7 py-3.5 rounded-xl border border-white/30 font-semibold opacity-70 hover:opacity-100 transition-all">
+                  {ctaSecLabel}
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── TEXTO ───────────────────────────────────────────── */
+    Texto: {
+      fields: {
+        contenido: { type: "textarea" },
+        nivel: { type: "select", options: ["h1","h2","h3","h4"].map(v => ({ label: v, value: v })) },
+        alineacion: { type: "select", options: [{ label: "Izquierda", value: "left" }, { label: "Centro", value: "center" }, { label: "Derecha", value: "right" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: { contenido: "Tu título aquí", nivel: "h2", alineacion: "left", fondo: "bg-white", texto: "text-gray-900", padding: "sm" },
+      render: ({ contenido, nivel, alineacion, fondo, texto, padding }) => {
+        const Tag = nivel as keyof React.JSX.IntrinsicElements;
+        const sizeMap: Record<string,string> = { h1: "text-5xl md:text-6xl font-black", h2: "text-3xl md:text-4xl font-bold", h3: "text-2xl font-bold", h4: "text-xl font-semibold" };
+        const alignMap: Record<string,string> = { left: "text-left", center: "text-center", right: "text-right" };
+        return (
+          <div className={`${fondo} ${texto} ${pad(padding)} ${alignMap[alineacion]}`}>
+            {React.createElement(Tag, { className: `${sizeMap[nivel]} leading-tight` }, contenido)}
+          </div>
+        );
+      },
+    },
+
+    /* ── PÁRRAFO ─────────────────────────────────────────── */
+    Parrafo: {
+      fields: {
+        contenido: { type: "textarea" },
+        tamaño: { type: "select", options: [{ label: "Pequeño", value: "sm" }, { label: "Normal", value: "base" }, { label: "Grande", value: "lg" }, { label: "Extra", value: "xl" }] },
+        alineacion: { type: "select", options: [{ label: "Izquierda", value: "left" }, { label: "Centro", value: "center" }, { label: "Derecha", value: "right" }] },
+        maxAncho: { type: "select", options: [{ label: "Angosto", value: "sm" }, { label: "Mediano", value: "lg" }, { label: "Ancho", value: "2xl" }, { label: "Muy ancho", value: "4xl" }, { label: "Sin límite", value: "none" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        contenido: "Escribe aquí tu texto descriptivo.",
+        tamaño: "base", alineacion: "left", maxAncho: "2xl",
+        fondo: "bg-white", texto: "text-gray-700", padding: "sm",
+      },
+      render: ({ contenido, tamaño, alineacion, maxAncho, fondo, texto, padding }) => {
+        const sizeMap: Record<string,string> = { sm: "text-sm", base: "text-base", lg: "text-lg", xl: "text-xl" };
+        const alignMap: Record<string,string> = { left: "text-left", center: "text-center", right: "text-right" };
+        const widthMap: Record<string,string> = { sm: "max-w-sm", lg: "max-w-lg", "2xl": "max-w-2xl", "4xl": "max-w-4xl", none: "max-w-none" };
+        return (
+          <div className={`${fondo} ${texto} ${pad(padding)} ${alignMap[alineacion]}`}>
+            <p className={`${sizeMap[tamaño]} ${widthMap[maxAncho]} leading-relaxed opacity-80 ${alineacion === "center" ? "mx-auto" : ""}`}>
+              {contenido}
+            </p>
+          </div>
+        );
+      },
+    },
+
+    /* ── SECCIÓN TEXTO ───────────────────────────────────── */
+    SeccionTexto: {
+      fields: {
+        titulo: { type: "text" },
+        subtitulo: { type: "text" },
+        contenido: { type: "textarea" },
+        nivel: { type: "select", options: ["h1","h2","h3"].map(v => ({ label: v, value: v })) },
+        alineacion: { type: "select", options: [{ label: "Izquierda", value: "left" }, { label: "Centro", value: "center" }, { label: "Derecha", value: "right" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Sobre nosotros", subtitulo: "Quiénes somos",
+        contenido: "Somos una empresa comprometida con el crecimiento de nuestros clientes.",
+        nivel: "h2", alineacion: "center",
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, subtitulo, contenido, nivel, alineacion, fondo, texto, padding }) => {
+        const Tag = nivel as keyof React.JSX.IntrinsicElements;
+        const alignMap: Record<string,string> = { left: "text-left", center: "text-center", right: "text-right" };
+        return (
+          <section className={`${fondo} ${texto} ${pad(padding)} ${alignMap[alineacion]}`}>
+            <div className="max-w-3xl mx-auto">
+              {subtitulo && <p className="text-sm font-semibold tracking-widest uppercase opacity-40 mb-3">{subtitulo}</p>}
+              {React.createElement(Tag, { className: "text-3xl md:text-4xl font-bold mb-5 leading-tight" }, titulo)}
+              {contenido && <p className="text-lg opacity-60 leading-relaxed">{contenido}</p>}
             </div>
           </section>
         );
       },
     },
 
-    /* Imagen (ahora nunca devuelve null) */
-    Imagen: {
+    /* ── CARACTERÍSTICAS ─────────────────────────────────── */
+    Caracteristicas: {
       fields: {
-        url:{ type:"text" }, alt:{ type:"text" },
-        borde:{ type:"select", options:borderOpts.map(v=>({label:v||"Sin borde",value:v}))},
-        sombra:{ type:"select", options:shadowOpts.map(v=>({label:v||"Sin sombra",value:v}))},
-        radio:{ type:"select", options:[{label:"sm",value:"sm"},{label:"md",value:"md"},{label:"lg",value:"lg"},{label:"xl",value:"xl"}]},
+        titulo: { type: "text" },
+        subtitulo: { type: "text" },
+        variante: { type: "select", options: [{ label: "Grid", value: "grid" }, { label: "Lista", value: "lista" }, { label: "Alternado", value: "alternado" }] },
+        items: {
+          type: "array",
+          arrayFields: {
+            icono: { type: "select", options: Object.keys(ICONS).map(v => ({ label: v, value: v })) },
+            titulo: { type: "text" }, descripcion: { type: "textarea" },
+          },
+          defaultItemProps: { icono: "rocket", titulo: "Característica", descripcion: "Descripción." },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
       },
-      defaultProps: { url:"data:image/jpeg;base64,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",
-      alt:"Imagen", borde:"", sombra:"", radio:"xl" },
-      render: ({ url, alt, borde, sombra, radio }) => {
-        const r = radio==="sm"?"rounded":radio==="md"?"rounded-md":radio==="lg"?"rounded-lg":"rounded-xl";
-        return url
-          ? <img src={url} alt={alt} className={`w-full h-auto object-cover ${r} ${borde} ${sombra}`} />
-          : <div className={`w-full h-40 bg-gray-100 ${r} ${borde} ${sombra}`} />;
+      defaultProps: {
+        titulo: "¿Por qué elegirnos?", subtitulo: "Nuestras ventajas",
+        variante: "grid",
+        items: [
+          { icono: "rocket", titulo: "Rápido", descripcion: "Tu sitio listo en minutos." },
+          { icono: "shield", titulo: "Seguro", descripcion: "Datos protegidos siempre." },
+          { icono: "star", titulo: "Profesional", descripcion: "Diseño de primer nivel." },
+        ],
+        fondo: "bg-gray-50", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, subtitulo, variante, items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-6xl mx-auto">
+            {(titulo || subtitulo) && (
+              <div className="text-center mb-12">
+                {subtitulo && <p className="text-sm font-semibold tracking-widest uppercase opacity-40 mb-2">{subtitulo}</p>}
+                {titulo && <h2 className="text-3xl md:text-4xl font-bold">{titulo}</h2>}
+              </div>
+            )}
+            {variante === "grid" && (
+              <div className="grid md:grid-cols-3 gap-6">
+                {items?.map((item, i) => (
+                  <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center mb-4">
+                      {ICONS[item.icono] || ICONS["star"]}
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">{item.titulo}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">{item.descripcion}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {variante === "lista" && (
+              <div className="space-y-4 max-w-2xl mx-auto">
+                {items?.map((item, i) => (
+                  <div key={i} className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="w-9 h-9 bg-gray-900 text-white rounded-lg flex items-center justify-center shrink-0">
+                      {ICONS[item.icono] || ICONS["check"]}
+                    </div>
+                    <div>
+                      <h3 className="font-bold mb-1">{item.titulo}</h3>
+                      <p className="text-gray-500 text-sm leading-relaxed">{item.descripcion}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {variante === "alternado" && (
+              <div className="space-y-16">
+                {items?.map((item, i) => (
+                  <div key={i} className={`flex flex-col md:flex-row items-center gap-10 ${i % 2 === 1 ? "md:flex-row-reverse" : ""}`}>
+                    <div className="w-20 h-20 bg-gray-900 text-white rounded-3xl flex items-center justify-center shrink-0 shadow-xl">
+                      {ICONS[item.icono] || ICONS["star"]}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold mb-3">{item.titulo}</h3>
+                      <p className="text-gray-500 leading-relaxed">{item.descripcion}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── ESTADÍSTICAS ────────────────────────────────────── */
+    Estadisticas: {
+      fields: {
+        items: {
+          type: "array",
+          arrayFields: {
+            numero: { type: "text" }, sufijo: { type: "text" },
+            descripcion: { type: "text" },
+            icono: { type: "select", options: Object.keys(ICONS).map(v => ({ label: v, value: v })) },
+          },
+          defaultItemProps: { numero: "100", sufijo: "+", descripcion: "Clientes felices", icono: "users" },
+        },
+        columnas: { type: "number" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        items: [
+          { numero: "500", sufijo: "+", descripcion: "Clientes activos", icono: "users" },
+          { numero: "99", sufijo: "%", descripcion: "Satisfacción", icono: "star" },
+          { numero: "24", sufijo: "/7", descripcion: "Soporte", icono: "clock" },
+          { numero: "5", sufijo: "años", descripcion: "De experiencia", icono: "award" },
+        ],
+        columnas: 4, fondo: "bg-gray-900", texto: "text-white", padding: "y-md",
+      },
+      render: ({ items, columnas, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className={`max-w-6xl mx-auto grid ${gridCols(columnas)} gap-8`}>
+            {items?.map((item, i) => (
+              <div key={i} className="text-center">
+                <div className="flex justify-center mb-3 opacity-40">{ICONS[item.icono] || ICONS["star"]}</div>
+                <p className="text-4xl md:text-5xl font-black mb-1">
+                  {item.numero}<span className="text-2xl opacity-50">{item.sufijo}</span>
+                </p>
+                <p className="text-sm opacity-50 font-medium">{item.descripcion}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── MISIÓN / VISIÓN ─────────────────────────────────── */
+    MisionVision: {
+      fields: {
+        variante: { type: "select", options: [{ label: "2 columnas", value: "dos-col" }, { label: "Tarjetas", value: "tarjetas" }] },
+        items: {
+          type: "array",
+          arrayFields: {
+            icono: { type: "select", options: Object.keys(ICONS).map(v => ({ label: v, value: v })) },
+            titulo: { type: "text" }, texto: { type: "textarea" },
+          },
+          defaultItemProps: { icono: "target", titulo: "Misión", texto: "Describe tu misión." },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        variante: "tarjetas",
+        items: [
+          { icono: "target", titulo: "Nuestra Misión", texto: "Impulsar el crecimiento digital de las PYMES." },
+          { icono: "eye", titulo: "Nuestra Visión", texto: "Ser la plataforma número uno de creación web." },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ variante, items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className={`max-w-6xl mx-auto grid md:grid-cols-2 ${variante === "tarjetas" ? "gap-6" : "gap-16"}`}>
+            {items?.map((it, i) => (
+              <div key={i} className={variante === "tarjetas"
+                ? "rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-md transition-shadow"
+                : "flex items-start gap-5"}>
+                <div className={`${variante === "tarjetas" ? "w-12 h-12 rounded-xl bg-gray-900 text-white flex items-center justify-center mb-5" : "w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 mt-1"}`}>
+                  {ICONS[it.icono] || ICONS["idea"]}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">{it.titulo}</h3>
+                  <p className="text-gray-500 leading-relaxed">{it.texto}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── MISIÓN VISIÓN VALORES ───────────────────────────── */
+    MisionVisionValores: {
+      fields: {
+        items: {
+          type: "array",
+          arrayFields: {
+            icono: { type: "select", options: Object.keys(ICONS).map(v => ({ label: v, value: v })) },
+            titulo: { type: "text" }, texto: { type: "textarea" },
+          },
+          defaultItemProps: { icono: "star", titulo: "Valor", texto: "Explica el valor." },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        items: [
+          { icono: "handshake", titulo: "Compromiso", texto: "Acompañamos a cada cliente." },
+          { icono: "scale", titulo: "Integridad", texto: "Hacemos lo correcto, siempre." },
+          { icono: "star", titulo: "Excelencia", texto: "Buscamos el máximo valor." },
+        ],
+        fondo: "bg-gray-50", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+            {items?.map((it, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex gap-4 hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center shrink-0">
+                  {ICONS[it.icono] || ICONS["star"]}
+                </div>
+                <div>
+                  <h3 className="font-bold mb-1">{it.titulo}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{it.texto}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── TESTIMONIO CARD ─────────────────────────────────── */
+    TestimonioCard: {
+      fields: {
+        nombre: { type: "text" }, rol: { type: "text" }, empresa: { type: "text" },
+        fotoUrl: { type: "text" }, texto: { type: "textarea" },
+        estrellas: { type: "number" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto_color: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+        radio: { type: "select", options: roundOpts },
+      },
+      defaultProps: {
+        nombre: "María González", rol: "Dueña", empresa: "Boutique Flores",
+        fotoUrl: "", texto: "Gracias a esta herramienta pude tener mi sitio web en un día. ¡Increíble!",
+        estrellas: 5, fondo: "bg-white", texto_color: "text-gray-900", padding: "md",
+        borde: "border border-gray-100", sombra: "shadow-sm", radio: "rounded-2xl",
+      },
+      render: ({ nombre, rol, empresa, fotoUrl, texto, estrellas, fondo, texto_color, padding, borde, sombra, radio }) => (
+        <div className={`${fondo} ${texto_color} ${pad(padding)} ${borde} ${sombra} ${radio}`}>
+          <Quote className="w-6 h-6 opacity-20 mb-4" />
+          <p className="text-gray-600 leading-relaxed mb-6 text-sm">{texto}</p>
+          <div className="flex items-center gap-1 mb-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className={`w-4 h-4 ${i < estrellas ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            {fotoUrl
+              ? <img src={fotoUrl} alt={nombre} className="w-10 h-10 rounded-full object-cover" />
+              : <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"><UserRound className="w-5 h-5 text-gray-400" /></div>}
+            <div>
+              <p className="font-semibold text-sm">{nombre}</p>
+              <p className="text-xs text-gray-400">{rol}{empresa ? `, ${empresa}` : ""}</p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+
+    /* ── TESTIMONIOS GRID ────────────────────────────────── */
+    TestimoniosGrid: {
+      fields: {
+        titulo: { type: "text" },
+        items: {
+          type: "array",
+          arrayFields: {
+            nombre: { type: "text" }, rol: { type: "text" },
+            texto: { type: "textarea" }, estrellas: { type: "number" }, fotoUrl: { type: "text" },
+          },
+          defaultItemProps: { nombre: "Cliente", rol: "Empresario", texto: "Excelente servicio.", estrellas: 5, fotoUrl: "" },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Lo que dicen nuestros clientes",
+        items: [
+          { nombre: "Carlos Mora", rol: "Restaurante El Rincón", texto: "Mi sitio quedó increíble, fácil de usar y muy profesional.", estrellas: 5, fotoUrl: "" },
+          { nombre: "Sofía Vargas", rol: "Tienda de ropa", texto: "Mis ventas aumentaron desde que tengo mi página web.", estrellas: 5, fotoUrl: "" },
+          { nombre: "Pedro Jiménez", rol: "Arquitecto", texto: "Perfecto para mostrar mi portafolio de proyectos.", estrellas: 5, fotoUrl: "" },
+        ],
+        fondo: "bg-gray-50", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-6xl mx-auto">
+            {titulo && <h2 className="text-3xl font-bold text-center mb-12">{titulo}</h2>}
+            <div className="grid md:grid-cols-3 gap-6">
+              {items?.map((item, i) => (
+                <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <Quote className="w-5 h-5 opacity-20 mb-3" />
+                  <p className="text-gray-600 text-sm leading-relaxed mb-5">{item.texto}</p>
+                  <div className="flex items-center gap-1 mb-4">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <Star key={j} className={`w-3.5 h-3.5 ${j < item.estrellas ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {item.fotoUrl
+                      ? <img src={item.fotoUrl} alt={item.nombre} className="w-9 h-9 rounded-full object-cover" />
+                      : <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"><UserRound className="w-4 h-4 text-gray-400" /></div>}
+                    <div>
+                      <p className="font-semibold text-sm">{item.nombre}</p>
+                      <p className="text-xs text-gray-400">{item.rol}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── PRECIO CARD ─────────────────────────────────────── */
+    PrecioCard: {
+      fields: {
+        titulo: { type: "text" }, precio: { type: "text" },
+        moneda: { type: "select", options: [{ label: "₡ CRC", value: "CRC" }, { label: "$ USD", value: "USD" }, { label: "€ EUR", value: "EUR" }] },
+        periodo: { type: "select", options: [{ label: "mes", value: "mes" }, { label: "año", value: "año" }, { label: "pago único", value: "único" }] },
+        descripcion: { type: "textarea" },
+        caracteristicas: { type: "array", arrayFields: { texto: { type: "text" } }, defaultItemProps: { texto: "Característica incluida" } },
+        ctaLabel: { type: "text" }, ctaUrl: { type: "text" },
+        destacado: { type: "select", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+        radio: { type: "select", options: roundOpts },
+      },
+      defaultProps: {
+        titulo: "Plan Pro", precio: "29,900", moneda: "CRC", periodo: "mes",
+        descripcion: "Todo lo que necesitas para crecer.",
+        caracteristicas: [{ texto: "Sitio web ilimitado" }, { texto: "Dominio personalizado" }, { texto: "Soporte prioritario" }],
+        ctaLabel: "Empezar ahora", ctaUrl: "#", destacado: "no",
+        fondo: "bg-white", texto: "text-gray-900", padding: "lg", radio: "rounded-2xl",
+      },
+      render: ({ titulo, precio, moneda, periodo, descripcion, caracteristicas, ctaLabel, ctaUrl, destacado, fondo, texto, padding, radio }) => {
+        const symbol = moneda === "CRC" ? "₡" : moneda === "EUR" ? "€" : "$";
+        const isDestacado = destacado === "si";
+        return (
+          <div className={`${isDestacado ? "bg-gray-900 text-white" : `${fondo} ${texto}`} ${pad(padding)} ${radio} ${isDestacado ? "shadow-2xl scale-105" : "border border-gray-100 shadow-sm"} relative overflow-hidden`}>
+            {isDestacado && <div className="absolute top-4 right-4 bg-white text-gray-900 text-xs font-bold px-3 py-1 rounded-full">Popular</div>}
+            <p className="font-bold text-sm tracking-wide uppercase opacity-50 mb-2">{titulo}</p>
+            <div className="flex items-end gap-1 mb-2">
+              <span className="text-4xl font-black">{symbol}{precio}</span>
+              <span className="opacity-40 mb-1 text-sm">/ {periodo}</span>
+            </div>
+            {descripcion && <p className="opacity-50 text-sm mb-6">{descripcion}</p>}
+            <ul className="space-y-3 mb-8">
+              {caracteristicas?.map((c, i) => (
+                <li key={i} className="flex items-center gap-2.5 text-sm">
+                  <CheckCircle2 className={`w-4 h-4 shrink-0 ${isDestacado ? "text-emerald-400" : "text-emerald-500"}`} />
+                  {c.texto}
+                </li>
+              ))}
+            </ul>
+            <a href={ctaUrl} className={`block text-center py-3 rounded-xl font-semibold text-sm transition-all hover:-translate-y-0.5 ${isDestacado ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-gray-700"}`}>
+              {ctaLabel}
+            </a>
+          </div>
+        );
       },
     },
 
-    /* Galería (slot acepta Imagen) */
-    Galeria: {
+    /* ── CARTA PRODUCTO ──────────────────────────────────── */
+    CartaProducto: {
       fields: {
-        contenido: { type: "slot", allow: ["Imagen"] },
-        columnasDesktop: { type: "number" },
-        gap: { type: "select", options: ["0","2","4","6","8"].map(v=>({label:v,value:v})) },
-        fondo: { type: "select", options: bgOpts.map(v=>({label:v,value:v})) },
-        padding: { type: "select", options: [{label:"0",value:"0"},{label:"sm",value:"sm"},{label:"lg",value:"lg"}] },
+        imagenUrl: { type: "text" }, titulo: { type: "text" }, descripcion: { type: "textarea" },
+        precio: { type: "text" },
+        moneda: { type: "select", options: [{ label: "₡ CRC", value: "CRC" }, { label: "$ USD", value: "USD" }, { label: "€ EUR", value: "EUR" }] },
+        badge: { type: "text" },
+        botonLabel: { type: "text" }, botonUrl: { type: "text" },
+        layout: { type: "radio", options: [{ label: "Vertical", value: "vertical" }, { label: "Horizontal", value: "horizontal" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+        radio: { type: "select", options: roundOpts },
       },
       defaultProps: {
-        contenido: [],
-        columnasDesktop: 4, gap: "4", fondo: "bg-white", padding: "sm",
+        imagenUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80&auto=format&fit=crop",
+        titulo: "Producto destacado",
+        descripcion: "Descripción corta del producto con sus beneficios principales.",
+        precio: "19,900", moneda: "CRC", badge: "Nuevo",
+        botonLabel: "Agregar al carrito", botonUrl: "#", layout: "vertical",
+        fondo: "bg-white", texto: "text-gray-900", padding: "0",
+        borde: "border border-gray-100", sombra: "shadow-sm", radio: "rounded-2xl",
       },
-      render: ({ contenido: Content, columnasDesktop, gap, fondo, padding }) => {
-        const cols =
-          columnasDesktop >= 6 ? "md:columns-3 lg:columns-6" :
-          columnasDesktop === 5 ? "md:columns-3 lg:columns-5" :
-          columnasDesktop === 4 ? "md:columns-2 lg:columns-4" :
-          columnasDesktop === 3 ? "md:columns-2 lg:columns-3" : "md:columns-2 lg:columns-2";
+      render: (p) => {
+        const symbol = p.moneda === "CRC" ? "₡" : p.moneda === "EUR" ? "€" : "$";
         return (
-          <section className={`${fondo} ${pad(padding)}`}>
-            <Content className={`columns-1 ${cols} ${gaps[gap] || gaps["4"]} [column-fill:_balance] [&>*]:mb-4 [&>*]:break-inside-avoid`} />
+          <div className={`${p.fondo} ${p.texto} ${p.borde} ${p.sombra} ${p.radio} overflow-hidden hover:shadow-md transition-shadow`}>
+            <div className={p.layout === "horizontal" ? "flex" : ""}>
+              <div className={`relative ${p.layout === "horizontal" ? "w-2/5 shrink-0" : ""}`}>
+                {p.imagenUrl
+                  ? <img src={p.imagenUrl} alt={p.titulo} className={`w-full object-cover ${p.layout === "horizontal" ? "h-full" : "h-52"}`} />
+                  : <div className={`w-full bg-gray-100 ${p.layout === "horizontal" ? "h-full" : "h-52"}`} />}
+                {p.badge && <span className="absolute top-3 left-3 bg-gray-900 text-white text-xs font-bold px-2.5 py-1 rounded-full">{p.badge}</span>}
+              </div>
+              <div className="flex-1 p-5">
+                <h3 className="font-bold text-base mb-1">{p.titulo}</h3>
+                <p className="text-gray-500 text-sm mb-3 leading-relaxed">{p.descripcion}</p>
+                <p className="text-xl font-black mb-4">{symbol}{p.precio}</p>
+                <a href={p.botonUrl} className="block text-center py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-700 transition-all">
+                  {p.botonLabel}
+                </a>
+              </div>
+            </div>
+          </div>
+        );
+      },
+    },
+
+    /* ── FAQ ACCORDION ───────────────────────────────────── */
+    FAQAccordion: {
+      fields: {
+        titulo: { type: "text" },
+        items: {
+          type: "array",
+          arrayFields: { pregunta: { type: "text" }, respuesta: { type: "textarea" } },
+          defaultItemProps: { pregunta: "¿Pregunta frecuente?", respuesta: "Respuesta clara y concisa." },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Preguntas frecuentes",
+        items: [
+          { pregunta: "¿Cómo funciona el servicio?", respuesta: "Creas tu cuenta, eliges una plantilla y empiezas a personalizar tu sitio en minutos." },
+          { pregunta: "¿Necesito conocimientos técnicos?", respuesta: "No. Nuestra plataforma está diseñada para que cualquier persona pueda usarla sin experiencia previa." },
+          { pregunta: "¿Puedo cancelar en cualquier momento?", respuesta: "Sí, puedes cancelar tu suscripción cuando quieras sin cargos adicionales." },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: (props) => <FAQRender {...props} />,
+    },
+
+    /* ── CONTACTO INFO ───────────────────────────────────── */
+    ContactoInfo: {
+      fields: {
+        titulo: { type: "text" }, descripcion: { type: "textarea" },
+        telefono: { type: "text" }, email: { type: "text" }, direccion: { type: "text" },
+        redes: {
+          type: "array",
+          arrayFields: {
+            tipo: { type: "select", options: ["instagram","twitter","facebook","linkedin","youtube"].map(v => ({ label: v, value: v })) },
+            url: { type: "text" },
+          },
+          defaultItemProps: { tipo: "instagram", url: "#" },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Contáctanos",
+        descripcion: "Estamos disponibles para atenderte.",
+        telefono: "+506 8888-8888", email: "info@miempresa.com", direccion: "San José, Costa Rica",
+        redes: [{ tipo: "instagram", url: "#" }],
+        fondo: "bg-gray-50", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, descripcion, telefono, email, direccion, redes, fondo, texto, padding }) => {
+        const REDES_ICONS: Record<string, React.ReactElement> = {
+          instagram: <Instagram className="w-4 h-4" />,
+          twitter: <Twitter className="w-4 h-4" />,
+          facebook: <Facebook className="w-4 h-4" />,
+          linkedin: <Linkedin className="w-4 h-4" />,
+          youtube: <Youtube className="w-4 h-4" />,
+        };
+        return (
+          <section className={`${fondo} ${texto} ${pad(padding)}`}>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-3">{titulo}</h2>
+              {descripcion && <p className="text-gray-500 mb-10">{descripcion}</p>}
+              <div className="grid md:grid-cols-3 gap-6 mb-10">
+                {telefono && (
+                  <div className="flex flex-col items-center gap-2 p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center"><Phone className="w-4 h-4" /></div>
+                    <p className="font-semibold text-sm">Teléfono</p>
+                    <p className="text-gray-500 text-sm">{telefono}</p>
+                  </div>
+                )}
+                {email && (
+                  <div className="flex flex-col items-center gap-2 p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center"><Mail className="w-4 h-4" /></div>
+                    <p className="font-semibold text-sm">Email</p>
+                    <p className="text-gray-500 text-sm">{email}</p>
+                  </div>
+                )}
+                {direccion && (
+                  <div className="flex flex-col items-center gap-2 p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center"><MapPin className="w-4 h-4" /></div>
+                    <p className="font-semibold text-sm">Dirección</p>
+                    <p className="text-gray-500 text-sm">{direccion}</p>
+                  </div>
+                )}
+              </div>
+              {redes?.length > 0 && (
+                <div className="flex justify-center gap-3">
+                  {redes.map((r, i) => (
+                    <a key={i} href={r.url} className="p-3 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+                      {REDES_ICONS[r.tipo]}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </section>
         );
       },
     },
 
-    /* FlexBox */
-    FlexBox: {
+    /* ── LOGO GRID ───────────────────────────────────────── */
+    LogoGrid: {
       fields: {
-        contenido: { type: "slot" },
-        direccion: { type:"select", options:[{label:"Fila",value:"row"},{label:"Columna",value:"column"}] },
-        alineacion: { type:"select", options:[
-          {label:"Inicio",value:"start"},{label:"Centro",value:"center"},{label:"Final",value:"end"},{label:"Espaciado",value:"between"}
-        ]},
-        gap: { type:"select", options:Object.keys(gaps).map(v=>({label:v,value:v})) },
-        fondo: { type:"select", options:bgOpts.map(v=>({label:v,value:v})) },
-        padding: { type:"select", options:Object.keys(pads).map(v=>({label:v,value:v})) },
-      },
-      defaultProps: { contenido: [], direccion:"row", alineacion:"start", gap:"4", fondo:"bg-white", padding:"0" },
-      render: ({ contenido: Content, direccion, alineacion, gap, fondo, padding }) => {
-        const dir = direccion==="column"?"flex-col":"flex-row";
-        const just =
-          alineacion==="center"?"justify-center":
-          alineacion==="end"?"justify-end":
-          alineacion==="between"?"justify-between":"justify-start";
-        return (
-          <div className={`${fondo} ${pad(padding)} flex ${dir} ${just} ${gaps[gap] || gaps["4"]}`}>
-            <Content />
-          </div>
-        );
-      }
-    },
-
-    /* Carta de presentación */
-    CartaPerfil: {
-      fields: {
-        fotoUrl:{ type:"text" }, nombre:{ type:"text" }, rol:{ type:"text" }, bio:{ type:"textarea" },
-        fondo:{ type:"select", options:bgOpts.map(v=>({label:v,value:v})) },
-        texto:{ type:"select", options:textOpts.map(v=>({label:v,value:v})) },
-        padding:{ type:"select", options:Object.keys(pads).map(v=>({label:v,value:v})) },
-        borde:{ type:"select", options:borderOpts.map(v=>({label:v||"Sin borde",value:v})) },
-        sombra:{ type:"select", options:shadowOpts.map(v=>({label:v||"Sin sombra",value:v})) },
-        links:{ type:"array", arrayFields:{ label:{type:"text"}, url:{type:"text"} }, defaultItemProps:{ label:"Web", url:"#"} }
+        titulo: { type: "text" },
+        logos: {
+          type: "array",
+          arrayFields: { url: { type: "text" }, nombre: { type: "text" } },
+          defaultItemProps: { url: "", nombre: "Empresa" },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
       },
       defaultProps: {
-        fotoUrl:"", nombre:"Tu nombre", rol:"Propietario", bio:"Breve descripción o presentación.",
-        fondo:"bg-white", texto:"text-gray-900", padding:"md", borde:"border border-gray-200", sombra:"shadow-sm",
-        links:[{label:"Sitio",url:"#"}]
+        titulo: "Empresas que confían en nosotros",
+        logos: [{ url: "", nombre: "Empresa 1" }, { url: "", nombre: "Empresa 2" }, { url: "", nombre: "Empresa 3" }, { url: "", nombre: "Empresa 4" }],
+        fondo: "bg-white", padding: "y-md",
       },
-      render: ({ fotoUrl, nombre, rol, bio, fondo, texto, padding, borde, sombra, links }) => (
-        <div className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} rounded-xl flex items-center gap-4`}>
-          {fotoUrl ? <img src={fotoUrl} alt={nombre} className="w-20 h-20 rounded-full object-cover" /> : <UserRound className="w-16 h-16 text-gray-400" />}
+      render: ({ titulo, logos, fondo, padding }) => (
+        <section className={`${fondo} ${pad(padding)}`}>
+          <div className="max-w-5xl mx-auto">
+            {titulo && <p className="text-center text-sm font-semibold tracking-widest uppercase opacity-40 mb-10">{titulo}</p>}
+            <div className="flex flex-wrap items-center justify-center gap-8">
+              {logos?.map((logo, i) => (
+                <div key={i} className="grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                  {logo.url
+                    ? <img src={logo.url} alt={logo.nombre} className="h-10 w-auto object-contain" />
+                    : <div className="h-10 px-5 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-semibold text-gray-400">{logo.nombre}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── TIMELINE ────────────────────────────────────────── */
+    Timeline: {
+      fields: {
+        titulo: { type: "text" },
+        items: {
+          type: "array",
+          arrayFields: { año: { type: "text" }, titulo: { type: "text" }, descripcion: { type: "textarea" } },
+          defaultItemProps: { año: "2020", titulo: "Fundación", descripcion: "Así comenzó todo." },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Nuestra historia",
+        items: [
+          { año: "2020", titulo: "Fundación", descripcion: "Empezamos con un sueño y mucha dedicación." },
+          { año: "2021", titulo: "Primer cliente", descripcion: "Cerramos nuestro primer contrato importante." },
+          { año: "2023", titulo: "Expansión", descripcion: "Abrimos nuevas oficinas y ampliamos el equipo." },
+          { año: "2025", titulo: "Hoy", descripcion: "Seguimos creciendo junto a nuestros clientes." },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-3xl mx-auto">
+            {titulo && <h2 className="text-3xl font-bold text-center mb-12">{titulo}</h2>}
+            <div className="relative">
+              <div className="absolute left-[calc(50%-1px)] top-0 bottom-0 w-px bg-gray-100 hidden md:block" />
+              <div className="space-y-10">
+                {items?.map((item, i) => (
+                  <div key={i} className={`relative flex flex-col md:flex-row items-start gap-6 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}>
+                    <div className={`flex-1 ${i % 2 === 0 ? "md:text-right" : "md:text-left"}`}>
+                      <span className="text-xs font-bold tracking-widest uppercase opacity-40">{item.año}</span>
+                      <h3 className="font-bold text-lg mt-1">{item.titulo}</h3>
+                      <p className="text-gray-500 text-sm leading-relaxed mt-1">{item.descripcion}</p>
+                    </div>
+                    <div className="hidden md:flex w-4 h-4 bg-gray-900 rounded-full shrink-0 mt-5 z-10 ring-4 ring-white" />
+                    <div className="flex-1 hidden md:block" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── CARTA PERFIL ────────────────────────────────────── */
+    CartaPerfil: {
+      fields: {
+        fotoUrl: { type: "text" }, nombre: { type: "text" }, rol: { type: "text" }, bio: { type: "textarea" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+        radio: { type: "select", options: roundOpts },
+        links: { type: "array", arrayFields: { label: { type: "text" }, url: { type: "text" } }, defaultItemProps: { label: "Web", url: "#" } },
+      },
+      defaultProps: {
+        fotoUrl: "", nombre: "Tu nombre", rol: "Propietario / Fundador",
+        bio: "Breve descripción o presentación personal.",
+        fondo: "bg-white", texto: "text-gray-900", padding: "md",
+        borde: "border border-gray-100", sombra: "shadow-sm", radio: "rounded-2xl",
+        links: [{ label: "Sitio web", url: "#" }],
+      },
+      render: ({ fotoUrl, nombre, rol, bio, fondo, texto, padding, borde, sombra, radio, links }) => (
+        <div className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} ${radio} flex items-center gap-5`}>
+          {fotoUrl
+            ? <img src={fotoUrl} alt={nombre} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
+            : <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center shrink-0"><UserRound className="w-8 h-8 text-gray-300" /></div>}
           <div className="flex-1">
-            <h3 className="text-lg font-semibold">{nombre}</h3>
-            <p className="text-gray-600">{rol}</p>
-            <p className="mt-2 text-gray-700">{bio}</p>
-            {!!links?.length && (
+            <p className="font-bold text-lg leading-tight">{nombre}</p>
+            <p className="text-sm opacity-50 mb-2">{rol}</p>
+            <p className="text-sm text-gray-500 leading-relaxed">{bio}</p>
+            {links?.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
-                {links.map((l,i)=>(
-                  <a key={i} href={l.url} className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200">
-                    <LinkIcon className="w-4 h-4" />{l.label}
+                {links.map((l, i) => (
+                  <a key={i} href={l.url} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium transition-colors">
+                    <LinkIcon className="w-3 h-3" />{l.label}
                   </a>
                 ))}
               </div>
             )}
           </div>
         </div>
-      )
+      ),
     },
-    /* Video */
-Video: {
-  fields: {
-    url: { type: "text" },
-    poster: { type: "text" },
-    caption: { type: "text" },
 
-    autoplay: { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
-    loop:     { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
-    controls: { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
-    muted:    { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
-
-    variante: { type: "select", options: [
-      { label: "Simple", value: "simple" },
-      { label: "Card", value: "card" },
-      { label: "Framed", value: "framed" },
-    ]},
-
-    ratio: { type: "select", options: [
-      { label: "16/9", value: "16/9" },
-      { label: "4/3",  value: "4/3"  },
-      { label: "1/1",  value: "1/1"  },
-      { label: "9/16", value: "9/16" },
-    ]},
-
-    fit: { type: "select", options: [
-      { label: "Cover",   value: "cover" },
-      { label: "Contain", value: "contain" },
-    ]},
-
-    radio:  { type: "select", options: [
-      { label: "sm", value: "sm" },
-      { label: "md", value: "md" },
-      { label: "lg", value: "lg" },
-      { label: "xl", value: "xl" },
-    ]},
-    borde:  { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
-    sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
-
-    alineacion: { type: "select", options: [
-      { label: "Izquierda", value: "start" },
-      { label: "Centro",    value: "center" },
-      { label: "Derecha",   value: "end" },
-    ]},
-
-    ancho: { type: "select", options: [
-      { label: "max-w-sm",  value: "max-w-sm"  },
-      { label: "max-w-md",  value: "max-w-md"  },
-      { label: "max-w-lg",  value: "max-w-lg"  },
-      { label: "max-w-2xl", value: "max-w-2xl" },
-      { label: "max-w-4xl", value: "max-w-4xl" },
-      { label: "Sin límite",value: "max-w-none"},
-    ]},
-
-    fondo:   { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
-    texto:   { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
-    padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
-  },
-
-  defaultProps: {
-    url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-    poster: "",
-    caption: "",
-
-    autoplay: "no",
-    loop: "no",
-    controls: "si",
-    muted: "no",
-
-    variante: "simple",
-    ratio: "16/9",
-    fit: "cover",
-
-    radio: "lg",
-    borde: "",
-    sombra: "shadow",
-
-    alineacion: "start",
-    ancho: "max-w-2xl",
-
-    fondo: "bg-white",
-    texto: "text-gray-900",
-    padding: "sm",
-  },
-
-  render: (p) => {
-    const r = p.radio === "sm" ? "rounded"
-      : p.radio === "md" ? "rounded-md"
-      : p.radio === "lg" ? "rounded-lg"
-      : "rounded-xl";
-
-    const align = p.alineacion === "center" ? "justify-center"
-      : p.alineacion === "end" ? "justify-end"
-      : "justify-start";
-
-    const aspectMap: Record<string, string> = {
-      "16/9": "16 / 9",
-      "4/3":  "4 / 3",
-      "1/1":  "1 / 1",
-      "9/16": "9 / 16",
-    };
-
-    const wrapper =
-      p.variante === "framed"
-        ? `${p.fondo} ${p.texto} ${pad(p.padding)} ${p.borde} ${p.sombra} ${p.ancho} w-full`
-        : p.variante === "card"
-        ? `${p.borde || "border border-gray-200"} ${p.sombra} bg-white ${p.ancho} w-full p-2`
-        : `${p.ancho} w-full`;
-
-    return (
-      <div className={`flex ${align}`}>
-        <figure className={wrapper}>
-          <div
-            className={`${r} overflow-hidden`}
-            style={{ width: "100%", aspectRatio: aspectMap[p.ratio] || "16 / 9" }}
-          >
-            <video
-              src={p.url}
-              poster={p.poster || undefined}
-              controls={p.controls === "si"}
-              autoPlay={p.autoplay === "si"}
-              muted={p.muted === "si"}
-              loop={p.loop === "si"}
-              style={{ width: "100%", height: "100%", objectFit: p.fit === "contain" ? "contain" : "cover" }}
-              className={`block ${r}`}
-            />
-          </div>
-          {p.caption ? <figcaption className="mt-2 text-sm text-gray-600">{p.caption}</figcaption> : null}
-        </figure>
-      </div>
-    );
-  },
-},
-    /* Espacio (separador transparente) */
-    Espacio: {
+    /* ── BOTÓN ───────────────────────────────────────────── */
+    Boton: {
       fields: {
-        ancho:{ type:"select", options:[
-          {label:"auto",value:"auto"},{label:"1/4",value:"1/4"},{label:"1/3",value:"1/3"},{label:"1/2",value:"1/2"},
-          {label:"2/3",value:"2/3"},{label:"3/4",value:"3/4"},{label:"full",value:"full"},
-        ]},
-        alto:{ type:"select", options:[{label:"0",value:"0"},{label:"2",value:"2"},{label:"4",value:"4"},{label:"6",value:"6"},{label:"8",value:"8"},{label:"12",value:"12"},{label:"16",value:"16"}] }
-      },
-      defaultProps: { ancho:"auto", alto:"4" },
-      render: ({ ancho, alto }) => {
-        const w = ancho==="auto"?"w-auto":ancho==="full"?"w-full":`w-${ancho.replace("/","/")}`;
-        const h = `h-${alto}`;
-        return <div className={`${w} ${h}`} />;
-      }
-    },
-    Carta: {
-      fields: {
-        titulo: { type: "text" },
-        descripcion: { type: "textarea" },
-        padding: { type: "number"},
-        variante: { type: "select", 
-        options: [
-          {label:"Normal",value:"border rounded-md"}, 
-          {label:"Destacado",value:"shadow-lg"}
-        ],
-      },
-        colorDeFondo: { type: "select", 
-        options: [
-          {label:"Inherente",value:"inherit"}, 
-          {label:"Rojo",value:"red-300"},
-          {label:"Amarillo",value:"yellow-100"},
-          {label:"Verde",value:"green-100"},
-        ],
-      },
+        label: { type: "text" }, url: { type: "text" },
+        alineacion: { type: "select", options: [{ label: "Izquierda", value: "left" }, { label: "Centro", value: "center" }, { label: "Derecha", value: "right" }] },
+        variante: { type: "select", options: [{ label: "Sólido", value: "solido" }, { label: "Outline", value: "outline" }, { label: "Ghost", value: "ghost" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        tam: { type: "select", options: [{ label: "Pequeño", value: "sm" }, { label: "Mediano", value: "md" }, { label: "Grande", value: "lg" }] },
+        radio: { type: "select", options: roundOpts },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
       },
       defaultProps: {
-        titulo: "titulo",
-        descripcion: "descripcion de la carta",
-        padding: 16,
-        variante: "border rounded-md",
-        colorDeFondo: "inherit",
-      }, 
-      render: ({ titulo, descripcion, padding, variante,colorDeFondo}) => {
-        //cuando hay muchas variantes de un elemento el classname se escribe de esta manera 
-        //clasname={`${variante}`}
-       return <div style={{ padding }} className={`${variante} bg-${colorDeFondo} `}>
-          <h2 className="text-4xl font-bold p-4">{titulo}</h2>
-          <p className="text-xl font-light p-4">{descripcion}</p>
+        label: "Llévame", url: "#", alineacion: "left",
+        variante: "solido", fondo: "bg-gray-900", texto: "text-white",
+        tam: "md", radio: "rounded-xl", sombra: "shadow",
+      },
+      render: ({ label, url, alineacion, variante, fondo, texto, tam, radio, sombra }) => {
+        const size = tam === "sm" ? "px-4 py-2 text-sm" : tam === "lg" ? "px-8 py-4 text-base" : "px-6 py-3 text-sm";
+        const alignMap: Record<string,string> = { left: "justify-start", center: "justify-center", right: "justify-end" };
+        const style = variante === "outline" ? `border-2 border-current bg-transparent ${texto}`
+          : variante === "ghost" ? `bg-transparent ${texto} hover:bg-black/5`
+          : `${fondo} ${texto}`;
+        return (
+          <div className={`flex ${alignMap[alineacion]}`}>
+            <a href={url} className={`inline-flex items-center font-semibold ${size} ${radio} ${sombra} ${style} hover:opacity-90 hover:-translate-y-0.5 transition-all`}>
+              {label}
+            </a>
+          </div>
+        );
+      },
+    },
+
+    /* ── IMAGEN ──────────────────────────────────────────── */
+    Imagen: {
+      fields: {
+        url: { type: "text" }, alt: { type: "text" },
+        aspecto: { type: "select", options: [{ label: "Auto", value: "auto" }, { label: "Cuadrado", value: "square" }, { label: "Video 16/9", value: "video" }, { label: "Retrato", value: "portrait" }] },
+        radio: { type: "select", options: roundOpts },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+      },
+      defaultProps: {
+        url: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80&auto=format&fit=crop",
+        alt: "Imagen", aspecto: "video", radio: "rounded-2xl", borde: "", sombra: "shadow-md",
+      },
+      render: ({ url, alt, aspecto, radio, borde, sombra }) => {
+        const aspectMap: Record<string,string> = { auto: "", square: "aspect-square", video: "aspect-video", portrait: "aspect-[3/4]" };
+        return url
+          ? <img src={url} alt={alt} className={`w-full object-cover ${aspectMap[aspecto]} ${radio} ${borde} ${sombra}`} />
+          : <div className={`w-full bg-gray-100 ${aspectMap[aspecto] || "h-48"} ${radio} ${borde} ${sombra}`} />;
+      },
+    },
+
+    /* ── GALERÍA ─────────────────────────────────────────── */
+    Galeria: {
+      fields: {
+        contenido: { type: "slot", allow: ["Imagen"] },
+        columnasDesktop: { type: "number" },
+        gap: { type: "select", options: ["0","2","4","6","8"].map(v => ({ label: v, value: v })) },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: { contenido: [], columnasDesktop: 3, gap: "4", fondo: "bg-white", padding: "sm" },
+      render: ({ contenido: Content, columnasDesktop, gap, fondo, padding }) => {
+        const cols = columnasDesktop >= 5 ? "md:columns-3 lg:columns-5"
+          : columnasDesktop === 4 ? "md:columns-2 lg:columns-4"
+          : columnasDesktop === 3 ? "md:columns-2 lg:columns-3"
+          : "md:columns-2 lg:columns-2";
+        return (
+          <section className={`${fondo} ${pad(padding)}`}>
+            <Content className={`columns-1 ${cols} ${gaps[gap] || gaps["4"]} [&>*]:mb-4 [&>*]:break-inside-avoid`} />
+          </section>
+        );
+      },
+    },
+
+    /* ── CARRUSEL ────────────────────────────────────────── */
+    Carrusel: {
+      fields: {
+        slides: {
+          type: "array",
+          arrayFields: {
+            tipo: { type: "radio", options: [{ label: "Imagen", value: "image" }, { label: "Video", value: "video" }] },
+            url: { type: "text" }, caption: { type: "text" },
+          },
+          defaultItemProps: { tipo: "image", url: "", caption: "" },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+      },
+      defaultProps: {
+        slides: [
+          { tipo: "image", url: "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?w=1600&q=80", caption: "Primera imagen" },
+          { tipo: "image", url: "https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?w=1600&q=80", caption: "Segunda imagen" },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "sm", borde: "", sombra: "",
+      },
+      render: (props) => <CarruselRender {...props} />,
+    },
+
+    /* ── VIDEO ───────────────────────────────────────────── */
+    Video: {
+      fields: {
+        url: { type: "text" }, poster: { type: "text" }, caption: { type: "text" },
+        autoplay: { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
+        loop: { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
+        controls: { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
+        muted: { type: "radio", options: [{ label: "Sí", value: "si" }, { label: "No", value: "no" }] },
+        variante: { type: "select", options: [{ label: "Simple", value: "simple" }, { label: "Card", value: "card" }, { label: "Framed", value: "framed" }] },
+        ratio: { type: "select", options: [{ label: "16/9", value: "16/9" }, { label: "4/3", value: "4/3" }, { label: "1/1", value: "1/1" }] },
+        radio: { type: "select", options: roundOpts },
+        borde: { type: "select", options: borderOpts.map(v => ({ label: v || "Sin borde", value: v })) },
+        sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+        alineacion: { type: "select", options: [{ label: "Izquierda", value: "start" }, { label: "Centro", value: "center" }, { label: "Derecha", value: "end" }] },
+        ancho: { type: "select", options: [{ label: "max-w-sm", value: "max-w-sm" }, { label: "max-w-lg", value: "max-w-lg" }, { label: "max-w-2xl", value: "max-w-2xl" }, { label: "max-w-4xl", value: "max-w-4xl" }, { label: "Sin límite", value: "max-w-none" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+        poster: "", caption: "", autoplay: "no", loop: "no", controls: "si", muted: "no",
+        variante: "simple", ratio: "16/9", radio: "rounded-2xl", borde: "", sombra: "shadow-md",
+        alineacion: "center", ancho: "max-w-2xl", fondo: "bg-white", texto: "text-gray-900", padding: "sm",
+      },
+      render: (p) => {
+        const aspectMap: Record<string,string> = { "16/9": "16 / 9", "4/3": "4 / 3", "1/1": "1 / 1" };
+        const alignMap: Record<string,string> = { start: "justify-start", center: "justify-center", end: "justify-end" };
+        const wrapper = p.variante === "framed"
+          ? `${p.fondo} ${p.texto} ${pad(p.padding)} ${p.borde} ${p.sombra} ${p.ancho} w-full ${p.radio}`
+          : p.variante === "card"
+          ? `${p.borde || "border border-gray-100"} ${p.sombra} bg-white ${p.ancho} w-full p-3 ${p.radio}`
+          : `${p.ancho} w-full`;
+        return (
+          <div className={`flex ${alignMap[p.alineacion]}`}>
+            <figure className={wrapper}>
+              <div className={`${p.radio} overflow-hidden`} style={{ aspectRatio: aspectMap[p.ratio] || "16 / 9" }}>
+                <video src={p.url} poster={p.poster || undefined}
+                  controls={p.controls === "si"} autoPlay={p.autoplay === "si"}
+                  muted={p.muted === "si"} loop={p.loop === "si"}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </div>
+              {p.caption && <figcaption className="mt-2 text-sm text-center opacity-50">{p.caption}</figcaption>}
+            </figure>
+          </div>
+        );
+      },
+    },
+
+    /* ── GRID ────────────────────────────────────────────── */
+    Grid: {
+      fields: {
+        items: { type: "slot" },
+        columnas: { type: "number" },
+        gap: { type: "select", options: Object.keys(gaps).map(v => ({ label: v, value: v })) },
+        colorFondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: { items: [], columnas: 3, gap: "6", colorFondo: "bg-white", padding: "0" },
+      render: ({ items: Items, columnas, gap, colorFondo, padding }) => (
+        <div className={`${colorFondo} ${pad(padding)}`}>
+          <Items className={`grid ${gridCols(columnas)} ${gaps[gap] || gaps["6"]}`} />
         </div>
+      ),
+    },
+
+    /* ── FLEXBOX ─────────────────────────────────────────── */
+    FlexBox: {
+      fields: {
+        contenido: { type: "slot" },
+        direccion: { type: "select", options: [{ label: "Fila", value: "row" }, { label: "Columna", value: "column" }] },
+        alineacion: { type: "select", options: [{ label: "Inicio", value: "start" }, { label: "Centro", value: "center" }, { label: "Final", value: "end" }, { label: "Espaciado", value: "between" }] },
+        gap: { type: "select", options: Object.keys(gaps).map(v => ({ label: v, value: v })) },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
       },
+      defaultProps: { contenido: [], direccion: "row", alineacion: "start", gap: "4", fondo: "bg-white", padding: "0" },
+      render: ({ contenido: Content, direccion, alineacion, gap, fondo, padding }) => {
+        const dir = direccion === "column" ? "flex-col" : "flex-row flex-wrap";
+        const just = alineacion === "center" ? "justify-center" : alineacion === "end" ? "justify-end" : alineacion === "between" ? "justify-between" : "justify-start";
+        return (
+          <div className={`${fondo} ${pad(padding)} flex ${dir} ${just} ${gaps[gap] || gaps["4"]}`}>
+            <Content />
+          </div>
+        );
       },
-    }
-  };
+    },
+
+    /* ── DIVISOR ─────────────────────────────────────────── */
+    Divisor: {
+      fields: {
+        estilo: { type: "select", options: [{ label: "Línea", value: "linea" }, { label: "Puntos", value: "puntos" }, { label: "Ondas", value: "ondas" }] },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: { estilo: "linea", fondo: "bg-white", padding: "sm" },
+      render: ({ estilo, fondo, padding }) => (
+        <div className={`${fondo} ${pad(padding)}`}>
+          {estilo === "linea" && <hr className="border-t border-gray-100" />}
+          {estilo === "puntos" && (
+            <div className="flex justify-center gap-2">
+              {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 rounded-full bg-gray-300" />)}
+            </div>
+          )}
+          {estilo === "ondas" && (
+            <svg viewBox="0 0 1200 40" className="w-full h-8 opacity-20" preserveAspectRatio="none">
+              <path d="M0,20 C300,40 900,0 1200,20" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+          )}
+        </div>
+      ),
+    },
+
+    /* ── ESPACIO ─────────────────────────────────────────── */
+    Espacio: {
+      fields: {
+        alto: { type: "select", options: ["2","4","6","8","12","16","24","32"].map(v => ({ label: `${v} (${parseInt(v) * 4}px)`, value: v })) },
+      },
+      defaultProps: { alto: "8" },
+      render: ({ alto }) => <div className={`h-${alto} w-full`} />,
+    },
+
+  },
+};
+
 export default config;

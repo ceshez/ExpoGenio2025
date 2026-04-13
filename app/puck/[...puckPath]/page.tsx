@@ -49,7 +49,7 @@ export const dynamic = "force-dynamic";
 
 //este codigo servira para despues cuando las rutas esten autenticadas
 // app/puck/[...puckPath]/page.tsx
-import "@measured/puck/puck.css";
+import "@puckeditor/core/puck.css";
 import { Client } from "./client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";

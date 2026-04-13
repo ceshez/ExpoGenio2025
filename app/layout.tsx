@@ -18,8 +18,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Script que aplica el modo oscuro antes de que React monte */}
-        <script dangerouslySetInnerHTML={{ __html: setInitialTheme }} />
       </head>
       <body>
         <ThemeProvider>

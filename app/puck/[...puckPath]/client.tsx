@@ -1,13 +1,13 @@
 "use client";
 
-import type { Data } from "@measured/puck";
-import { Puck } from "@measured/puck";
+import type { Data } from "@puckeditor/core";
+import { Puck} from "@puckeditor/core";
 import { createAiPlugin } from "@puckeditor/plugin-ai";
 import "@puckeditor/plugin-ai/styles.css";
 import config from "../../../puck.config";
 import Sidebar from "../../components/Layout/Sidebar";
 import { useState } from "react";
-import  Link from "next/link";
+import Link from "next/link";
 export const runtime = "nodejs";
 
 type RecentItem = {
