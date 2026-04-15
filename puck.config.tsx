@@ -82,9 +82,113 @@ const ICONS: Record<string, React.ReactElement> = {
   check: <CheckCircle2 className="w-5 h-5" />,
 };
 
+const buttonTransitions: Record<string, string> = {
+  "scale": "hover:scale-105 hover:shadow-xl transition-all duration-300 active:scale-95",
+  "lift": "hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 active:translate-y-0",
+  "glow": "hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 active:shadow-none",
+  "slide": "hover:translate-x-1 transition-all duration-300 active:-translate-x-0.5",
+  "pulse": "hover:animate-pulse transition-all duration-300",
+  "gradient": "hover:bg-gradient-to-r transition-all duration-300 active:opacity-80",
+  "smooth": "hover:opacity-90 transition-opacity duration-500 active:opacity-75",
+};
+
 /* ============================================================
    COMPONENTES REACT SEPARADOS (para los que usan hooks)
    ============================================================ */
+
+/* --- Header con Hamburguesa --- */
+const HeaderRender = ({ titulo, logoUrl, nav, estilo, fondo, texto, padding, borde, sombra }: any) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <header className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} sticky top-0 z-50`}>
+      <div className="max-w-6xl mx-auto">
+        <div className={`flex items-center ${estilo === "centrado" ? "flex-col" : "justify-between"}`}>
+          {/* Logo/Título */}
+          <div className="flex items-center gap-3">
+            {logoUrl
+              ? <img src={logoUrl} alt={titulo} className="h-8 sm:h-9 w-auto" />
+              : <span className="text-base sm:text-lg font-black tracking-tight">{titulo}</span>}
+          </div>
+
+          {/* Nav Desktop */}
+          {nav?.length > 0 && (
+            <nav className="hidden lg:block">
+              <ul className={`flex items-center gap-6 ${estilo === "centrado" ? "justify-center" : ""}`}>
+                {nav.map((n: any, i: number) => (
+                  <li key={i}>
+                    <a href={n.url} className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">{n.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+
+          {/* Hamburger Button - Mobile & Tablet */}
+          {nav?.length > 0 && (
+            <motion.button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 flex flex-col gap-1.5"
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.span
+                animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+                className="w-6 h-0.5 bg-current block transition-all"
+              />
+              <motion.span
+                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+                className="w-6 h-0.5 bg-current block transition-all"
+              />
+              <motion.span
+                animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+                className="w-6 h-0.5 bg-current block transition-all"
+              />
+            </motion.button>
+          )}
+        </div>
+
+        {/* Mobile Drawer */}
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              {/* Overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsOpen(false)}
+                className="fixed inset-0 bg-black/20 lg:hidden"
+              />
+
+              {/* Drawer Nav */}
+              <motion.nav
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+                className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg"
+              >
+                <ul className="flex flex-col">
+                  {nav.map((n: any, i: number) => (
+                    <li key={i} className="border-b border-gray-100 last:border-0">
+                      <a
+                        href={n.url}
+                        onClick={() => setIsOpen(false)}
+                        className="block px-4 sm:px-6 py-3 text-sm font-medium opacity-70 hover:opacity-100 hover:bg-gray-50 transition-colors"
+                      >
+                        {n.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </motion.nav>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+    </header>
+  );
+};
 
 /* --- Hero con palabras rotativas --- */
 const HeroAnimadoRender = ({
@@ -106,17 +210,17 @@ const HeroAnimadoRender = ({
 
   return (
     <section className={`${fondo} ${texto} ${pad(padding)} overflow-hidden`}>
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center px-4 sm:px-6 md:px-0">
         <div>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-sm font-semibold tracking-widest uppercase opacity-50 mb-4"
+            className="text-xs sm:text-sm font-semibold tracking-widest uppercase opacity-50 mb-3 sm:mb-4"
           >
             Bienvenido
           </motion.p>
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight mb-3 sm:mb-4">
             {titulo}{" "}
             <span className="inline-block relative">
               <AnimatePresence mode="wait">
@@ -133,15 +237,15 @@ const HeroAnimadoRender = ({
               </AnimatePresence>
             </span>
           </h1>
-          <p className="text-lg opacity-70 mb-8 max-w-md leading-relaxed">{descripcion}</p>
-          <div className="flex flex-wrap gap-3">
+          <p className="text-sm sm:text-base opacity-70 mb-6 sm:mb-8 max-w-md leading-relaxed">{descripcion}</p>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
             {ctaLabel && (
-              <a href={ctaUrl} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+              <a href={ctaUrl} className="inline-flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0">
                 {ctaLabel}
               </a>
             )}
             {ctaSecLabel && (
-              <a href={ctaSecUrl} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-current font-semibold opacity-70 hover:opacity-100 transition-all">
+              <a href={ctaSecUrl} className="inline-flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border border-current font-semibold opacity-70 hover:opacity-100 transition-all">
                 {ctaSecLabel}
               </a>
             )}
@@ -152,7 +256,7 @@ const HeroAnimadoRender = ({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
+            className="relative hidden md:block"
           >
             <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 to-emerald-500/20 rounded-3xl blur-2xl" />
             <img src={imagenUrl} alt={titulo} className="relative rounded-2xl w-full object-cover shadow-2xl aspect-[4/3]" />
@@ -163,36 +267,133 @@ const HeroAnimadoRender = ({
   );
 };
 
-/* --- Carrusel --- */
+/* --- Carrusel Tradicional con Auto-play --- */
 const CarruselRender = ({
   slides, fondo, texto, padding, borde, sombra,
 }: {
   slides: { tipo: "image" | "video"; url: string; caption?: string }[];
   fondo: string; texto: string; padding: string; borde: string; sombra: string;
 }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const scroll = (d: number) =>
-    ref.current?.scrollBy({ left: d * (ref.current.clientWidth * 0.85), behavior: "smooth" });
+  const [current, setCurrent] = React.useState(0);
+  const [touchStart, setTouchStart] = React.useState(0);
+  const [touchEnd, setTouchEnd] = React.useState(0);
+
+  // Auto-play cada 5 segundos
+  React.useEffect(() => {
+    if (!slides?.length) return;
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides?.length]);
+
+  const goToSlide = (index: number) => {
+    setCurrent((index + slides.length) % slides.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+
+    if (touchStart - touchEnd > 50) {
+      goToSlide(current + 1);
+    }
+    if (touchEnd - touchStart > 50) {
+      goToSlide(current - 1);
+    }
+  };
+
+  if (!slides?.length) return null;
+
+  const slide = slides[current];
 
   return (
-    <section className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} overflow-hidden`}>
-      <div className="relative">
-        <div ref={ref} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2">
-          {slides?.map((s, i) => (
-            <div key={i} className="snap-center shrink-0 basis-full md:basis-[75%]">
-              {s.tipo === "image"
-                ? (s.url
-                  ? <img className="w-full h-[400px] object-cover rounded-2xl" src={s.url} alt={s.caption || ""} />
-                  : <div className="w-full h-[400px] bg-gray-100 rounded-2xl" />)
-                : (s.url
-                  ? <video className="w-full h-[400px] object-cover rounded-2xl" src={s.url} controls />
-                  : <div className="w-full h-[400px] bg-gray-100 rounded-2xl" />)}
-              {s.caption && <p className="mt-3 text-center text-sm opacity-60">{s.caption}</p>}
+    <section className={`${fondo} ${texto} ${pad(padding)}`}>
+      <div className="max-w-5xl mx-auto">
+        {/* Carousel Container */}
+        <div
+          className="relative rounded-2xl overflow-hidden shadow-xl"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Slide */}
+          <motion.div
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {slide.tipo === "image" ? (
+              slide.url ? (
+                <img
+                  src={slide.url}
+                  alt={slide.caption || "Slide"}
+                  className="w-full h-60 sm:h-80 lg:h-[400px] object-cover"
+                />
+              ) : (
+                <div className="w-full h-60 sm:h-80 lg:h-[400px] bg-gradient-to-br from-gray-300 to-gray-100 flex items-center justify-center">
+                  <div className="text-center opacity-50">
+                    <p className="text-sm font-medium">Imagen no disponible</p>
+                  </div>
+                </div>
+              )
+            ) : (
+              <video
+                src={slide.url}
+                controls
+                className="w-full h-60 sm:h-80 lg:h-[400px] object-cover bg-black"
+              />
+            )}
+          </motion.div>
+
+          {/* Caption */}
+          {slide.caption && (
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 text-white">
+              <p className="text-sm md:text-base font-medium">{slide.caption}</p>
             </div>
-          ))}
+          )}
+
+          {/* Navigation Buttons */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => goToSlide(current - 1)}
+            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 rounded-full p-2 sm:p-3 transition-all shadow-lg z-10"
+          >
+            <span className="text-lg sm:text-xl font-bold">‹</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => goToSlide(current + 1)}
+            className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-900 rounded-full p-2 sm:p-3 transition-all shadow-lg z-10"
+          >
+            <span className="text-lg sm:text-xl font-bold">›</span>
+          </motion.button>
         </div>
-        <button onClick={() => scroll(-1)} className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 rounded-full bg-white shadow-lg p-2.5 hover:scale-110 transition-transform z-10">‹</button>
-        <button onClick={() => scroll(1)} className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 rounded-full bg-white shadow-lg p-2.5 hover:scale-110 transition-transform z-10">›</button>
+
+        {/* Dot Indicators */}
+        {slides.length > 1 && (
+          <div className="flex justify-center gap-2 mt-6">
+            {slides.map((_, i) => (
+              <motion.button
+                key={i}
+                onClick={() => goToSlide(i)}
+                whileHover={{ scale: 1.2 }}
+                className={`rounded-full transition-all ${
+                  i === current
+                    ? "bg-gray-900 w-3 h-3"
+                    : "bg-gray-300 w-2.5 h-2.5 hover:bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -252,7 +453,14 @@ type Props = {
   Header: { titulo: string; logoUrl: string; nav: { label: string; url: string }[]; fondo: string; texto: string; padding: string; borde: string; sombra: string; estilo: "simple"|"centrado"; };
   Hero: { titulo: string; descripcion: string; ctaLabel: string; ctaUrl: string; ctaSecLabel: string; ctaSecUrl: string; imagenUrl: string; fondo: string; texto: string; padding: string; };
   HeroAnimado: { titulo: string; palabras: { texto: string }[]; descripcion: string; ctaLabel: string; ctaUrl: string; ctaSecLabel: string; ctaSecUrl: string; imagenUrl: string; fondo: string; texto: string; padding: string; };
-  Boton: { label: string; url: string; alineacion: "left"|"center"|"right"; variante: "solido"|"outline"|"ghost"; fondo: string; texto: string; tam: "sm"|"md"|"lg"; radio: string; sombra: string; };
+  Boton: { label: string; url: string; alineacion: "left"|"center"|"right"; variante: "solido"|"outline"|"ghost"; fondo: string; texto: string; tam: "sm"|"md"|"lg"; radio: string; sombra: string; transicion: "scale"|"lift"|"glow"|"slide"|"pulse"|"smooth"; };
+  Equipo: { titulo: string; subtitulo: string; miembros: { foto: string; nombre: string; role: string; bio: string; redes: { tipo: "instagram"|"twitter"|"linkedin"; url: string }[] }[]; fondo: string; texto: string; padding: string; };
+  Servicios: { titulo: string; subtitulo: string; items: { icono: string; titulo: string; descripcion: string; enlace: string }[]; variante: "grid"|"columnas"; fondo: string; texto: string; padding: string; };
+  Newsletter: { titulo: string; descripcion: string; placeholder: string; botonLabel: string; botonUrl: string; fondo: string; texto: string; padding: string; };
+  Pasos: { titulo: string; items: { numero: string; titulo: string; descripcion: string }[]; fondo: string; texto: string; padding: string; };
+  Comparativa: { titulo: string; descripcion: string; imagen1Url: string; imagen2Url: string; label1: string; label2: string; fondo: string; texto: string; padding: string; };
+  PortfolioGrid: { titulo: string; items: { imagen: string; titulo: string; categoria: string; enlace: string }[]; columnas: number; fondo: string; texto: string; padding: string; };
+  EquipoCompacto: { titulo: string; miembros: { nombre: string; rol: string; foto: string }[]; fondo: string; texto: string; padding: string; };
   SeccionTexto: { titulo: string; subtitulo: string; contenido: string; nivel: "h1"|"h2"|"h3"; alineacion: "left"|"center"|"right"; fondo: string; texto: string; padding: string; };
   Imagen: { url: string; alt: string; radio: string; borde: string; sombra: string; aspecto: "auto"|"square"|"video"|"portrait"; };
   Espacio: { alto: "2"|"4"|"6"|"8"|"12"|"16"|"24"|"32"; };
@@ -284,19 +492,23 @@ type Props = {
    ============================================================ */
 export const config: Config<Props> = {
   categories: {
-    Estructura: { title: "Estructura", components: ["Header","Footer","Espacio","Divisor","Grid","FlexBox"] },
+    Estructura: { title: "Estructura", components: ["Header","Footer","Divisor","Espacio","Grid","FlexBox"] },
     Heroes: { title: "Heroes", components: ["Hero","HeroAnimado","BannerCTA"] },
-    Contenido: { title: "Contenido", components: ["Texto","Parrafo","SeccionTexto","Caracteristicas","Estadisticas","Timeline"] },
-    Multimedia: { title: "Multimedia", components: ["Imagen","Galeria","Carrusel","Video"] },
-    Negocios: { title: "Negocios", components: ["CartaProducto","PrecioCard","LogoGrid"] },
-    Social: { title: "Social", components: ["TestimonioCard","TestimoniosGrid","CartaPerfil","FAQAccordion","ContactoInfo"] },
-    Acciones: { title: "Acciones", components: ["Boton"] },
+    Contenido: { title: "Contenido", components: ["Texto","Parrafo","SeccionTexto"] },
+    Características: { title: "Características", components: ["Caracteristicas","Estadisticas","MisionVision","MisionVisionValores"] },
+    Equipo: { title: "Equipo", components: ["Equipo","EquipoCompacto","CartaPerfil"] },
+    Servicios: { title: "Servicios & Productos", components: ["Servicios","CartaProducto","PrecioCard"] },
+    Multimedia: { title: "Multimedia", components: ["Imagen","Galeria","Carrusel","Video","Comparativa"] },
+    Social: { title: "Prueba Social", components: ["TestimonioCard","TestimoniosGrid","FAQAccordion"] },
+    Portafolio: { title: "Portafolio", components: ["PortfolioGrid"] },
+    Conversión: { title: "Conversión", components: ["Newsletter","ContactoInfo","LogoGrid","Pasos"] },
+    Utilidades: { title: "Utilidades", components: ["Boton","Timeline"] },
     others: { title: "Otros" },
   },
 
   components: {
 
-    /* ── HEADER ──────────────────────────────────────────── */
+    /* ── HEADER ─────────────────────────────────────────────── */
     Header: {
       fields: {
         titulo: { type: "text" },
@@ -315,28 +527,7 @@ export const config: Config<Props> = {
         estilo: "simple", fondo: "bg-white", texto: "text-gray-900", padding: "sm",
         borde: "border-b border-gray-100", sombra: "",
       },
-      render: ({ titulo, logoUrl, nav, estilo, fondo, texto, padding, borde, sombra }) => (
-        <header className={`${fondo} ${texto} ${pad(padding)} ${borde} ${sombra} sticky top-0 z-50`}>
-          <div className={`max-w-6xl mx-auto flex items-center gap-6 ${estilo === "centrado" ? "flex-col" : "justify-between"}`}>
-            <div className="flex items-center gap-3">
-              {logoUrl
-                ? <img src={logoUrl} alt={titulo} className="h-9 w-auto" />
-                : <span className="text-lg font-black tracking-tight">{titulo}</span>}
-            </div>
-            {nav?.length > 0 && (
-              <nav>
-                <ul className={`flex items-center gap-6 ${estilo === "centrado" ? "justify-center" : ""}`}>
-                  {nav.map((n, i) => (
-                    <li key={i}>
-                      <a href={n.url} className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">{n.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            )}
-          </div>
-        </header>
-      ),
+      render: (props) => <HeaderRender {...props} />,
     },
 
     /* ── FOOTER ──────────────────────────────────────────── */
@@ -441,28 +632,33 @@ export const config: Config<Props> = {
       },
       render: ({ titulo, descripcion, ctaLabel, ctaUrl, ctaSecLabel, ctaSecUrl, imagenUrl, fondo, texto, padding }) => (
         <section className={`${fondo} ${texto} ${pad(padding)}`}>
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center px-4 sm:px-6 md:px-0">
             <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-5">{titulo}</h1>
-              <p className="text-lg opacity-60 mb-8 leading-relaxed max-w-md">{descripcion}</p>
-              <div className="flex flex-wrap gap-3">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 sm:mb-5">{titulo}</h1>
+              <p className="text-base sm:text-lg opacity-60 mb-6 sm:mb-8 leading-relaxed max-w-md">{descripcion}</p>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 {ctaLabel && (
-                  <a href={ctaUrl} className="inline-flex px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-all shadow-lg hover:-translate-y-0.5">
+                  <a href={ctaUrl} className="inline-flex items-center justify-center sm:justify-start px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gray-900 text-white font-semibold hover:bg-gray-700 transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0">
                     {ctaLabel}
                   </a>
                 )}
                 {ctaSecLabel && (
-                  <a href={ctaSecUrl} className="inline-flex px-6 py-3 rounded-xl border border-current font-semibold opacity-60 hover:opacity-100 transition-all">
+                  <a href={ctaSecUrl} className="inline-flex items-center justify-center sm:justify-start px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border border-current font-semibold opacity-60 hover:opacity-100 transition-all">
                     {ctaSecLabel}
                   </a>
                 )}
               </div>
             </div>
             {imagenUrl && (
-              <div className="relative">
-                <div className="absolute -inset-3 bg-gradient-to-br from-gray-200 to-gray-100 rounded-3xl" />
-                <img src={imagenUrl} alt={titulo} className="relative rounded-2xl w-full object-cover shadow-xl aspect-[4/3]" />
-              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="relative hidden md:block"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-br from-gray-200 to-gray-100 rounded-3xl blur-2xl" />
+                <img src={imagenUrl} alt={titulo} className="relative rounded-2xl w-full object-cover shadow-2xl aspect-[4/3]" />
+              </motion.div>
             )}
           </div>
         </section>
@@ -1005,7 +1201,7 @@ export const config: Config<Props> = {
         titulo: "Producto destacado",
         descripcion: "Descripción corta del producto con sus beneficios principales.",
         precio: "19,900", moneda: "CRC", badge: "Nuevo",
-        botonLabel: "Agregar al carrito", botonUrl: "#", layout: "vertical",
+        botonLabel: "Agregar al carrito", botonUrl: "#", layout: "horizontal",
         fondo: "bg-white", texto: "text-gray-900", padding: "0",
         borde: "border border-gray-100", sombra: "shadow-sm", radio: "rounded-2xl",
       },
@@ -1270,21 +1466,26 @@ export const config: Config<Props> = {
         tam: { type: "select", options: [{ label: "Pequeño", value: "sm" }, { label: "Mediano", value: "md" }, { label: "Grande", value: "lg" }] },
         radio: { type: "select", options: roundOpts },
         sombra: { type: "select", options: shadowOpts.map(v => ({ label: v || "Sin sombra", value: v })) },
+        transicion: { type: "select", options: [
+          { label: "Escala", value: "scale" }, { label: "Levantamiento", value: "lift" }, { label: "Resplandor", value: "glow" },
+          { label: "Deslizamiento", value: "slide" }, { label: "Pulso", value: "pulse" }, { label: "Suave", value: "smooth" }
+        ] },
       },
       defaultProps: {
         label: "Llévame", url: "#", alineacion: "left",
         variante: "solido", fondo: "bg-gray-900", texto: "text-white",
-        tam: "md", radio: "rounded-xl", sombra: "shadow",
+        tam: "md", radio: "rounded-xl", sombra: "shadow", transicion: "lift",
       },
-      render: ({ label, url, alineacion, variante, fondo, texto, tam, radio, sombra }) => {
+      render: ({ label, url, alineacion, variante, fondo, texto, tam, radio, sombra, transicion }) => {
         const size = tam === "sm" ? "px-4 py-2 text-sm" : tam === "lg" ? "px-8 py-4 text-base" : "px-6 py-3 text-sm";
         const alignMap: Record<string,string> = { left: "justify-start", center: "justify-center", right: "justify-end" };
         const style = variante === "outline" ? `border-2 border-current bg-transparent ${texto}`
           : variante === "ghost" ? `bg-transparent ${texto} hover:bg-black/5`
           : `${fondo} ${texto}`;
+        const transition = buttonTransitions[transicion] || buttonTransitions["lift"];
         return (
           <div className={`flex ${alignMap[alineacion]}`}>
-            <a href={url} className={`inline-flex items-center font-semibold ${size} ${radio} ${sombra} ${style} hover:opacity-90 hover:-translate-y-0.5 transition-all`}>
+            <a href={url} className={`inline-flex items-center font-semibold ${size} ${radio} ${sombra} ${style} ${transition}`}>
               {label}
             </a>
           </div>
@@ -1484,6 +1685,516 @@ export const config: Config<Props> = {
       },
       defaultProps: { alto: "8" },
       render: ({ alto }) => <div className={`h-${alto} w-full`} />,
+    },
+
+    /* ── EQUIPO ──────────────────────────────────────────── */
+    Equipo: {
+      fields: {
+        titulo: { type: "text" },
+        subtitulo: { type: "text" },
+        miembros: {
+          type: "array",
+          arrayFields: {
+            foto: { type: "text" },
+            nombre: { type: "text" },
+            role: { type: "text" },
+            bio: { type: "textarea" },
+            redes: {
+              type: "array",
+              arrayFields: {
+                tipo: { type: "select", options: ["instagram","twitter","linkedin"].map(v => ({ label: v, value: v })) },
+                url: { type: "text" },
+              },
+              defaultItemProps: { tipo: "linkedin", url: "#" },
+            },
+          },
+          defaultItemProps: { foto: "", nombre: "Nombre", role: "Cargo", bio: "Bio corta", redes: [] },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Nuestro equipo", subtitulo: "Las personas detrás",
+        miembros: [
+          { foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop", nombre: "Juan Pérez", role: "CEO & Fundador", bio: "Con 10 años de experiencia en tecnología.", redes: [] },
+          { foto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop", nombre: "María García", role: "Directora Creativa", bio: "Experta en diseño y UX.", redes: [] },
+          { foto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop", nombre: "Carlos López", role: "Desarrollador Lead", bio: "Especialista en arquitectura web.", redes: [] },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, subtitulo, miembros, fondo, texto, padding }) => {
+        const REDES_ICONS: Record<string, React.ReactElement> = {
+          instagram: <Instagram className="w-3.5 h-3.5" />,
+          twitter: <Twitter className="w-3.5 h-3.5" />,
+          linkedin: <Linkedin className="w-3.5 h-3.5" />,
+        };
+        return (
+          <section className={`${fondo} ${texto} ${pad(padding)}`}>
+            <div className="max-w-6xl mx-auto">
+              {(titulo || subtitulo) && (
+                <div className="text-center mb-12">
+                  {subtitulo && <p className="text-sm font-semibold tracking-widest uppercase opacity-40 mb-2">{subtitulo}</p>}
+                  {titulo && <h2 className="text-3xl md:text-4xl font-bold">{titulo}</h2>}
+                </div>
+              )}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {miembros?.map((m, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className="group bg-white/50 rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <div className="relative mb-5 overflow-hidden rounded-xl">
+                      {m.foto
+                        ? <img src={m.foto} alt={m.nombre} className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500" />
+                        : <div className="w-full h-56 bg-gradient-to-br from-gray-200 to-gray-100 flex items-center justify-center"><UserRound className="w-12 h-12 text-gray-400" /></div>}
+                    </div>
+                    <h3 className="text-lg font-bold mb-1">{m.nombre}</h3>
+                    <p className="text-sm text-blue-600 font-medium mb-2">{m.role}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{m.bio}</p>
+                    {m.redes?.length > 0 && (
+                      <div className="flex gap-2 mt-4">
+                        {m.redes.map((r, j) => (
+                          <a key={j} href={r.url} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700">
+                            {REDES_ICONS[r.tipo]}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      },
+    },
+
+    /* ── SERVICIOS ───────────────────────────────────────── */
+    Servicios: {
+      fields: {
+        titulo: { type: "text" },
+        subtitulo: { type: "text" },
+        variante: { type: "select", options: [{ label: "Grid", value: "grid" }, { label: "Columnas", value: "columnas" }] },
+        items: {
+          type: "array",
+          arrayFields: {
+            icono: { type: "select", options: Object.keys(ICONS).map(v => ({ label: v, value: v })) },
+            titulo: { type: "text" },
+            descripcion: { type: "textarea" },
+            enlace: { type: "text" },
+          },
+          defaultItemProps: { icono: "rocket", titulo: "Servicio", descripcion: "Descripción del servicio.", enlace: "#" },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Nuestros servicios", subtitulo: "Lo que ofrecemos",
+        variante: "grid",
+        items: [
+          { icono: "rocket", titulo: "Desarrollo web", descripcion: "Sitios rápidos y modernos", enlace: "#" },
+          { icono: "shield", titulo: "Seguridad", descripcion: "Protección de datos garantizada", enlace: "#" },
+          { icono: "star", titulo: "Diseño premium", descripcion: "Interfaces hermosas y funcionales", enlace: "#" },
+        ],
+        fondo: "bg-gray-50", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, subtitulo, variante, items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-6xl mx-auto">
+            {(titulo || subtitulo) && (
+              <div className="text-center mb-12">
+                {subtitulo && <p className="text-sm font-semibold tracking-widest uppercase opacity-40 mb-2">{subtitulo}</p>}
+                {titulo && <h2 className="text-3xl md:text-4xl font-bold">{titulo}</h2>}
+              </div>
+            )}
+            {variante === "grid" && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {items?.map((item, i) => (
+                  <motion.a
+                    key={i}
+                    href={item.enlace}
+                    whileHover={{ y: -8 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all group"
+                  >
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                      {ICONS[item.icono] || ICONS["star"]}
+                    </div>
+                    <h3 className="text-lg font-bold mb-2">{item.titulo}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{item.descripcion}</p>
+                  </motion.a>
+                ))}
+              </div>
+            )}
+            {variante === "columnas" && (
+              <div className="space-y-6 max-w-3xl mx-auto">
+                {items?.map((item, i) => (
+                  <motion.a
+                    key={i}
+                    href={item.enlace}
+                    whileHover={{ x: 8 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex gap-6 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
+                  >
+                    <div className="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      {ICONS[item.icono] || ICONS["star"]}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold mb-1">{item.titulo}</h3>
+                      <p className="text-gray-600 text-sm">{item.descripcion}</p>
+                    </div>
+                  </motion.a>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── NEWSLETTER CON POPUP ────────────────────────────── */
+    Newsletter: {
+      fields: {
+        titulo: { type: "text" },
+        descripcion: { type: "textarea" },
+        placeholder: { type: "text" },
+        botonLabel: { type: "text" },
+        botonUrl: { type: "text" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Suscríbete a nuestro boletín",
+        descripcion: "Recibe las mejores ofertas y noticias directamente en tu correo.",
+        placeholder: "tu@correo.com",
+        botonLabel: "Suscribirse",
+        botonUrl: "#",
+        fondo: "bg-gradient-to-r from-blue-600 to-blue-700",
+        texto: "text-white",
+        padding: "y-lg",
+      },
+      render: ({ titulo, descripcion, placeholder, botonLabel, botonUrl, fondo, texto, padding }) => {
+        const [email, setEmail] = React.useState("");
+        const [showPopup, setShowPopup] = React.useState(false);
+        const [isValid, setIsValid] = React.useState(false);
+
+        const handleSubmit = (e: React.FormEvent) => {
+          e.preventDefault();
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailRegex.test(email)) {
+            setIsValid(true);
+            setShowPopup(true);
+            setEmail("");
+            setTimeout(() => setShowPopup(false), 3000);
+          } else {
+            setIsValid(false);
+          }
+        };
+
+        return (
+          <section className={`${fondo} ${texto} ${pad(padding)}`}>
+            <div className="max-w-2xl mx-auto text-center px-4 sm:px-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3">{titulo}</h2>
+              {descripcion && <p className="text-base sm:text-lg opacity-80 mb-6 sm:mb-8">{descripcion}</p>}
+              <motion.form
+                onSubmit={handleSubmit}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-white rounded-lg sm:rounded-2xl p-3 flex flex-col sm:flex-row gap-2 sm:gap-3 shadow-xl hover:shadow-2xl transition-shadow"
+              >
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={placeholder}
+                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none text-sm sm:text-base"
+                />
+                <button
+                  type="submit"
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-sm sm:text-base transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                >
+                  {botonLabel}
+                </button>
+              </motion.form>
+            </div>
+
+            {/* Success Popup */}
+            <AnimatePresence>
+              {showPopup && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/40 z-40"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: -50 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -50 }}
+                    transition={{ type: "spring", damping: 15 }}
+                    className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 sm:p-8 max-w-sm mx-4 shadow-2xl z-50"
+                  >
+                    <div className="text-center">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.1, type: "spring" }}
+                        className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                      >
+                        <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                      </motion.div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">¡Perfecto!</h3>
+                      <p className="text-gray-600 text-sm sm:text-base mb-6">Te hemos enviado un correo de confirmación. Revisa tu bandeja de entrada.</p>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setShowPopup(false)}
+                        className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-all text-sm sm:text-base"
+                      >
+                        Cerrar
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </section>
+        );
+      },
+    },
+
+    /* ── PASOS / PROCESO ─────────────────────────────────── */
+    Pasos: {
+      fields: {
+        titulo: { type: "text" },
+        items: {
+          type: "array",
+          arrayFields: {
+            numero: { type: "text" },
+            titulo: { type: "text" },
+            descripcion: { type: "textarea" },
+          },
+          defaultItemProps: { numero: "1", titulo: "Paso", descripcion: "Descripción del paso." },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Cómo funciona",
+        items: [
+          { numero: "1", titulo: "Crea tu cuenta", descripcion: "Es rápido, fácil y gratuito." },
+          { numero: "2", titulo: "Personaliza", descripcion: "Diseña tu sitio como desees." },
+          { numero: "3", titulo: "Publica", descripcion: "Tu sitio está listo para el mundo." },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, items, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-5xl mx-auto">
+            {titulo && <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">{titulo}</h2>}
+            <div className="grid md:grid-cols-3 gap-8">
+              {items?.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="relative"
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-emerald-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-5 shadow-lg">
+                      {item.numero}
+                    </div>
+                    <h3 className="text-lg font-bold mb-2">{item.titulo}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{item.descripcion}</p>
+                  </div>
+                  {i < items.length - 1 && <div className="hidden md:block absolute -right-4 top-8 w-8 h-0.5 bg-gradient-to-r from-blue-400 to-transparent" />}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── COMPARATIVA (ANTES/DESPUÉS) ─────────────────────── */
+    Comparativa: {
+      fields: {
+        titulo: { type: "text" },
+        descripcion: { type: "textarea" },
+        imagen1Url: { type: "text" },
+        imagen2Url: { type: "text" },
+        label1: { type: "text" },
+        label2: { type: "text" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "El cambio es visible",
+        descripcion: "Mira la transformación que hemos logrado",
+        imagen1Url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80",
+        imagen2Url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80",
+        label1: "Antes", label2: "Después",
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, descripcion, imagen1Url, imagen2Url, label1, label2, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-5xl mx-auto">
+            {titulo && <h2 className="text-3xl md:text-4xl font-bold text-center mb-3">{titulo}</h2>}
+            {descripcion && <p className="text-center text-lg opacity-60 mb-12 max-w-2xl mx-auto">{descripcion}</p>}
+            <div className="grid md:grid-cols-2 gap-8">
+              {imagen1Url && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="relative rounded-2xl overflow-hidden shadow-lg"
+                >
+                  <img src={imagen1Url} alt={label1} className="w-full h-80 object-cover" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                    <p className="text-white text-lg font-bold">{label1}</p>
+                  </div>
+                </motion.div>
+              )}
+              {imagen2Url && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="relative rounded-2xl overflow-hidden shadow-lg"
+                >
+                  <img src={imagen2Url} alt={label2} className="w-full h-80 object-cover" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                    <p className="text-white text-lg font-bold">{label2}</p>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── PORTFOLIO GRID ──────────────────────────────────── */
+    PortfolioGrid: {
+      fields: {
+        titulo: { type: "text" },
+        items: {
+          type: "array",
+          arrayFields: {
+            imagen: { type: "text" },
+            titulo: { type: "text" },
+            categoria: { type: "text" },
+            enlace: { type: "text" },
+          },
+          defaultItemProps: { imagen: "", titulo: "Proyecto", categoria: "Categoría", enlace: "#" },
+        },
+        columnas: { type: "number" },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "Nuestros proyectos",
+        items: [
+          { imagen: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop", titulo: "Proyecto 1", categoria: "Web Design", enlace: "#" },
+          { imagen: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop", titulo: "Proyecto 2", categoria: "Branding", enlace: "#" },
+          { imagen: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop", titulo: "Proyecto 3", categoria: "E-commerce", enlace: "#" },
+        ],
+        columnas: 3,
+        fondo: "bg-gray-50", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, items, columnas, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-6xl mx-auto">
+            {titulo && <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">{titulo}</h2>}
+            <div className={`grid ${gridCols(columnas)} gap-6`}>
+              {items?.map((item, i) => (
+                <motion.a
+                  key={i}
+                  href={item.enlace}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.3 }}
+                  className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-2xl transition-all"
+                >
+                  {item.imagen
+                    ? <img src={item.imagen} alt={item.titulo} className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500" />
+                    : <div className="w-full h-56 bg-gradient-to-br from-gray-200 to-gray-100" />}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform">
+                    <p className="text-xs font-semibold text-blue-400 mb-1">{item.categoria}</p>
+                    <h3 className="text-lg font-bold">{item.titulo}</h3>
+                  </div>
+                </motion.a>
+              ))}
+            </div>
+          </div>
+        </section>
+      ),
+    },
+
+    /* ── EQUIPO COMPACTO ─────────────────────────────────── */
+    EquipoCompacto: {
+      fields: {
+        titulo: { type: "text" },
+        miembros: {
+          type: "array",
+          arrayFields: {
+            nombre: { type: "text" },
+            rol: { type: "text" },
+            foto: { type: "text" },
+          },
+          defaultItemProps: { nombre: "Nombre", rol: "Cargo", foto: "" },
+        },
+        fondo: { type: "select", options: bgOpts.map(v => ({ label: v, value: v })) },
+        texto: { type: "select", options: textOpts.map(v => ({ label: v, value: v })) },
+        padding: { type: "select", options: Object.keys(pads).map(v => ({ label: v, value: v })) },
+      },
+      defaultProps: {
+        titulo: "El equipo",
+        miembros: [
+          { nombre: "Juan", rol: "CEO", foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop" },
+          { nombre: "María", rol: "Diseñadora", foto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop" },
+          { nombre: "Carlos", rol: "Desarrollador", foto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop" },
+        ],
+        fondo: "bg-white", texto: "text-gray-900", padding: "y-lg",
+      },
+      render: ({ titulo, miembros, fondo, texto, padding }) => (
+        <section className={`${fondo} ${texto} ${pad(padding)}`}>
+          <div className="max-w-5xl mx-auto">
+            {titulo && <h2 className="text-3xl font-bold text-center mb-10">{titulo}</h2>}
+            <div className="flex flex-wrap justify-center gap-6">
+              {miembros?.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className="flex flex-col items-center group"
+                >
+                  <div className="relative mb-3 overflow-hidden rounded-full w-20 h-20 border-4 border-gray-100 group-hover:border-blue-300 transition-colors">
+                    {m.foto
+                      ? <img src={m.foto} alt={m.nombre} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      : <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100 flex items-center justify-center"><UserRound className="w-10 h-10 text-gray-400" /></div>}
+                  </div>
+                  <p className="font-semibold text-sm">{m.nombre}</p>
+                  <p className="text-xs text-gray-500">{m.rol}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ),
     },
 
   },
