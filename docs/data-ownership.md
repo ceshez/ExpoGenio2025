@@ -89,8 +89,9 @@ Recommended fields:
 id
 ownerId
 displayName
-publicId
 slug
+publicId
+publicSlug
 status
 primaryDomainId
 createdAt
@@ -109,8 +110,9 @@ Responsibilities:
 Field meanings:
 
 - `displayName`: friendly name shown in the dashboard. Not unique.
-- `publicId`: random stable identifier. Globally unique.
-- `slug`: human-readable Genio-hosted identifier. Globally unique if used in `/s/{slug}` URLs.
+- `slug`: internal dashboard slug. Unique per owner, not globally.
+- `publicId`: random stable identifier. Globally unique. Used for legacy and fallback public URLs.
+- `publicSlug`: human-readable public Genio-hosted identifier. Globally unique when present. Used for friendly `/s/{publicSlug}` URLs.
 - `status`: site lifecycle state.
 - `primaryDomainId`: optional preferred custom domain for canonical URLs later.
 
@@ -123,6 +125,13 @@ unpublished
 archived
 deleted
 ```
+
+Rules:
+
+- `ownerId + slug` should be unique.
+- `publicId` must be globally unique.
+- `publicSlug` must be globally unique when present.
+- `displayName` should not be unique.
 
 ### CustomDomain
 
@@ -137,6 +146,7 @@ domain
 status
 verificationToken
 verifiedAt
+activatedAt
 isPrimary
 createdAt
 updatedAt
@@ -147,15 +157,25 @@ Recommended statuses:
 ```txt
 pending
 verified
+active
 failed
 disabled
 ```
 
+Status meanings:
+
+- `pending`: domain was added but DNS has not been verified.
+- `verified`: user proved ownership, usually through DNS TXT.
+- `active`: domain points to Genio and can render the site.
+- `failed`: verification or routing failed.
+- `disabled`: domain is intentionally disabled.
+
 Rules:
 
 - `domain` must be globally unique.
-- Only verified active domains should render public sites.
+- Only active domains should render public sites.
 - A domain points to exactly one `Site`.
+- `verified` is not enough to render if the domain does not point to Genio yet.
 
 ### PageMetadata
 
@@ -205,7 +225,7 @@ Rules:
 - Deleted pages should not render publicly.
 - Deleted pages may still reserve their slug until permanently deleted or restored with a new slug.
 
-### Product
+### Product - Future Store Phase
 
 `Product` should live in Prisma/PostgreSQL because it is structured business data.
 
@@ -235,8 +255,9 @@ Rules:
 
 - `siteId + slug` should be unique.
 - Products should not be stored as Puck-only content.
+- Do not implement products until the site/page routing foundation is stable.
 
-### Collection
+### Collection - Future Store Phase
 
 `Collection` should live in Prisma/PostgreSQL because it groups products and owns a public route.
 
@@ -262,6 +283,7 @@ Responsibilities:
 Rules:
 
 - `siteId + slug` should be unique.
+- Do not implement collections until product data exists in Prisma.
 
 ### PageFavorite
 
@@ -371,7 +393,7 @@ MongoDB should not be needed for normal dashboard lists unless showing a content
 Public rendering should:
 
 ```txt
-1. Resolve Site by Genio-hosted URL or custom domain.
+1. Resolve Site by Genio-hosted URL or active custom domain.
 2. Resolve the site-local resource in Prisma.
 3. Confirm Site and resource are published and not deleted.
 4. Load Mongo publishedContent by pageId when rendering a Puck page.
@@ -424,8 +446,8 @@ These must be unique across all of Genio:
 
 ```txt
 Site.publicId
+Site.publicSlug, when present
 CustomDomain.domain
-Site.slug, if used as a public /s/{slug} identifier
 ```
 
 ### Unique Per User
@@ -433,7 +455,7 @@ Site.slug, if used as a public /s/{slug} identifier
 These may be unique only within one user's workspace:
 
 ```txt
-Internal site dashboard slug, if separate from public slug
+Site.slug
 ```
 
 ### Unique Per Site
@@ -458,6 +480,35 @@ Collection title
 ```
 
 This allows many users to have sites with the same display name.
+
+## First Implementation Scope
+
+The first implementation should focus only on the site/page foundation:
+
+```txt
+Site
+PageMetadata
+PageFavorite
+PuckContent linking
+legacy /{publicId}
+/s/{siteIdentifier}
+draftContent / publishedContent separation
+```
+
+Do not implement these in the first migration unless explicitly requested:
+
+```txt
+Product
+Collection
+CustomDomain
+Inventory
+Checkout
+Order requests
+Billing
+AI credits
+```
+
+Those features are future phases that depend on stable site/page ownership.
 
 ## Migration Plan From the Current Mongo Page Model
 
@@ -558,7 +609,7 @@ Migration:
 Once Prisma site/page resolution is stable:
 
 - Stop using Mongo `path` as the ownership key.
-- Use `Site.publicId` or custom domain to resolve the site.
+- Use `Site.publicId`, `Site.publicSlug`, or custom domain to resolve the site.
 - Use `PageMetadata.slug`, `Product.slug`, or `Collection.slug` inside the site.
 - Keep legacy read fallback until all existing links are migrated.
 
