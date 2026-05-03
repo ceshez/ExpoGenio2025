@@ -42,7 +42,39 @@ genio-flame.vercel.app/ZyxMaenr6Q
 
 That legacy route should resolve `ZyxMaenr6Q` as a site public ID and render the site's home page.
 
-## 2. Recommended URL Formats
+## 2. Public Site Identity
+
+Genio should separate internal identity from public URL identity.
+
+Recommended fields:
+
+```txt
+Site.id           -> internal database ID, never used as the public URL
+Site.displayName  -> friendly dashboard name, not unique
+Site.slug         -> internal dashboard slug, unique per owner
+Site.publicId     -> random public fallback ID, globally unique
+Site.publicSlug   -> friendly public Genio URL slug, globally unique and optional
+```
+
+Examples:
+
+```txt
+User A:
+displayName = "Tienda Maria"
+slug = "tienda-maria"
+publicSlug = "tienda-maria"
+publicId = "ZyxMaenr6Q"
+
+User B:
+displayName = "Tienda Maria"
+slug = "tienda-maria"
+publicSlug = "tienda-maria-2"
+publicId = "Abc92LmPx"
+```
+
+`publicId` is the safest compatibility identifier. `publicSlug` is the friendly sharing identifier. `slug` is only for internal organization unless a task explicitly changes that rule.
+
+## 3. Recommended URL Formats
 
 ### Legacy Compatibility
 
@@ -52,7 +84,7 @@ Keep this working:
 https://genio-flame.vercel.app/ZyxMaenr6Q
 ```
 
-This resolves to the site home page.
+This resolves to the site home page by treating `ZyxMaenr6Q` as `Site.publicId`.
 
 ### Genio-Hosted URLs
 
@@ -68,6 +100,15 @@ https://genio.cr/s/cafe-pura-vida/contacto
 ```
 
 The `/s` namespace means "public site hosted by Genio".
+
+The `{siteIdentifier}` can resolve by either:
+
+```txt
+Site.publicId
+Site.publicSlug
+```
+
+Use `publicSlug` for friendly new links when available. Keep `publicId` as the stable fallback.
 
 ### Custom-Domain URLs
 
@@ -91,7 +132,7 @@ https://tiendamaria.com/tienda-maria/productos
 
 The custom domain already identifies the `Site`.
 
-## 3. Genio-Hosted URLs vs Custom-Domain URLs
+## 4. Genio-Hosted URLs vs Custom-Domain URLs
 
 Genio-hosted URLs need a site identifier in the path because many user sites share the same Genio host:
 
@@ -116,7 +157,7 @@ https://tiendamaria.com
 
 Both can point to the same site.
 
-## 4. URL Resolution Algorithm
+## 5. URL Resolution Algorithm
 
 Public routing should classify the host first, then resolve the site, then resolve the site-local resource.
 
@@ -151,7 +192,7 @@ Resolution:
 ```txt
 1. Detect /s namespace.
 2. Read {siteIdentifier}.
-3. Resolve Site by publicId or public slug.
+3. Resolve Site by publicSlug first, then publicId.
 4. Confirm Site is active/published and not deleted.
 5. Resolve the remaining path as a site-local route.
 ```
@@ -166,7 +207,7 @@ Resolution:
 
 ```txt
 1. If the path is not a reserved Genio app route, treat the first segment as a possible legacy Site.publicId.
-2. Resolve Site by publicId.
+2. Resolve Site by publicId only.
 3. Confirm Site is active/published and not deleted.
 4. Resolve to the home page.
 ```
@@ -189,10 +230,11 @@ Resolution:
 
 ```txt
 1. Normalize the request host.
-2. Find active verified CustomDomain by domain.
-3. Resolve the linked Site.
-4. Confirm Site is active/published and not deleted.
-5. Treat the full path as a site-local route.
+2. Find CustomDomain by domain.
+3. Confirm CustomDomain.status is active.
+4. Resolve the linked Site.
+5. Confirm Site is active/published and not deleted.
+6. Treat the full path as a site-local route.
 ```
 
 Do not require the site slug after a custom domain.
@@ -204,8 +246,8 @@ Once the `Site` is known, resolve the remaining path:
 ```txt
 /                         -> home page
 /pages/{slug}             -> PageMetadata
-/products/{slug}          -> Product
-/collections/{slug}       -> Collection
+/products/{slug}          -> Product, future phase
+/collections/{slug}       -> Collection, future phase
 /{slug}                   -> PageMetadata shortcut
 ```
 
@@ -216,10 +258,10 @@ Site must be published/active.
 Resource must be published/active.
 Deleted resources must not render.
 Puck pages load Mongo publishedContent by pageId.
-Products and collections load structured Prisma data.
+Products and collections load structured Prisma data when those features exist.
 ```
 
-## 5. Home Page Resolution Rules
+## 6. Home Page Resolution Rules
 
 For Genio-hosted URLs:
 
@@ -259,9 +301,9 @@ Rules:
 - If no published home page exists, return 404 or a simple unpublished state.
 - Do not resolve the home page by Mongo path.
 
-## 6. Page/Product/Collection Namespace Rules
+## 7. Page/Product/Collection Namespace Rules
 
-Recommended reserved namespaces:
+Recommended reserved site-local namespaces:
 
 ```txt
 /pages
@@ -278,9 +320,14 @@ Near-term priority:
 
 ```txt
 /pages/{pageSlug}
+/{pageSlug}
+```
+
+Future store priority:
+
+```txt
 /products/{productSlug}
 /collections/{collectionSlug}
-/{pageSlug}
 ```
 
 ### Pages
@@ -305,7 +352,7 @@ Rules:
 - Reserved namespace names should not be allowed as page slugs unless Genio explicitly supports overrides later.
 - Puck content is loaded through `PageMetadata.id`.
 
-### Products
+### Products - Future Phase
 
 Product route:
 
@@ -318,8 +365,9 @@ Rules:
 - `Product.slug` is unique per site.
 - Product identity, price, status, and inventory belong in Prisma.
 - Puck can later provide product page templates, but product data should stay relational.
+- Do not implement product routing until product data exists in Prisma.
 
-### Collections
+### Collections - Future Phase
 
 Collection route:
 
@@ -332,8 +380,46 @@ Rules:
 - `Collection.slug` is unique per site.
 - Collection identity and product grouping belong in Prisma.
 - Puck can later provide collection page templates, but collection data should stay relational.
+- Do not implement collection routing until collection data exists in Prisma.
 
-## 7. Custom Domain Resolution Rules
+## 8. Reserved Routes and Slugs
+
+Reserved Genio app routes should not be used as legacy `/{publicId}` routes or public site slugs:
+
+```txt
+dashboard
+login
+register
+api
+puck
+admin
+s
+pricing
+blog
+templates
+settings
+account
+help
+```
+
+Reserved site-local namespaces should not be used as page slugs unless Genio intentionally supports overrides later:
+
+```txt
+pages
+products
+collections
+cart
+checkout
+search
+account
+blog
+api
+admin
+```
+
+Public IDs should be generated so they cannot match reserved app routes.
+
+## 9. Custom Domain Resolution Rules
 
 Custom domains should resolve to the same internal `Site` as Genio-hosted URLs.
 
@@ -346,15 +432,46 @@ https://tiendamaria.com
 
 Both can resolve to the same `Site.id`.
 
+Recommended domain statuses:
+
+```txt
+pending   -> user added the domain, but DNS has not been verified
+verified  -> user proved ownership through DNS, usually TXT
+active    -> domain points to Genio and can render the site
+failed    -> verification or routing failed
+disabled  -> domain is intentionally disabled
+```
+
 Rules:
 
 - A custom domain identifies the site by host.
 - A custom-domain URL should never require `/s/{siteIdentifier}`.
 - A custom-domain URL should never require the site slug after the domain.
-- Only verified active custom domains should render public sites.
+- Only active custom domains should render public sites.
+- `verified` is not enough to render if the domain does not point to Genio yet.
 - Genio may later redirect Genio-hosted URLs to the primary custom domain.
 
-## 8. Migration Plan From Current `/{publicId}` Model
+## 10. Canonical URL Behavior
+
+A site may have multiple public URLs:
+
+```txt
+https://genio.cr/s/ZyxMaenr6Q
+https://genio.cr/s/cafe-pura-vida
+https://tiendamaria.com
+```
+
+Near-term recommendation:
+
+- Do not automatically redirect Genio-hosted URLs when a custom domain is added.
+- Add canonical metadata later so search engines know the preferred URL.
+
+Future recommendation:
+
+- Let users choose a primary domain.
+- If a primary custom domain is active, optionally redirect Genio-hosted URLs to it.
+
+## 11. Migration Plan From Current `/{publicId}` Model
 
 ### Phase 1: Keep Current Public Route Working
 
@@ -413,7 +530,7 @@ Add:
 
 Start with pages before adding store routes.
 
-### Phase 5: Add Product and Collection Namespaces
+### Phase 5: Add Product and Collection Namespaces - Future Store Phase
 
 Add:
 
@@ -424,7 +541,7 @@ Add:
 
 Only add these after product and collection data exists in Prisma.
 
-### Phase 6: Add Custom Domains
+### Phase 6: Add Custom Domains - Future Domain Phase
 
 Add host-based site resolution:
 
@@ -434,7 +551,9 @@ customdomain.com/contacto -> page slug contacto
 customdomain.com/products/camisa-roja -> product slug camisa-roja
 ```
 
-## 9. Risks and Tradeoffs
+Only add this after `Site`, `PageMetadata`, `/s/{siteIdentifier}`, and Mongo `pageId/siteId` linking are stable.
+
+## 12. Risks and Tradeoffs
 
 ### Legacy Root Routes Can Conflict With App Routes
 
@@ -486,20 +605,21 @@ Many users may want:
 Mitigation:
 
 - Keep `publicId` as the guaranteed fallback.
-- Make public `Site.slug` globally unique if used in `/s/{slug}`.
+- Make `Site.publicSlug` globally unique if used in `/s/{publicSlug}`.
+- Keep `Site.slug` as an internal dashboard slug unique per owner.
 - Suggest suffixes like `cafe-pura-vida-2`.
 
-## 10. Recommended Implementation Phases for Later Use With 5.3-Codex
+## 13. Recommended Implementation Phases for Later Use With 5.3-Codex
 
-1. Add or keep `docs/data-ownership.md` as the source of truth for database responsibilities.
+1. Keep `docs/data-ownership.md` as the source of truth for database responsibilities.
 2. Keep `docs/public-routing.md` focused on public URL behavior.
-3. Add Prisma `Site` and `PageMetadata`.
+3. Add Prisma `Site` and `PageMetadata` only.
 4. Backfill current `/{publicId}` pages into `Site + home PageMetadata`.
 5. Build a single public route resolver that accepts `host` and `pathname`.
 6. Support both `/{publicId}` and `/s/{siteIdentifier}`.
 7. Link Mongo Puck content to `siteId/pageId`.
 8. Separate `draftContent` and `publishedContent`.
 9. Add `/pages/{slug}` and `/{pageSlug}`.
-10. Add products and collections when store data exists.
-11. Add custom domain verification and host-based site resolution.
+10. Add products and collections only when store data exists.
+11. Add custom domain verification and host-based site resolution later.
 12. Clean up legacy path-based Mongo reads only after all existing links are migrated.
