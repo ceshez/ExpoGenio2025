@@ -38,6 +38,17 @@ Future areas:
 8. AI-assisted site generation.
 9. SaaS plans, limits, billing, and analytics.
 
+## Source-of-truth documents
+
+Use these documents when making architectural changes:
+
+- `docs/data-ownership.md`: source of truth for Prisma/PostgreSQL vs MongoDB responsibilities, ownership rules, status, favorites, deleted state, publishing state, and migration phases.
+- `docs/public-routing.md`: source of truth for public URL behavior, legacy `/{publicId}` links, future `/s/{siteIdentifier}` links, custom-domain routing, route namespaces, and home page resolution.
+- `docs/puck-editor.md`: source of truth for editor behavior and Puck component rules.
+- `docs/design-system.md`: source of truth for Genio visual/UI rules.
+
+Before changing Prisma models, Mongo page/content documents, public routes, publishing, or ownership checks, read `docs/data-ownership.md` and `docs/public-routing.md` first.
+
 ## Routing structure
 
 Important current routes include:
@@ -120,9 +131,15 @@ Do not modularize everything at once. Do it gradually when adding or refactoring
 
 Genio currently uses two persistence layers.
 
+For the detailed target model, ownership boundaries, and migration phases, use:
+
+```txt
+docs/data-ownership.md
+```
+
 ### PostgreSQL / Prisma
 
-Prisma is used for structured relational data such as:
+Prisma is currently used for structured relational data such as:
 
 - Users.
 - Roles.
@@ -138,11 +155,53 @@ Current Prisma schema includes:
 - `PreAuthToken`.
 - `Role` enum with `USER`, `SUBADMIN`, and `ADMIN`.
 
+Future Prisma responsibilities should include:
+
+- `Site`.
+- `PageMetadata`.
+- `PageFavorite`.
+- `CustomDomain` in a later domain phase.
+- `Product` and `Collection` in a later store phase.
+
 ### MongoDB / Mongoose
 
-MongoDB is used for editable page documents and Puck page content.
+MongoDB is currently used for editable page documents and Puck page content.
 
 This makes sense because Puck content is flexible JSON-like structured content that can change as components evolve.
+
+Future MongoDB responsibilities should be limited to flexible Puck content, especially:
+
+- `draftContent`.
+- `publishedContent`.
+- component tree data.
+- future Puck-backed templates.
+
+MongoDB should not be the long-term source of truth for ownership, favorites, deleted state, published state, domains, products, collections, or SaaS permissions.
+
+## Public routing architecture
+
+For the detailed public URL model, use:
+
+```txt
+docs/public-routing.md
+```
+
+Target public routing rule:
+
+```txt
+Host or /s/{siteIdentifier} resolves Site.
+The remaining path resolves a site-local page, product, or collection.
+Prisma owns identity and status.
+MongoDB renders only flexible Puck content.
+```
+
+Important routing principles:
+
+- Keep current `/{publicId}` links working as legacy compatibility.
+- Treat the current random public segment as `Site.publicId` in the future model.
+- Use `/s/{siteIdentifier}` for future Genio-hosted public links.
+- Custom domains identify the `Site` by host and should not require the site slug in the path.
+- Page slugs are unique inside a site, not globally.
 
 ## Data ownership rules
 
@@ -155,6 +214,7 @@ Rules:
 - Public/published pages may be readable without session, but private editor state must not be exposed.
 - Dashboard queries should only return data owned by the current user.
 - Favor selecting only required fields.
+- For future ownership changes, Prisma should verify ownership before MongoDB loads draft Puck content.
 
 ## Authentication architecture
 
@@ -205,6 +265,7 @@ Rules:
 - Published pages should not require login unless the site/page is explicitly private in the future.
 - Published pages should render the same component content as the editor preview when possible.
 - Do not let editor-only UI leak into published pages.
+- Public rendering should eventually load published Puck content by `pageId`, not global Mongo path.
 
 ## Future store architecture
 
@@ -213,9 +274,9 @@ Store features should be added gradually.
 Recommended future entities:
 
 - `Site`.
-- `Page` metadata if moved or mirrored into Prisma.
+- `PageMetadata`.
 - `Product`.
-- `Category`.
+- `Collection`.
 - `InventoryMovement`.
 - `CustomerRequest` or `OrderRequest`.
 - `StoreSettings`.
@@ -228,6 +289,8 @@ Recommended approach:
 4. Add customer request flow.
 5. Add inventory tracking.
 6. Add notifications and analytics later.
+
+Do not add product and collection routing until structured store data exists in Prisma.
 
 ## Future AI architecture
 
@@ -283,6 +346,7 @@ Highest priority:
 3. Organized Puck components.
 4. Clean dashboard UX.
 5. Clear separation between editor, dashboard, and published pages.
+6. Gradual migration from global Mongo path toward `Site + PageMetadata + PuckContent`.
 
 Medium priority:
 
@@ -306,6 +370,7 @@ Lower priority until SaaS launch:
 - Old README references may become outdated when package versions change.
 - Editor-only logic must stay separate from published page rendering.
 - Public routes must not accidentally expose user-owned private content.
+- Current global Mongo `path` behavior should be treated as legacy, not as the long-term ownership model.
 
 ## Documentation rule
 
@@ -316,3 +381,7 @@ Update this file when:
 - Prisma or MongoDB responsibilities change.
 - Puck architecture changes.
 - Store or AI architecture becomes real implementation.
+
+Update `docs/data-ownership.md` when database responsibility or ownership rules change.
+
+Update `docs/public-routing.md` when public URL behavior, legacy route compatibility, `/s/{siteIdentifier}`, route namespaces, or custom-domain behavior changes.
