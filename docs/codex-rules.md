@@ -14,6 +14,8 @@ Always read the relevant docs before making changes:
 - `docs/architecture.md` for technical structure.
 - `docs/design-system.md` for UI and visual rules.
 - `docs/puck-editor.md` when modifying Puck components, editor routes, saved page data, preview, or publishing behavior.
+- `docs/data-ownership.md` before modifying Prisma models, Mongo page/content models, ownership checks, favorites, deleted state, publishing state, or site/page data.
+- `docs/public-routing.md` before modifying public routes, published page rendering, legacy `/{publicId}` behavior, `/s/{siteIdentifier}` behavior, route namespaces, or custom-domain logic.
 
 ## General coding rules
 
@@ -50,14 +52,18 @@ Always read the relevant docs before making changes:
 - Do not break published page rendering while changing editor behavior.
 - Header, footer, product, media, and section components should work both in editor preview and published output.
 
-## Data and persistence rules
+## Data, routing, and persistence rules
 
-- Prisma/PostgreSQL currently handles users, roles, favorites, and authentication-related data.
-- MongoDB/Mongoose currently handles editable page content and published page data.
+- Follow `docs/data-ownership.md` for all ownership and database responsibility decisions.
+- Follow `docs/public-routing.md` for all public URL and route resolution decisions.
+- Prisma/PostgreSQL should be the source of truth for users, ownership, site/page metadata, favorites, deleted state, published state, custom domains, products, collections, and future SaaS data.
+- MongoDB/Mongoose should store flexible Puck content, including draft and published content.
 - Be careful when moving data between Prisma and MongoDB; document the reason first.
 - Do not mix persistence responsibilities without a clear migration plan.
 - Use minimal selected fields when querying user-owned data.
 - Always preserve ownership checks for private editor/page data.
+- Do not deepen dependence on global Mongo `path` as the long-term ownership key.
+- Keep legacy `/{publicId}` public links working unless explicitly instructed otherwise.
 
 ## Authentication and security rules
 
@@ -95,7 +101,31 @@ Use this order:
 3. Make the smallest working version.
 4. Add only necessary UI.
 5. Preserve existing behavior.
-6. Update documentation if the feature changes architecture, data, or product behavior.
+6. Update documentation if the feature changes architecture, data, routing, or product behavior.
+
+## First implementation scope reminder
+
+For the future site/page migration, do not implement everything at once.
+
+Near-term foundation:
+
+- `Site`.
+- `PageMetadata`.
+- `PageFavorite`.
+- Puck content linked by `siteId/pageId`.
+- Legacy `/{publicId}` compatibility.
+- Future `/s/{siteIdentifier}` support.
+- Draft vs published Puck content.
+
+Future phases:
+
+- Products.
+- Collections.
+- Custom domains.
+- Inventory.
+- Checkout/order requests.
+- Billing.
+- AI credits.
 
 ## End-of-task response format
 
