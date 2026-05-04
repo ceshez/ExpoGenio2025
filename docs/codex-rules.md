@@ -6,11 +6,24 @@ These rules are the default operating guide for any AI coding work in this repos
 
 Genio is a no-code / low-code website builder for entrepreneurs, small businesses, stores, and service providers. The product must stay simple for non-technical users while remaining scalable enough to become a real SaaS platform.
 
+The core brand line is:
+
+```txt
+Genio: Tu web, tu manera.
+```
+
+For visual identity, logo meaning, typography, colors, and brand motifs, read:
+
+```txt
+docs/brand-identity.md
+```
+
 ## Before coding
 
 Always read the relevant docs before making changes:
 
 - `docs/product-vision.md` for product direction.
+- `docs/brand-identity.md` for brand identity, logo concept, color usage, typography, and visual motifs.
 - `docs/architecture.md` for technical structure.
 - `docs/design-system.md` for UI and visual rules.
 - `docs/puck-editor.md` when modifying Puck components, editor routes, saved page data, preview, or publishing behavior.
@@ -33,9 +46,15 @@ Always read the relevant docs before making changes:
 - Avoid using `any` unless there is a clear temporary reason.
 - Avoid hardcoded user/business data in reusable components.
 
-## UI rules
+## Brand and UI rules
 
-- Follow `docs/design-system.md`.
+- Follow `docs/brand-identity.md` for brand meaning and visual identity.
+- Follow `docs/design-system.md` for UI rules.
+- Genio should communicate `Tu web, tu manera`.
+- Use the logo-inspired visual language carefully: modular blocks, geometric cards, play/start details, sliders/controls, editable panels, and drag-and-drop object patterns.
+- Use deep blue, purple, and bright blue as the core brand palette.
+- Use turquoise and warm accents as support, not as replacements for the main identity.
+- Keep the experience warm, approachable, professional, and empowering for small business owners and women-owned SMEs without becoming stereotypically feminine, childish, or overly decorative.
 - Use Tailwind CSS and existing UI patterns.
 - Prefer shadcn/Radix-style primitives when already present.
 - Keep interfaces responsive.
@@ -101,7 +120,7 @@ Use this order:
 3. Make the smallest working version.
 4. Add only necessary UI.
 5. Preserve existing behavior.
-6. Update documentation if the feature changes architecture, data, routing, or product behavior.
+6. Update documentation if the feature changes architecture, data, routing, brand, UI, or product behavior.
 
 ## First implementation scope reminder
 
